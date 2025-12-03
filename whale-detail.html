@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Whale Species - Whale Migration Guide</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="page-enter">
+    <!-- Navigation Bar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <span class="whale-icon">🐋</span>
+                <span class="brand-text">Whale Migration Guide</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link">Species Tracking</a>
+                <a href="whale-species-gallery.html" class="nav-link active">Whale Species</a>
+                <a href="#" class="nav-link disabled">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Detail Page Content -->
+    <main class="species-detail">
+        <!-- Hero Section -->
+        <div class="species-hero" id="speciesHero">
+            <img class="species-hero-image" id="heroImage" src="" alt="">
+            <div class="species-hero-overlay"></div>
+            <a href="whale-species-gallery.html" class="species-back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Species
+            </a>
+            <div class="species-hero-content">
+                <div class="species-hero-category" id="heroCategory"></div>
+                <h1 class="species-hero-title" id="heroTitle"></h1>
+                <p class="species-hero-scientific" id="heroScientific"></p>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="species-content">
+            <!-- Main Content -->
+            <div class="species-main">
+                <section class="species-section">
+                    <h2 class="species-section-title">About This Species</h2>
+                    <p class="species-description" id="speciesDescription"></p>
+                </section>
+
+                <section class="species-section">
+                    <h2 class="species-section-title">Migration Pattern</h2>
+                    <p class="species-description" id="migrationPattern"></p>
+                </section>
+
+                <section class="species-section">
+                    <h2 class="species-section-title">Fun Facts</h2>
+                    <ul class="fun-facts-list" id="funFactsList"></ul>
+                </section>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="species-sidebar">
+                <!-- Stats Card -->
+                <div class="species-stats-card">
+                    <h3 class="species-stats-title">Quick Facts</h3>
+                    <div id="statsContainer"></div>
+                </div>
+
+                <!-- Map Card -->
+                <div class="species-map-card">
+                    <div class="species-map-header">
+                        <h3>Distribution Map</h3>
+                    </div>
+                    <div class="species-map-container" id="mapContainer">
+                        <!-- Map or placeholder will be rendered here -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="whale-species.js"></script>
+    <script>
+        // Get species ID from URL
+        function getSpeciesId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // Find species by ID
+        function findSpecies(id) {
+            return WHALE_SPECIES.find(s => s.id === id);
+        }
+
+        // Get status class
+        function getStatusClass(status) {
+            const statusMap = {
+                'Endangered': 'status-endangered',
+                'Vulnerable': 'status-vulnerable',
+                'Least Concern': 'status-least-concern',
+                'Data Deficient': 'status-data-deficient'
+            };
+            return statusMap[status] || 'status-data-deficient';
+        }
+
+        // Render species stats
+        function renderStats(stats) {
+            const container = document.getElementById('statsContainer');
+            const statsHTML = Object.entries(stats).map(([key, value]) => {
+                const label = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+                
+                if (key === 'status') {
+                    return `
+                        <div class="species-stat">
+                            <span class="species-stat-label">${label}</span>
+                            <span class="species-status ${getStatusClass(value)}">${value}</span>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="species-stat">
+                        <span class="species-stat-label">${label}</span>
+                        <span class="species-stat-value">${value}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = statsHTML;
+        }
+
+        // Render fun facts
+        function renderFunFacts(facts) {
+            const list = document.getElementById('funFactsList');
+            list.innerHTML = facts.map(fact => `<li>${fact}</li>`).join('');
+        }
+
+        // Get species config from config.js if available
+        function getSpeciesConfig(speciesId) {
+            const configMap = {
+                'blue-whale': SPECIES_CONFIG.find(s => s.id === 'blue_2008_heat'),
+                'humpback-whale': SPECIES_CONFIG.find(s => s.id === 'humpback_2019_heat'),
+                'sperm-whale': SPECIES_CONFIG.find(s => s.id === 'sperm_2019_heat')
+            };
+            return configMap[speciesId];
+        }
+
+        // Initialize map for species with data
+        function initMap(species) {
+            const container = document.getElementById('mapContainer');
+            const speciesConfig = getSpeciesConfig(species.id);
+            
+            if (!species.hasMapData || !speciesConfig) {
+                container.innerHTML = `
+                    <div class="species-map-placeholder">
+                        <div class="species-map-placeholder-icon">🗺️</div>
+                        <p>Migration map data coming soon.<br>Check back later for updates!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Create map
+            mapboxgl.accessToken = MAPBOX_TOKEN;
+            const map = new mapboxgl.Map({
+                container: container,
+                style: 'mapbox://styles/mapbox/light-v11',
+                center: [-130, 35],
+                zoom: 2,
+                interactive: true
+            });
+
+            // Add navigation controls
+            map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+            map.on('load', () => {
+                // Add source
+                map.addSource('species-data', {
+                    type: 'vector',
+                    url: speciesConfig.url
+                });
+
+                // Add heatmap layer
+                map.addLayer({
+                    id: 'species-heatmap',
+                    type: 'heatmap',
+                    source: 'species-data',
+                    'source-layer': speciesConfig.sourceLayer,
+                    maxzoom: 9,
+                    paint: {
+                        'heatmap-weight': 1,
+                        'heatmap-intensity': [
+                            'interpolate', ['linear'], ['zoom'],
+                            0, 0.5,
+                            5, 1.0,
+                            8, 1.5
+                        ],
+                        'heatmap-color': speciesConfig.color.heatmap,
+                        'heatmap-radius': [
+                            'interpolate', ['linear'], ['zoom'],
+                            0, 2,
+                            4, 12,
+                            8, 24
+                        ],
+                        'heatmap-opacity': 0.85
+                    }
+                }, 'waterway-label');
+            });
+        }
+
+        // Initialize page
+        function initPage() {
+            const speciesId = getSpeciesId();
+            const species = findSpecies(speciesId);
+
+            if (!species) {
+                window.location.href = 'whale-species-gallery.html';
+                return;
+            }
+
+            // Update page title
+            document.title = `${species.commonName} - Whale Migration Guide`;
+
+            // Update hero section
+            document.getElementById('heroImage').src = species.heroImage;
+            document.getElementById('heroImage').alt = species.commonName;
+            document.getElementById('heroCategory').textContent = species.category;
+            document.getElementById('heroTitle').textContent = species.commonName;
+            document.getElementById('heroScientific').textContent = species.scientificName;
+
+            // Update content
+            document.getElementById('speciesDescription').textContent = species.fullDescription;
+            document.getElementById('migrationPattern').textContent = species.migrationPattern;
+
+            // Render stats and facts
+            renderStats(species.stats);
+            renderFunFacts(species.funFacts);
+
+            // Initialize map
+            initMap(species);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

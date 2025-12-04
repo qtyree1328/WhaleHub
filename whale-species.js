@@ -15,9 +15,12 @@ const WHALE_SPECIES = [
         scientificName: 'Balaenoptera musculus',
         category: 'Baleen Whale',
         hasMapData: true,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg/1280px-Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg/1920px-Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg',
-        // heroImages: [], // Add multiple images here if needed
+        image: 'https://whalewatchersatlas.com/images/whales/Blue_whale1.webp',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/Blue_whale1.webp',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/Blue_whale1.webp',
+            'https://whalewatchersatlas.com/images/whales/Blue_whale2.jpg'
+        ],
         color: '#0066ff',
         shortDescription: 'The largest animal ever known to exist on Earth.',
         fullDescription: `The blue whale is the largest animal known to have ever existed, reaching lengths of up to 100 feet (30 meters) and weights of up to 200 tons. Despite their enormous size, blue whales feed almost exclusively on tiny shrimp-like animals called krill.
@@ -65,8 +68,16 @@ Their distinctive mottled blue-gray coloring and small dorsal fin make them iden
         scientificName: 'Megaptera novaeangliae',
         category: 'Baleen Whale',
         hasMapData: true,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Humpback_Whale_underwater_shot.jpg/1280px-Humpback_Whale_underwater_shot.jpg',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Humpback_Whale_underwater_shot.jpg/1920px-Humpback_Whale_underwater_shot.jpg',
+        image: 'https://whalewatchersatlas.com/images/whales/Humpback1.avif',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/Humpback1.avif',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/Humpback1.avif',
+            'https://whalewatchersatlas.com/images/whales/Humpback2.jpg',
+            'https://whalewatchersatlas.com/images/whales/Humpback3.jpg',
+            'https://whalewatchersatlas.com/images/whales/Humpback4.jpg',
+            'https://whalewatchersatlas.com/images/whales/Humpback5.jpg'
+            
+        ],
         color: '#00a65a',
         shortDescription: 'Famous for their spectacular breaching and complex songs.',
         fullDescription: `Humpback whales are among the most acrobatic of the great whales, known for their spectacular breaching displays where they launch their massive bodies almost entirely out of the water. They are also renowned for their complex and haunting songs, which can last for hours.
@@ -114,8 +125,13 @@ Humpbacks are found in all oceans and undertake one of the longest migrations of
         scientificName: 'Physeter macrocephalus',
         category: 'Toothed Whale',
         hasMapData: true,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Sperm_whale_pod.jpg/1280px-Sperm_whale_pod.jpg',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Sperm_whale_pod.jpg/1920px-Sperm_whale_pod.jpg',
+        image: 'https://whalewatchersatlas.com/images/whales/Sperm1.png',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/Sperm1.png',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/Sperm1.png',
+            'https://whalewatchersatlas.com/images/whales/Sperm2.jpg',
+            'https://whalewatchersatlas.com/images/whales/Sperm3.jpg'
+        ],
         color: '#d7263d',
         shortDescription: 'The largest toothed predator and deepest diving mammal.',
         fullDescription: `The sperm whale is the largest of all toothed whales and the largest toothed predator on Earth. Made famous by Herman Melville's "Moby Dick," these magnificent creatures possess the largest brain of any animal and can dive deeper than any other mammal.
@@ -163,8 +179,17 @@ They are found throughout the world's oceans, from the equator to the edges of p
         scientificName: 'Orcinus orca',
         category: 'Toothed Whale',
         hasMapData: false,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Killerwhales_jumping.jpg/1280px-Killerwhales_jumping.jpg',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Killerwhales_jumping.jpg/1920px-Killerwhales_jumping.jpg',
+        image: 'https://whalewatchersatlas.com/images/whales/orca1.webp',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/orca1.webp',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/orca1.webp',
+            'https://whalewatchersatlas.com/images/whales/Orca2.jpg',
+            'https://whalewatchersatlas.com/images/whales/Orca3.jpg',
+            'https://whalewatchersatlas.com/images/whales/Orca4.webp',
+            'https://whalewatchersatlas.com/images/whales/Orca5.jpg',
+            'https://whalewatchersatlas.com/images/whales/Orca6.webp',
+            'https://whalewatchersatlas.com/images/whales/Orca7.webp'
+        ],
         color: '#1a1a2e',
         shortDescription: 'Apex predators with complex social structures and cultures.',
         fullDescription: `Orcas, also known as killer whales, are actually the largest members of the dolphin family. They are apex predators found in every ocean, from the Arctic to the Antarctic. Their distinctive black and white coloring and tall dorsal fin make them instantly recognizable.
@@ -195,8 +220,14 @@ These highly intelligent creatures have been observed using sophisticated huntin
         scientificName: 'Eschrichtius robustus',
         category: 'Baleen Whale',
         hasMapData: false,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Ballena_gris_adulta_con_su_ballenato.jpg/1280px-Ballena_gris_adulta_con_su_ballenato.jpg',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Ballena_gris_adulta_con_su_ballenato.jpg/1920px-Ballena_gris_adulta_con_su_ballenato.jpg',
+        image: 'https://whalewatchersatlas.com/images/whales/Grey1.webp',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/Grey1.webp',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/Grey1.webp',
+            'https://whalewatchersatlas.com/images/whales/Grey2.webp',
+            'https://whalewatchersatlas.com/images/whales/Grey3.webp',
+            'https://whalewatchersatlas.com/images/whales/Grey4.jpg'
+        ],
         color: '#6c757d',
         shortDescription: 'Champion migrators traveling 12,000 miles annually.',
         fullDescription: `Gray whales are known for making one of the longest annual migrations of any mammal, traveling up to 12,000 miles round trip between their summer feeding grounds in the Arctic and their winter breeding lagoons in Baja California, Mexico.
@@ -227,8 +258,14 @@ Gray whales in the breeding lagoons of Mexico are famous for being "friendly," o
         scientificName: 'Balaenoptera physalus',
         category: 'Baleen Whale',
         hasMapData: false,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Fin_whale_from_air.jpg/1280px-Fin_whale_from_air.jpg',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Fin_whale_from_air.jpg/1920px-Fin_whale_from_air.jpg',
+        image: 'https://whalewatchersatlas.com/images/whales/fin1.jpg',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/fin1.jpg',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/fin1.jpg',
+            'https://whalewatchersatlas.com/images/whales/fin2.webp',
+            'https://whalewatchersatlas.com/images/whales/fin3.png',
+            'https://whalewatchersatlas.com/images/whales/fin4.webp'
+        ],
         color: '#495057',
         shortDescription: 'The "greyhound of the sea" and second-largest animal.',
         fullDescription: `The fin whale is the second-largest animal on Earth after the blue whale, reaching lengths of up to 85 feet. Known as the "greyhound of the sea" for its sleek body and impressive speed, fin whales can swim at speeds up to 23 mph in short bursts.
@@ -259,8 +296,14 @@ Fin whales are found in all oceans and are often seen in social groups. Despite 
         scientificName: 'Delphinapterus leucas',
         category: 'Toothed Whale',
         hasMapData: false,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Belugawal2.JPG/1280px-Belugawal2.JPG',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Belugawal2.JPG/1920px-Belugawal2.JPG',
+        image: 'https://whalewatchersatlas.com/images/whales/beluga1.avif',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/beluga1.avif',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/beluga1.avif',
+            'https://whalewatchersatlas.com/images/whales/beluga1.webp',
+            'https://whalewatchersatlas.com/images/whales/beluga2.webp',
+            'https://whalewatchersatlas.com/images/whales/beluga3.jpg'
+        ],
         color: '#f8f9fa',
         shortDescription: 'The "canary of the sea" with remarkable vocal abilities.',
         fullDescription: `Beluga whales are small, white whales known for their distinctive rounded forehead called a "melon" and their remarkable vocal abilities, which earned them the nickname "canary of the sea." They are highly social animals that live in groups and can produce a wide variety of sounds.
@@ -291,8 +334,13 @@ Belugas are found in Arctic and sub-Arctic waters, often congregating in estuari
         scientificName: 'Eubalaena australis',
         category: 'Baleen Whale',
         hasMapData: false,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Southern_right_whale.jpg/1280px-Southern_right_whale.jpg',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Southern_right_whale.jpg/1920px-Southern_right_whale.jpg',
+        image: 'https://whalewatchersatlas.com/images/whales/Southern_right3.jpg',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/Southern_right3.jpg',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/Southern_right3.jpg',
+            'https://whalewatchersatlas.com/images/whales/Southern_right_whale2.jpg',
+            'https://whalewatchersatlas.com/images/whales/southern-right-whale-1.webp'
+        ],
         color: '#343a40',
         shortDescription: 'Gentle giants that come remarkably close to shore.',
         fullDescription: `Southern right whales are large baleen whales named by early whalers who considered them the "right" whale to hunt—they were slow swimmers, floated when killed, and yielded large quantities of oil and baleen. This made them easy targets, and they were hunted nearly to extinction.
@@ -323,8 +371,14 @@ Southern right whales are found in southern hemisphere waters and are known for 
         scientificName: 'Balaenoptera acutorostrata',
         category: 'Baleen Whale',
         hasMapData: false,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Minke_whale_in_ross_sea.jpg/1280px-Minke_whale_in_ross_sea.jpg',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Minke_whale_in_ross_sea.jpg/1920px-Minke_whale_in_ross_sea.jpg',
+        image: 'https://whalewatchersatlas.com/images/whales/minke1.webp',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/minke1.webp',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/minke1.webp',
+            'https://whalewatchersatlas.com/images/whales/minke2.jpg',
+            'https://whalewatchersatlas.com/images/whales/minke3.jpg',
+            'https://whalewatchersatlas.com/images/whales/minke4.jpg'
+        ],
         color: '#20c997',
         shortDescription: 'The smallest and most abundant of the rorqual whales.',
         fullDescription: `Minke whales are the smallest of the rorqual whales (the family that includes blue, fin, and humpback whales) and are found in oceans worldwide. They are curious animals that often approach boats, making them popular with whale watchers.
@@ -355,8 +409,14 @@ Despite being the most abundant of the large baleen whales, minke whales face th
         scientificName: 'Balaenoptera brydei',
         category: 'Baleen Whale',
         hasMapData: false,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Brydes_whale.jpg/1280px-Brydes_whale.jpg',
-        heroImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Brydes_whale.jpg/1920px-Brydes_whale.jpg',
+        // still using Wikimedia until you add your own files for this species
+        image: 'https://whalewatchersatlas.com/images/whales/Bryde3.jpg',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/Bryde3.jpg',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/Bryde2.jpeg',
+            'https://whalewatchersatlas.com/images/whales/Bryde3.jpg',
+            'https://whalewatchersatlas.com/images/whales/bryde1.avif'
+        ],
         color: '#fd7e14',
         shortDescription: 'Tropical residents with three distinctive head ridges.',
         fullDescription: `Bryde's whales (pronounced "broo-dus") are medium-sized baleen whales that prefer warmer waters than most other baleen whale species. They are named after Johan Bryde, a Norwegian consul who helped establish the first whaling station in South Africa.
@@ -382,6 +442,7 @@ Bryde's whales are known for their unpredictable behavior. They may surface erra
         ]
     }
 ];
+
 
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Location Details - Whale Migration Guide</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a4a7c;
+            --primary-light: #1a6db0;
+            --accent: #00c9a7;
+            --text: #1a2b3c;
+            --text-muted: #5a6d7e;
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --border: #e2e8f0;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.25s ease;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f1f5f9; color: var(--text); line-height: 1.6; }
+        
+        /* Navigation */
+        #navbar { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); padding: 0 24px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 64px; }
+        .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; font-weight: 700; font-size: 18px; }
+        .whale-icon { font-size: 24px; }
+        .nav-links { display: flex; gap: 8px; }
+        .nav-link { color: rgba(255,255,255,0.85); text-decoration: none; padding: 8px 16px; border-radius: 8px; font-weight: 500; font-size: 14px; transition: all var(--transition-fast); }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
+
+        /* Page Layout */
+        .location-detail { max-width: 1400px; margin: 0 auto; padding: 0 24px 48px; }
+        
+        /* Hero Section */
+        .location-hero { position: relative; height: 450px; margin: 0 -24px 32px; overflow: hidden; background: #1a2b3c; }
+        .location-hero-image { width: 100%; height: 100%; object-fit: cover; }
+        .location-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 40%, transparent 100%); }
+        .location-hero-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 40px; color: white; }
+        .location-hero-region { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; margin-bottom: 16px; backdrop-filter: blur(8px); }
+        .location-hero-title { font-size: 52px; font-weight: 700; margin: 0 0 12px 0; letter-spacing: -0.03em; text-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .location-hero-tagline { font-size: 18px; opacity: 0.9; max-width: 700px; }
+        .location-hero-scores { position: absolute; top: 24px; right: 24px; display: flex; gap: 12px; }
+        .hero-score { text-align: center; background: rgba(0,0,0,0.5); padding: 16px 20px; border-radius: var(--radius-md); backdrop-filter: blur(12px); }
+        .hero-score-value { font-size: 32px; font-weight: 700; color: white; }
+        .hero-score-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.8); margin-top: 4px; }
+        .hero-score.experience .hero-score-value { color: #FF6B6B; }
+        .hero-score.sighting .hero-score-value { color: #4CAF50; }
+        .location-back-link { position: absolute; top: 24px; left: 24px; display: flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-weight: 500; font-size: 14px; padding: 10px 16px; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); border-radius: var(--radius-md); transition: all var(--transition-base); }
+        .location-back-link:hover { background: rgba(0,0,0,0.5); transform: translateX(-4px); }
+        .hero-nav { position: absolute; bottom: 120px; right: 40px; display: flex; gap: 8px; display: none; }
+        .hero-nav-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); transition: all var(--transition-fast); }
+        .hero-nav-btn:hover { background: rgba(255,255,255,0.4); }
+        .hero-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Content Grid */
+        .location-content { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
+        @media (max-width: 960px) { .location-content { grid-template-columns: 1fr; } }
+        .location-main { display: flex; flex-direction: column; gap: 24px; }
+        .location-section { background: var(--surface); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-md); }
+        .section-title { font-size: 18px; font-weight: 700; color: var(--primary); margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+
+        /* Species Grid */
+        .species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+        .species-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--surface-alt); border-radius: var(--radius-md); border: 1px solid var(--border); transition: all var(--transition-fast); }
+        .species-item:hover { border-color: var(--primary-light); transform: translateY(-2px); }
+        .species-icon { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .species-name { font-weight: 600; color: var(--text); font-size: 14px; }
+        .species-season { font-size: 12px; color: var(--text-muted); }
+
+        /* Monthly Chart */
+        .monthly-chart {
+            margin-top: 8px;
+        }
+
+        /* Monthly density chart – same as index panel */
+        .monthly-density-chart {
+            margin-top: 8px;
+            padding: 12px 14px 10px;
+            border-radius: 10px;
+            background: #fdfdfd;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .monthly-density-chart .chart-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 8px;
+        }
+
+        .month-bars {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 4px;
+            align-items: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .month-bar {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .bar-wrapper {
+            width: 100%;
+            height: 60px;
+            border-radius: 999px;
+            background: linear-gradient(to top, rgba(148, 163, 184, 0.20), rgba(148, 163, 184, 0.05));
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stacked-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .species-segment {
+            width: 100%;
+        }
+
+        .bar-count {
+            font-size: 11px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .bar-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6b7280;
+        }
+
+        /* Tooltip */
+        .month-bar {
+            position: relative;
+        }
+
+        .month-tooltip {
+            position: absolute;
+            bottom: 72px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 8px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.97);
+            color: white;
+            font-size: 11px;
+            white-space: nowrap;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.45);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 10;
+            min-width: 140px;
+        }
+
+        .month-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(15, 23, 42, 0.97) transparent transparent transparent;
+        }
+
+        .month-bar:hover .month-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        .tooltip-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .tooltip-species {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 1px;
+        }
+
+        .tooltip-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            flex-shrink: 0;
+        }
+
+        /* Legend */
+        .species-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 10px;
+            margin-top: 2px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: #4b5563;
+            padding: 3px 6px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.12);
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+        }
+        /* Sidebar */
+        .location-sidebar { display: flex; flex-direction: column; gap: 24px; }
+        .quick-facts-card, .best-months-card { background: var(--surface); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-md); }
+        .fact-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
+        .fact-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .fact-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .fact-value { font-size: 14px; color: var(--text); font-weight: 600; }
+        .accessibility-badge { display: inline-flex; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .accessibility-excellent { background: #dcfce7; color: #16a34a; }
+        .accessibility-good { background: #e0f2fe; color: #0284c7; }
+        .accessibility-moderate { background: #fef3c7; color: #d97706; }
+        .months-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .month-badge { text-align: center; padding: 10px 8px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; background: var(--surface-alt); color: var(--text-muted); border: 1px solid var(--border); }
+        .month-badge.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* Map */
+        .location-map-card { background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); }
+        .location-map-header { padding: 16px 20px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; }
+        .location-map-header h3 { font-size: 14px; font-weight: 600; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+        .location-map-container { height: 300px; position: relative; }
+
+        /* Nearby Locations */
+        .nearby-locations { display: flex; flex-direction: column; gap: 10px; }
+        .nearby-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface-alt); border-radius: var(--radius-md); text-decoration: none; color: inherit; transition: all var(--transition-fast); }
+        .nearby-item:hover { background: var(--border); transform: translateX(4px); }
+        .nearby-distance { font-size: 11px; color: var(--text-muted); min-width: 60px; }
+        .nearby-name { font-weight: 600; color: var(--text); font-size: 14px; }
+        .nearby-region { font-size: 12px; color: var(--text-muted); }
+
+        @media (max-width: 768px) {
+            .location-hero { height: 350px; }
+            .location-hero-title { font-size: 32px; }
+            .location-hero-tagline { font-size: 15px; }
+            .location-hero-content { padding: 24px; }
+            .species-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <span class="whale-icon">🐋</span>
+                <span class="brand-text">Whale Migration Guide</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link">Species Tracking</a>
+                <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
+                <a href="whale-locations-gallery.html" class="nav-link active">Locations</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="location-detail">
+        <div class="location-hero">
+            <img class="location-hero-image" id="heroImage" src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop" alt="">
+            <div class="location-hero-overlay"></div>
+            <a href="whale-locations-gallery.html" class="location-back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Locations
+            </a>
+            <div class="location-hero-scores">
+                <div class="hero-score experience">
+                    <div class="hero-score-value" id="experienceScore">--</div>
+                    <div class="hero-score-label">Experience</div>
+                </div>
+                <div class="hero-score sighting">
+                    <div class="hero-score-value" id="sightingScore">--</div>
+                    <div class="hero-score-label">Sighting Rate</div>
+                </div>
+            </div>
+            <div class="hero-nav" id="heroNav">
+                <button class="hero-nav-btn" id="prevImage" disabled><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+                <button class="hero-nav-btn" id="nextImage"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+            </div>
+            <div class="location-hero-content">
+                <span class="location-hero-region">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span id="regionName">Loading...</span>
+                </span>
+                <h1 class="location-hero-title" id="heroTitle">Loading...</h1>
+                <p class="location-hero-tagline" id="heroTagline"></p>
+            </div>
+        </div>
+
+        <div class="location-content">
+            <div class="location-main">
+                <section class="location-section">
+                    <h2 class="section-title">Species You Can See</h2>
+                    <div class="species-grid" id="speciesGrid"></div>
+                </section>
+                <section class="location-section">
+                    <h2 class="section-title">Monthly Whale Activity</h2>
+                    <div class="monthly-chart" id="monthlyChart"></div>
+                    <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 8px;">Higher bars indicate more whale activity.</p>
+                </section>
+                <section class="location-section">
+                    <h2 class="section-title">Nearby Destinations</h2>
+                    <div class="nearby-locations" id="nearbyLocations"></div>
+                </section>
+            </div>
+            <aside class="location-sidebar">
+                <div class="quick-facts-card">
+                    <h3 class="section-title">Quick Facts</h3>
+                    <div id="quickFacts"></div>
+                </div>
+                <div class="best-months-card">
+                    <h3 class="section-title">Best Viewing Months</h3>
+                    <div class="months-grid" id="monthsGrid"></div>
+                </div>
+                <div class="location-map-card">
+                    <div class="location-map-header"><h3>Location Map</h3></div>
+                    <div class="location-map-container" id="mapContainer"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script>
+        // ============== EMBEDDED LOCATION DATA ==============
+        const WHALE_WATCHING_LOCATIONS = [
+            { name: "Juneau", location: "USA", coordinates: [-134.42, 58.3019], entertainment: 94, visibility: 70, species: ["Humpback whale", "Orca", "Gray whale", "Minke whale"], bestMonths: [4, 5, 6, 7, 8, 9, 10], specialNotes: "Bubble-net feeding; largest AK whale port; glacier viewing", accessibility: "Good", imageUrls: ["https://www.juneauwhalewatch.com/wp-content/uploads/2022/03/Juneau-Whale-Watching-Tour-and-Tracys-King-Crab-Combo_8.jpg"], industrySize: "20 operators, 68 vessels", annualVisitors: 400000, monthlyDensity: [0, 0, 0, 3, 4, 4, 4, 4, 3, 2, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0], "Orca": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Gray whale": [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0], "Minke whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0]} },
+            { name: "San Ignacio Lagoon", location: "Mexico", coordinates: [-113.2, 27.3], entertainment: 93, visibility: 77, species: ["Humpback whale", "Blue whale", "Gray whale", "Fin whale"], bestMonths: [1, 2, 3, 4, 12], specialNotes: "Friendliest whales; touching distance; mothers & calves", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "Multiple small operators", annualVisitors: 50000, monthlyDensity: [3, 4, 4, 2, 0, 0, 0, 0, 0, 0, 0, 2], speciesMonthly: {"Humpback whale": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], "Blue whale": [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], "Gray whale": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], "Fin whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Húsavík", location: "Iceland", coordinates: [-17.34, 66.0449], entertainment: 87, visibility: 82, species: ["Humpback whale", "Blue whale", "Orca", "Sperm whale", "Fin whale"], bestMonths: [4, 5, 6, 7, 8, 9, 10], specialNotes: "Whale Capital of Europe; 24 cetaceans spotted; traditional oak boats", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "4 major operators", annualVisitors: 100000, monthlyDensity: [0, 0, 0, 3, 4, 5, 5, 5, 4, 3, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0], "Blue whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Orca": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Sperm whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Fin whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0]} },
+            { name: "Puerto Madryn", location: "Argentina", coordinates: [-65.0442, -42.7797], entertainment: 86, visibility: 75, species: ["Orca", "Humpback whale", "Southern right whale"], bestMonths: [6, 7, 8, 9, 10, 11], specialNotes: "Main town for Peninsula Valdés; combines with orca beach-hunting", accessibility: "Excellent", imageUrl: "https://media.timeout.com/images/106176947/image.webp", industrySize: "6-10 operators", annualVisitors: 157000, monthlyDensity: [0, 0, 0, 0, 0, 1, 2, 3, 3, 3, 2, 1], speciesMonthly: {"Orca": [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0], "Humpback whale": [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0], "Southern right whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Península Valdés", location: "Argentina", coordinates: [-63.9333, -42.5], entertainment: 86, visibility: 74, species: ["Orca", "Humpback whale", "Southern right whale"], bestMonths: [7, 8, 9, 10, 11, 12], specialNotes: "UNESCO World Heritage; orcas beach-hunting; right whale nursery", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "6-10 operators", annualVisitors: 244000, monthlyDensity: [0, 0, 0, 0, 0, 0, 2, 3, 3, 3, 3, 2], speciesMonthly: {"Orca": [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0], "Humpback whale": [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], "Southern right whale": [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]} },
+            { name: "Monterey Bay", location: "USA", coordinates: [-121.894, 36.747], entertainment: 92, visibility: 79, species: ["Humpback whale", "Blue whale", "Gray whale", "Orca", "Fin whale"], bestMonths: [4, 5, 6, 7, 8, 9, 10, 11], specialNotes: "World-class marine sanctuary; submarine canyon; kelp forests; year-round diversity", accessibility: "Excellent", imageUrls: ["https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1564979045531-fa386a275b27?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1568430462989-44163eb1752f?w=600&h=400&fit=crop"], industrySize: "10-15 operators", annualVisitors: 300000, monthlyDensity: [2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 4, 2], speciesMonthly: {"Blue whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0], "Humpback whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Orca": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Gray whale": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1], "Fin whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Dana Point", location: "USA", coordinates: [-117.6981, 33.4667], entertainment: 90, visibility: 81, species: ["Gray whale", "Blue whale", "Humpback whale", "Fin whale"], bestMonths: [1, 2, 3, 12], specialNotes: "Dolphin & whale capital; 10,000+ dolphins resident; gray whale migration peak", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "5-8 operators", annualVisitors: 150000, monthlyDensity: [2, 2, 2, 2, 3, 4, 4, 4, 3, 3, 2, 2], speciesMonthly: {"Blue whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0], "Humpback whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Orca": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Gray whale": [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], "Fin whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Vancouver Island", location: "Canada", coordinates: [-125.5, 49.66], entertainment: 91, visibility: 77, species: ["Orca", "Humpback whale", "Gray whale"], bestMonths: [5, 6, 7, 8, 9], specialNotes: "Resident & transient orcas; salmon runs; ancient rainforest coastline", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "15+ operators", annualVisitors: 250000, monthlyDensity: [0, 0, 0, 0, 3, 3, 3, 3, 3, 2, 0, 0], speciesMonthly: {"Orca": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0], "Humpback whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0], "Gray whale": [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], "Minke whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]} },
+            { name: "Tadoussac", location: "Canada", coordinates: [-69.7183, 48.1433], entertainment: 89, visibility: 84, species: ["Beluga whale", "Minke whale", "Fin whale", "Blue whale", "Humpback whale"], bestMonths: [6, 7, 8, 9, 10], specialNotes: "Belugas & 12 other whale species; fjord meets ocean; marine interpretation center", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "8-12 operators", annualVisitors: 200000, monthlyDensity: [0, 0, 0, 0, 3, 4, 4, 4, 4, 3, 0, 0], speciesMonthly: {"Blue whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0], "Humpback whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0], "Beluga whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0], "Fin whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0], "Minke whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]} },
+            { name: "San Diego", location: "USA", coordinates: [-117.1611, 32.7157], entertainment: 87, visibility: 80, species: ["Gray whale", "Blue whale", "Humpback whale", "Fin whale"], bestMonths: [1, 2, 3, 12], specialNotes: "20,000 gray whales migrate past annually; warm year-round climate; family-friendly", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "8-12 operators", annualVisitors: 250000, monthlyDensity: [2, 2, 2, 2, 3, 4, 4, 4, 3, 3, 2, 2], speciesMonthly: {"Blue whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Humpback whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Orca": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Gray whale": [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], "Fin whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "San Juan Islands", location: "USA", coordinates: [-123, 48.55], entertainment: 92, visibility: 73, species: ["Orca", "Humpback whale", "Gray whale", "Minke whale"], bestMonths: [5, 6, 7, 8, 9], specialNotes: "Southern Resident orcas (J, K, L pods); critical habitat; world-class research", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "12+ operators", annualVisitors: 300000, monthlyDensity: [0, 0, 0, 0, 2, 3, 3, 3, 2, 0, 0, 0], speciesMonthly: {"Orca": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Humpback whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Gray whale": [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], "Minke whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0]} },
+            { name: "Victoria", location: "Canada", coordinates: [-123.3656, 48.4284], entertainment: 87, visibility: 73, species: ["Orca", "Humpback whale", "Gray whale", "Minke whale"], bestMonths: [5, 6, 7, 8, 9], specialNotes: "Capital city access; Salish Sea orcas; historic Inner Harbour; Royal BC Museum", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "15+ operators", annualVisitors: 275000, monthlyDensity: [0, 0, 1, 2, 3, 3, 3, 3, 3, 2, 0, 0], speciesMonthly: {"Orca": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0], "Humpback whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0], "Gray whale": [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], "Minke whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]} },
+            { name: "Kaikōura", location: "New Zealand", coordinates: [173.6833, -42.4167], entertainment: 91, visibility: 78, species: ["Sperm whale", "Humpback whale", "Orca", "Blue whale"], bestMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], specialNotes: "Year-round sperm whales; submarine canyon; giant squid habitat; UNESCO consideration", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "3-4 operators", annualVisitors: 100000, monthlyDensity: [3, 3, 3, 3, 3, 4, 4, 4, 3, 3, 3, 4], speciesMonthly: {"Humpback whale": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0], "Orca": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], "Sperm whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Southern right whale": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0]} },
+            { name: "Cabo San Lucas", location: "Mexico", coordinates: [-109.9167, 22.8905], entertainment: 88, visibility: 77, species: ["Humpback whale", "Gray whale", "Blue whale"], bestMonths: [1, 2, 3, 12], specialNotes: "Pacific meets Sea of Cortez; warm-water destination; luxury resort base", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "15+ operators", annualVisitors: 300000, monthlyDensity: [3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 2], speciesMonthly: {"Blue whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Humpback whale": [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], "Gray whale": [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], "Sperm whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Fin whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Seward", location: "USA", coordinates: [-149.4422, 60.1042], entertainment: 88, visibility: 72, species: ["Humpback whale", "Orca", "Gray whale", "Fin whale"], bestMonths: [5, 6, 7, 8], specialNotes: "Kenai Fjords gateway; tidewater glaciers; sea otters, sea lions, puffins", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop", industrySize: "8-12 operators", annualVisitors: 200000, monthlyDensity: [0, 0, 0, 2, 3, 3, 3, 3, 2, 1, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0], "Orca": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Gray whale": [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0], "Minke whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0]} },
+            { name: "Ushuaia", location: "Argentina", coordinates: [-68.3029, -54.8019], entertainment: 84, visibility: 71, species: ["Humpback whale", "Orca", "Fin whale", "Southern right whale"], bestMonths: [11, 12, 1, 2, 3], specialNotes: "Southernmost city; Beagle Channel; Antarctica gateway; dramatic Patagonian scenery", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "5-8 operators", annualVisitors: 80000, monthlyDensity: [4, 4, 3, 0, 0, 0, 0, 0, 0, 0, 2, 3], speciesMonthly: {"Humpback whale": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1], "Orca": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1], "Blue whale": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1], "Fin whale": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1], "Minke whale": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1]} },
+            { name: "Tofino", location: "Canada", coordinates: [-125.9076, 49.1534], entertainment: 87, visibility: 73, species: ["Gray whale", "Humpback whale", "Orca"], bestMonths: [3, 4, 5, 6, 7, 8, 9], specialNotes: "Pacific Rim National Park; ancient rainforest; hot springs accessible by boat", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "8-10 operators", annualVisitors: 100000, monthlyDensity: [0, 0, 1, 2, 3, 3, 3, 3, 3, 2, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0], "Orca": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Gray whale": [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0], "Minke whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0]} },
+            { name: "Samaná Bay", location: "Dominican Republic", coordinates: [-69.3365, 19.2064], entertainment: 88, visibility: 73, species: ["Humpback whale"], bestMonths: [1, 2, 3], specialNotes: "Caribbean humpback breeding grounds; males singing; mothers with calves", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "10+ operators", annualVisitors: 100000, monthlyDensity: [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], speciesMonthly: {"Humpback whale": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]} },
+            { name: "Reykjavík", location: "Iceland", coordinates: [-21.9426, 64.1466], entertainment: 83, visibility: 75, species: ["Humpback whale", "Minke whale", "Orca", "Blue whale"], bestMonths: [5, 6, 7, 8, 9], specialNotes: "Capital city departures; Faxaflói Bay; puffins; Northern Lights combo tours", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "6-8 operators", annualVisitors: 150000, monthlyDensity: [2, 2, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2], speciesMonthly: {"Humpback whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Orca": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Minke whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Stellwagen Bank", location: "USA", coordinates: [-70.3333, 42.4167], entertainment: 86, visibility: 73, species: ["Humpback whale", "Fin whale", "Minke whale", "Right whale"], bestMonths: [4, 5, 6, 7, 8, 9, 10], specialNotes: "National Marine Sanctuary; productive feeding grounds; historic whaling heritage", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "8-10 operators", annualVisitors: 200000, monthlyDensity: [0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0], "North Atlantic right whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0], "Fin whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0], "Minke whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0]} },
+            { name: "Akureyri", location: "Iceland", coordinates: [-18.09, 65.6835], entertainment: 82, visibility: 73, species: ["Humpback whale", "Minke whale", "Blue whale"], bestMonths: [6, 7, 8], specialNotes: "Northern Iceland; Eyjafjörður fjord; midnight sun; less crowded than south", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "3-4 operators", annualVisitors: 50000, monthlyDensity: [0, 0, 0, 2, 3, 4, 4, 4, 3, 2, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0], "Blue whale": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0], "Fin whale": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0], "Minke whale": [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0]} },
+            { name: "Mirissa", location: "Sri Lanka", coordinates: [80.4713, 5.9485], entertainment: 84, visibility: 73, species: ["Blue whale", "Sperm whale", "Fin whale"], bestMonths: [11, 12, 1, 2, 3, 4], specialNotes: "Blue whale hotspot; continental shelf; small fishing village; tropical climate", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "6-8 operators", annualVisitors: 75000, monthlyDensity: [3, 3, 3, 2, 1, 0, 0, 0, 0, 0, 2, 3], speciesMonthly: {"Blue whale": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1], "Humpback whale": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1], "Sperm whale": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1], "Bryde's whale": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1]} },
+            { name: "Lofoten Islands", location: "Norway", coordinates: [14.2, 68.2], entertainment: 86, visibility: 69, species: ["Orca", "Humpback whale", "Sperm whale"], bestMonths: [10, 11, 12, 1], specialNotes: "Arctic orca safari; herring run; Northern Lights; dramatic mountain scenery", accessibility: "Moderate", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "4-6 operators", annualVisitors: 40000, monthlyDensity: [2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2], speciesMonthly: {"Orca": [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1], "Humpback whale": [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]} },
+            { name: "Maui", location: "USA", coordinates: [-156.3319, 20.7984], entertainment: 89, visibility: 81, species: ["Humpback whale"], bestMonths: [12, 1, 2, 3, 4], specialNotes: "Prime breeding & calving grounds; singing males; shallow warm channels", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "20+ operators", annualVisitors: 500000, monthlyDensity: [2, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1], speciesMonthly: {"Humpback whale": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1], "Sperm whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Pilot whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Tonga (Vava'u)", location: "Tonga", coordinates: [-173.9833, -18.65], entertainment: 93, visibility: 82, species: ["Humpback whale"], bestMonths: [7, 8, 9, 10], specialNotes: "Swim with humpbacks; crystal-clear waters; mothers & calves; life-changing encounters", accessibility: "Moderate", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "8-10 operators", annualVisitors: 15000, monthlyDensity: [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0]} },
+            { name: "Hervey Bay", location: "Australia", coordinates: [152.872, -25.2854], entertainment: 88, visibility: 79, species: ["Humpback whale"], bestMonths: [7, 8, 9, 10, 11], specialNotes: "Natural 'whale playground'; curious whales approach boats; spectacular breaching", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "6-8 operators", annualVisitors: 120000, monthlyDensity: [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0]} },
+            { name: "Hermanus", location: "South Africa", coordinates: [19.241, -34.4187], entertainment: 92, visibility: 86, species: ["Southern right whale"], bestMonths: [7, 8, 9, 10, 11], specialNotes: "Best land-based viewing globally; whales close to shore; whale crier with kelp horn", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "8-10 operators", annualVisitors: 150000, monthlyDensity: [0, 0, 0, 0, 0, 2, 3, 3, 3, 3, 2, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], "Southern right whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0], "Bryde's whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Tromsø", location: "Norway", coordinates: [18.9553, 69.6492], entertainment: 87, visibility: 72, species: ["Orca", "Humpback whale", "Fin whale"], bestMonths: [10, 11, 12, 1], specialNotes: "Winter orca safari; herring migration; Northern Lights; Sami cultural heritage", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "6-8 operators", annualVisitors: 60000, monthlyDensity: [3, 2, 0, 0, 0, 2, 2, 2, 0, 1, 2, 3], speciesMonthly: {"Orca": [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1], "Humpback whale": [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1], "Sperm whale": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0], "Pilot whale": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0], "Minke whale": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0]} },
+            { name: "Andenes", location: "Norway", coordinates: [16.1194, 69.3143], entertainment: 88, visibility: 75, species: ["Sperm whale", "Orca", "Humpback whale"], bestMonths: [5, 6, 7, 8, 9], specialNotes: "World's best sperm whale site; Bleik Canyon; midnight sun; remote Arctic adventure", accessibility: "Moderate", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "3-4 operators", annualVisitors: 25000, monthlyDensity: [0, 0, 0, 0, 2, 3, 3, 3, 1, 0, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Orca": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1], "Sperm whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Pilot whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0], "Minke whale": [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0]} },
+            { name: "Bay of Fundy", location: "Canada", coordinates: [-66, 45], entertainment: 84, visibility: 74, species: ["Humpback whale", "Fin whale", "Minke whale", "Right whale"], bestMonths: [6, 7, 8, 9, 10], specialNotes: "Highest tides globally; endangered right whale habitat; dramatic coastal cliffs", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "6-8 operators", annualVisitors: 100000, monthlyDensity: [0, 0, 0, 0, 0, 3, 3, 3, 3, 2, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0], "North Atlantic right whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0], "Fin whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0], "Minke whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0]} },
+            { name: "Azores", location: "Portugal", coordinates: [-27.2, 38.7], entertainment: 89, visibility: 80, species: ["Sperm whale", "Blue whale", "Fin whale", "Sei whale"], bestMonths: [4, 5, 6, 7, 8, 9, 10], specialNotes: "20+ cetacean species; traditional lookout towers; volcanic islands; mid-Atlantic hotspot", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "10+ operators", annualVisitors: 80000, monthlyDensity: [0, 0, 3, 4, 5, 5, 4, 3, 3, 2, 0, 0], speciesMonthly: {"Blue whale": [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], "Sperm whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Fin whale": [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], "Sei whale": [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], "Pilot whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Oahu", location: "USA", coordinates: [-157.8583, 21.4389], entertainment: 84, visibility: 72, species: ["Humpback whale"], bestMonths: [12, 1, 2, 3, 4], specialNotes: "Honolulu departures; combines with snorkeling; Pearl Harbor historic site nearby", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "15+ operators", annualVisitors: 400000, monthlyDensity: [2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1], speciesMonthly: {"Humpback whale": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1], "Sperm whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Pilot whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Churchill", location: "Canada", coordinates: [-94.165, 58.7684], entertainment: 81, visibility: 66, species: ["Beluga whale"], bestMonths: [7, 8], specialNotes: "3,000 belugas in Churchill River estuary; polar bear capital; extreme remote access", accessibility: "Moderate", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "4-6 operators", annualVisitors: 30000, monthlyDensity: [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0], speciesMonthly: {"Beluga whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0]} },
+            { name: "Dominica", location: "Dominica", coordinates: [-61.371, 15.415], entertainment: 86, visibility: 72, species: ["Sperm whale"], bestMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], specialNotes: "Year-round resident sperm whales; snorkeling with whales permitted; volcanic island", accessibility: "Good", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "4-6 operators", annualVisitors: 20000, monthlyDensity: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], speciesMonthly: {"Sperm whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Pilot whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Beaked whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Humpback whale": [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]} },
+            { name: "Hauraki Gulf", location: "New Zealand", coordinates: [175, -36.5], entertainment: 82, visibility: 69, species: ["Orca", "Humpback whale", "Bryde's whale"], bestMonths: [1, 2, 3, 4, 5, 10, 11, 12], specialNotes: "Auckland departures; Bryde's whales year-round; dolphins abundant; volcanic islands", accessibility: "Excellent", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "6-8 operators", annualVisitors: 100000, monthlyDensity: [2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2], speciesMonthly: {"Orca": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Bryde's whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Nuquí/Bahía Solano", location: "Colombia", coordinates: [-77.2667, 5.7], entertainment: 85, visibility: 71, species: ["Humpback whale"], bestMonths: [7, 8, 9, 10], specialNotes: "Pacific coast rainforest; mothers & calves; remote jungle lodges; breaching displays", accessibility: "Moderate", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "Small local operators", annualVisitors: 15000, monthlyDensity: [0, 0, 0, 0, 0, 0, 2, 3, 3, 1, 0, 0], speciesMonthly: {"Humpback whale": [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0], "Sperm whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "Bryde's whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} },
+            { name: "Punta Norte", location: "Argentina", coordinates: [-63.681, -42.103], entertainment: 90, visibility: 75, species: ["Orca", "Southern right whale"], bestMonths: [2, 3, 4], specialNotes: "Famous orca intentional beaching; sea lion predation; decades of research", accessibility: "Moderate", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "Limited access", annualVisitors: 30000, monthlyDensity: [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0], speciesMonthly: {"Orca": [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0]} },
+            { name: "Galápagos (Bolívar Channel)", location: "Ecuador", coordinates: [-91.4167, -0.3833], entertainment: 83, visibility: 68, species: ["Orca", "Humpback whale", "Bryde's whale"], bestMonths: [6, 7, 8, 9, 10], specialNotes: "Endemic Galápagos orcas; Darwin's evolution islands; unique marine ecosystem", accessibility: "Moderate", imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop", industrySize: "Limited permits", annualVisitors: 40000, monthlyDensity: [0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 1, 0], speciesMonthly: {"Blue whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0], "Sei whale": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0], "Bryde's whale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]} }
+        ];
+
+        // Mapbox token
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoicXR5cmVlIiwiYSI6ImNtNDhvbnB5aTA4OXMya3B2cWNxajZyNnoifQ.21N9jiCKoCpxjdLBSFzVvw';
+
+        // ============== PAGE LOGIC ==============
+        const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const SPECIES_COLORS = {
+            "Humpback whale": "#3498db",
+            "Blue whale": "#2980b9",
+            "Gray whale": "#7f8c8d",
+            "Orca": "#2c3e50",
+            "Fin whale": "#8e44ad",
+            "Sperm whale": "#c0392b",
+            "Minke whale": "#27ae60",
+            "Southern right whale": "#d35400",
+            "North Atlantic right whale": "#d35400",
+            "Right whale": "#d35400",
+            "Beluga whale": "#ecf0f1",
+            "Sei whale": "#9b59b6",
+            "Bryde's whale": "#1abc9c",
+            "Pilot whale": "#34495e",
+            "Beaked whale": "#f39c12",
+            "default": "#95a5a6"
+        };
+
+        function getSpeciesColor(name) {
+            if (!name) return SPECIES_COLORS.default;
+            return SPECIES_COLORS[name] || SPECIES_COLORS.default;
+        }
+
+        const MAX_SPECIES_LEVELS = 5;
+        function createMonthlyDensityChart(location) {
+            const speciesMonthly = location.speciesMonthly;
+            if (!speciesMonthly || typeof speciesMonthly !== 'object') {
+                return '';
+            }
+
+            // Preserve exact species order defined in whale-locations.js
+            const orderedSpecies = Object.keys(speciesMonthly);
+            const numMonths = 12;
+
+            // Count how many species are present each month
+            const monthlyCounts = new Array(numMonths).fill(0);
+            orderedSpecies.forEach(sp => {
+                const arr = speciesMonthly[sp] || [];
+                for (let m = 0; m < numMonths; m++) {
+                    if (arr[m] > 0) monthlyCounts[m] += 1;
+                }
+            });
+
+            const anyCount = monthlyCounts.some(c => c > 0);
+            if (!anyCount) return '';
+
+            const bars = monthlyCounts.map((count, monthIndex) => {
+                if (!count) {
+                    return `
+                        <div class="month-bar">
+                            <div class="bar-wrapper">
+                                <div class="stacked-bar" style="height:0%;"></div>
+                            </div>
+                            <div class="bar-label">${MONTH_ABBR[monthIndex]}</div>
+                        </div>
+                    `;
+                }
+
+                const presentSpecies = orderedSpecies.filter(sp => {
+                    const arr = speciesMonthly[sp];
+                    return Array.isArray(arr) && arr[monthIndex] > 0;
+                });
+
+                const clampedCount = Math.min(count, MAX_SPECIES_LEVELS);
+                const barHeightPercent = (clampedCount / MAX_SPECIES_LEVELS) * 100;
+
+                const segments = presentSpecies.map(sp => {
+                    const color = getSpeciesColor(sp);
+                    return `
+                        <div class="species-segment"
+                            style="background:${color}; height:${100 / presentSpecies.length}%"
+                            title="${sp}">
+                        </div>
+                    `;
+                }).join('');
+
+                const tooltipSpecies = presentSpecies.map(sp => {
+                    const color = getSpeciesColor(sp);
+                    return `
+                        <div class="tooltip-species">
+                            <span class="tooltip-color" style="background:${color};"></span>${sp}
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="month-bar">
+                        <div class="month-tooltip">
+                            <div class="tooltip-title">${MONTH_NAMES[monthIndex]}</div>
+                            <div style="font-size:11px;margin-bottom:4px;">${count} species</div>
+                            ${tooltipSpecies}
+                        </div>
+
+                        <div class="bar-count">${count}</div>
+
+                        <div class="bar-wrapper">
+                            <div class="stacked-bar"
+                                style="height:${barHeightPercent}%; min-height:4px;">
+                                ${segments}
+                            </div>
+                        </div>
+
+                        <div class="bar-label">${MONTH_ABBR[monthIndex]}</div>
+                    </div>
+                `;
+            }).join('');
+
+            const legendItems = orderedSpecies.map(sp => {
+                const color = getSpeciesColor(sp);
+                return `
+                    <div class="legend-item">
+                        <span class="legend-color" style="background:${color};"></span>
+                        ${sp.replace(' whale', '')}
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="monthly-density-chart">
+                    <div class="chart-title">
+                        Species Stacked by Month
+                        <span style="display:block;font-size:10px;color:#777;margin-top:2px;">
+                            Stack order = dataset order (bottom = first species listed).
+                        </span>
+                    </div>
+
+                    <div class="month-bars">${bars}</div>
+
+                    <div class="species-legend">${legendItems}</div>
+                </div>
+            `;
+        }
+        let currentImageIndex = 0;
+        let locationImages = [];
+
+        function generateLocationId(name) {
+            const normalized = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            return normalized.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
+
+        function getLocationId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        function findLocation(id) {
+            return WHALE_WATCHING_LOCATIONS.find(loc => generateLocationId(loc.name) === id);
+        }
+
+        function formatVisitors(num) {
+            if (!num) return 'N/A';
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + ' million';
+            if (num >= 1000) return Math.round(num / 1000) + ',000';
+            return num.toLocaleString();
+        }
+
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function findNearbyLocations(currentLocation, count = 4) {
+            const [currentLon, currentLat] = currentLocation.coordinates;
+            return WHALE_WATCHING_LOCATIONS
+                .filter(loc => loc.name !== currentLocation.name)
+                .map(loc => ({ ...loc, distance: haversineDistance(currentLat, currentLon, loc.coordinates[1], loc.coordinates[0]) }))
+                .sort((a, b) => a.distance - b.distance)
+                .slice(0, count);
+        }
+
+        function getSpeciesSeasons(location) {
+            const seasons = {};
+            if (location.speciesMonthly) {
+                Object.entries(location.speciesMonthly).forEach(([species, months]) => {
+                    const activeMonths = months.map((active, i) => active ? MONTH_ABBR[i] : null).filter(Boolean);
+                    seasons[species] = activeMonths.length === 12 ? 'Year-round' : activeMonths.length > 0 ? `${activeMonths[0]}-${activeMonths[activeMonths.length - 1]}` : 'Seasonal';
+                });
+            }
+            return seasons;
+        }
+
+        function renderSpecies(location) {
+            const grid = document.getElementById('speciesGrid');
+            const seasons = getSpeciesSeasons(location);
+            grid.innerHTML = location.species.map(species => `
+                <div class="species-item">
+                    <div class="species-icon">🐋</div>
+                    <div>
+                        <div class="species-name">${species}</div>
+                        <div class="species-season">${seasons[species] || 'Seasonal'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMonthlyChart(location) {
+            const container = document.getElementById('monthlyChart');
+            const html = createMonthlyDensityChart(location);
+
+            if (!html) {
+                container.innerHTML = '<p style="margin:0;font-size:13px;color:#666;">Monthly activity data coming soon.</p>';
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        function renderQuickFacts(location) {
+            const container = document.getElementById('quickFacts');
+            const accessibilityClass = location.accessibility.toLowerCase().replace(' ', '-');
+            container.innerHTML = `
+                <div class="fact-item"><span class="fact-label">Accessibility</span><span class="accessibility-badge accessibility-${accessibilityClass}">${location.accessibility}</span></div>
+                <div class="fact-item"><span class="fact-label">Industry Size</span><span class="fact-value">${location.industrySize || 'N/A'}</span></div>
+                <div class="fact-item"><span class="fact-label">Annual Visitors</span><span class="fact-value">${formatVisitors(location.annualVisitors)}</span></div>
+                <div class="fact-item"><span class="fact-label">Species Count</span><span class="fact-value">${location.species.length} species</span></div>
+                <div class="fact-item"><span class="fact-label">Coordinates</span><span class="fact-value">${location.coordinates[1].toFixed(2)}°, ${location.coordinates[0].toFixed(2)}°</span></div>
+            `;
+        }
+
+        function renderMonthsGrid(location) {
+            const container = document.getElementById('monthsGrid');
+            container.innerHTML = MONTH_ABBR.map((month, i) => `<span class="month-badge ${location.bestMonths.includes(i + 1) ? 'active' : ''}">${month}</span>`).join('');
+        }
+
+        function renderNearbyLocations(location) {
+            const container = document.getElementById('nearbyLocations');
+            const nearby = findNearbyLocations(location);
+            container.innerHTML = nearby.map(loc => `
+                <a href="location-detail.html?id=${generateLocationId(loc.name)}" class="nearby-item">
+                    <span class="nearby-distance">${loc.distance < 100 ? Math.round(loc.distance) : Math.round(loc.distance / 100) * 100} km</span>
+                    <div>
+                        <div class="nearby-name">${loc.name}</div>
+                        <div class="nearby-region">${loc.location}</div>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        function initMap(location) {
+            mapboxgl.accessToken = MAPBOX_TOKEN;
+            const map = new mapboxgl.Map({
+                container: 'mapContainer',
+                style: 'mapbox://styles/mapbox/light-v11',
+                center: location.coordinates,
+                zoom: 6,
+                interactive: true
+            });
+            map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+            new mapboxgl.Marker({ color: '#0a4a7c' }).setLngLat(location.coordinates).addTo(map);
+        }
+
+        function updateHeroImage() {
+            document.getElementById('heroImage').src = locationImages[currentImageIndex];
+            document.getElementById('prevImage').disabled = currentImageIndex === 0;
+            document.getElementById('nextImage').disabled = currentImageIndex === locationImages.length - 1;
+        }
+
+        function initPage() {
+            const locationId = getLocationId();
+            const location = findLocation(locationId);
+
+            if (!location) {
+                document.getElementById('heroTitle').textContent = 'Location Not Found';
+                document.getElementById('heroTagline').textContent = 'The requested location could not be found.';
+                return;
+            }
+
+            document.title = `${location.name} - Whale Watching - Whale Migration Guide`;
+
+            locationImages = location.imageUrls || [location.imageUrl];
+            if (locationImages.length > 1) {
+                document.getElementById('heroNav').style.display = 'flex';
+            }
+
+            document.getElementById('heroImage').src = locationImages[0];
+            document.getElementById('heroImage').alt = location.name;
+            document.getElementById('regionName').textContent = location.location;
+            document.getElementById('heroTitle').textContent = location.name;
+            document.getElementById('heroTagline').textContent = location.specialNotes;
+            document.getElementById('experienceScore').textContent = location.entertainment;
+            document.getElementById('sightingScore').textContent = location.visibility;
+
+            renderSpecies(location);
+            renderMonthlyChart(location);
+            renderQuickFacts(location);
+            renderMonthsGrid(location);
+            renderNearbyLocations(location);
+            initMap(location);
+
+            document.getElementById('prevImage').addEventListener('click', () => { if (currentImageIndex > 0) { currentImageIndex--; updateHeroImage(); } });
+            document.getElementById('nextImage').addEventListener('click', () => { if (currentImageIndex < locationImages.length - 1) { currentImageIndex++; updateHeroImage(); } });
+        }
+
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

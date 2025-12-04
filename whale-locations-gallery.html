@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Whale Watching Locations - Whale Migration Guide</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="description" content="Explore the world's best whale watching destinations with detailed information about species, best seasons, and visitor experiences.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Location Gallery Specific Styles */
+        .locations-gallery {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px 48px;
+        }
+
+        .locations-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fade-slide-up 0.6s ease-out;
+        }
+
+        .locations-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 16px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .locations-header p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 32px;
+            justify-content: center;
+            animation: fade-slide-up 0.6s ease-out 0.1s backwards;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .filter-select {
+            padding: 8px 32px 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text);
+            background: var(--surface);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a6d7e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            transition: all var(--transition-fast);
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary-light);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(10, 74, 124, 0.1);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 32px;
+            padding: 16px 24px;
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            animation: fade-slide-up 0.6s ease-out 0.2s backwards;
+        }
+
+        .stat-item-bar {
+            text-align: center;
+        }
+
+        .stat-value-bar {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label-bar {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Location Grid */
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        /* Location Card */
+        .location-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            animation: fade-scale-in 0.5s ease-out backwards;
+        }
+
+        .location-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .location-card-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .location-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-slow);
+        }
+
+        .location-card:hover .location-card-image img {
+            transform: scale(1.08);
+        }
+
+        .location-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+        }
+
+        .location-card-region {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255,255,255,0.95);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--primary);
+            backdrop-filter: blur(4px);
+        }
+
+        .location-card-scores {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .score-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            backdrop-filter: blur(4px);
+        }
+
+        .score-badge.experience {
+            background: rgba(255, 107, 107, 0.9);
+        }
+
+        .score-badge.sighting {
+            background: rgba(76, 175, 80, 0.9);
+        }
+
+        .location-card-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .location-card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 8px 0;
+            letter-spacing: -0.01em;
+        }
+
+        .location-card-special {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0 0 16px 0;
+            flex: 1;
+        }
+
+        .location-card-species {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .species-mini-tag {
+            background: var(--surface-alt);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .location-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .location-card-months {
+            display: flex;
+            gap: 3px;
+        }
+
+        .month-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .month-dot.active {
+            background: var(--accent);
+        }
+
+        .location-card-action {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all var(--transition-fast);
+        }
+
+        .location-card:hover .location-card-action {
+            color: var(--primary-light);
+            gap: 8px;
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--text-muted);
+        }
+
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .locations-header h1 {
+                font-size: 28px;
+            }
+
+            .locations-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="page-enter">
+    <!-- Navigation Bar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <span class="whale-icon">🐋</span>
+                <span class="brand-text">Whale Migration Guide</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link">Species Tracking</a>
+                <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
+                <a href="whale-locations-gallery.html" class="nav-link active">Locations</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Gallery Section -->
+    <main class="locations-gallery">
+        <header class="locations-header">
+            <h1>Whale Watching Destinations</h1>
+            <p>
+                Discover the world's premier whale watching locations. From Arctic fjords to tropical lagoons, 
+                find your perfect spot to witness these magnificent creatures in their natural habitat.
+            </p>
+        </header>
+
+        <!-- Filter Controls -->
+        <div class="filter-controls">
+            <div class="filter-group">
+                <span class="filter-label">Region:</span>
+                <select id="regionFilter" class="filter-select">
+                    <option value="all">All Regions</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Species:</span>
+                <select id="speciesFilter" class="filter-select">
+                    <option value="all">All Species</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Best Month:</span>
+                <select id="monthFilter" class="filter-select">
+                    <option value="all">Any Month</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Sort By:</span>
+                <select id="sortFilter" class="filter-select">
+                    <option value="experience">Experience Score</option>
+                    <option value="sighting">Sighting Rate</option>
+                    <option value="visitors">Annual Visitors</option>
+                    <option value="name">Name (A-Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item-bar">
+                <div class="stat-value-bar" id="totalLocations">0</div>
+                <div class="stat-label-bar">Destinations</div>
+            </div>
+            <div class="stat-item-bar">
+                <div class="stat-value-bar" id="totalCountries">0</div>
+                <div class="stat-label-bar">Countries</div>
+            </div>
+            <div class="stat-item-bar">
+                <div class="stat-value-bar" id="totalVisitors">0</div>
+                <div class="stat-label-bar">Annual Visitors</div>
+            </div>
+        </div>
+
+        <!-- Location Grid -->
+        <div class="locations-grid" id="locationsGrid">
+            <!-- Cards generated dynamically -->
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <div class="no-results-icon">🔍</div>
+            <p>No locations match your filters. Try adjusting your search criteria.</p>
+        </div>
+    </main>
+
+    <script src="whale-locations.js"></script>
+    <script>
+        const MONTH_NAMES = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        // Generate URL-safe ID from location name - handles special characters
+        function generateLocationId(name) {
+            // Normalize unicode characters to their base form (é -> e, ü -> u, ō -> o, etc.)
+            const normalized = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            return normalized.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '');
+        }
+
+        // Get all unique regions
+        function getUniqueRegions() {
+            const regions = new Set();
+            WHALE_WATCHING_LOCATIONS.forEach(loc => regions.add(loc.location));
+            return Array.from(regions).sort();
+        }
+
+        // Get all unique species
+        function getUniqueSpecies() {
+            const species = new Set();
+            WHALE_WATCHING_LOCATIONS.forEach(loc => {
+                loc.species.forEach(s => species.add(s));
+            });
+            return Array.from(species).sort();
+        }
+
+        // Populate filter dropdowns
+        function populateFilters() {
+            const regionFilter = document.getElementById('regionFilter');
+            getUniqueRegions().forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                regionFilter.appendChild(option);
+            });
+
+            const speciesFilter = document.getElementById('speciesFilter');
+            getUniqueSpecies().forEach(species => {
+                const option = document.createElement('option');
+                option.value = species;
+                option.textContent = species;
+                speciesFilter.appendChild(option);
+            });
+        }
+
+        // Format visitor numbers
+        function formatVisitors(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+            return num.toString();
+        }
+
+        // Create location card HTML
+        function createLocationCard(location, index) {
+            const id = generateLocationId(location.name);
+            const imageUrl = location.imageUrls ? location.imageUrls[0] : location.imageUrl;
+            
+            // Create month dots
+            const monthDots = Array.from({length: 12}, (_, i) => {
+                const isActive = location.bestMonths.includes(i + 1);
+                return `<div class="month-dot ${isActive ? 'active' : ''}" title="${MONTH_NAMES[i]}"></div>`;
+            }).join('');
+
+            // Limit species tags
+            const speciesTags = location.species.slice(0, 4).map(s => 
+                `<span class="species-mini-tag">${s}</span>`
+            ).join('');
+            const moreSpecies = location.species.length > 4 ? 
+                `<span class="species-mini-tag">+${location.species.length - 4}</span>` : '';
+
+            return `
+                <a href="location-detail.html?id=${id}" class="location-card" style="animation-delay: ${index * 0.05}s">
+                    <div class="location-card-image">
+                        <img src="${imageUrl}" alt="${location.name}" loading="lazy" referrerpolicy="no-referrer" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop';">
+                        <div class="location-card-overlay"></div>
+                        <span class="location-card-region">${location.location}</span>
+                        <div class="location-card-scores">
+                            <span class="score-badge experience" title="Experience Score">${location.entertainment}</span>
+                            <span class="score-badge sighting" title="Sighting Rate">${location.visibility}</span>
+                        </div>
+                    </div>
+                    <div class="location-card-content">
+                        <h2 class="location-card-title">${location.name}</h2>
+                        <p class="location-card-special">${location.specialNotes}</p>
+                        <div class="location-card-species">
+                            ${speciesTags}${moreSpecies}
+                        </div>
+                        <div class="location-card-meta">
+                            <div class="location-card-months" title="Best viewing months highlighted">
+                                ${monthDots}
+                            </div>
+                            <span class="location-card-action">
+                                Explore
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            `;
+        }
+
+        // Filter and sort locations
+        function filterAndSortLocations() {
+            const regionFilter = document.getElementById('regionFilter').value;
+            const speciesFilter = document.getElementById('speciesFilter').value;
+            const monthFilter = document.getElementById('monthFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+
+            let filtered = WHALE_WATCHING_LOCATIONS.filter(loc => {
+                if (regionFilter !== 'all' && loc.location !== regionFilter) return false;
+                if (speciesFilter !== 'all' && !loc.species.includes(speciesFilter)) return false;
+                if (monthFilter !== 'all' && !loc.bestMonths.includes(parseInt(monthFilter))) return false;
+                return true;
+            });
+
+            // Sort
+            filtered.sort((a, b) => {
+                switch (sortFilter) {
+                    case 'experience':
+                        return b.entertainment - a.entertainment;
+                    case 'sighting':
+                        return b.visibility - a.visibility;
+                    case 'visitors':
+                        return b.annualVisitors - a.annualVisitors;
+                    case 'name':
+                        return a.name.localeCompare(b.name);
+                    default:
+                        return 0;
+                }
+            });
+
+            return filtered;
+        }
+
+        // Render location cards
+        function renderLocations() {
+            const filtered = filterAndSortLocations();
+            const grid = document.getElementById('locationsGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+                grid.innerHTML = filtered.map((loc, i) => createLocationCard(loc, i)).join('');
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            const locations = WHALE_WATCHING_LOCATIONS;
+            const countries = new Set(locations.map(loc => loc.location)).size;
+            const totalVisitors = locations.reduce((sum, loc) => sum + (loc.annualVisitors || 0), 0);
+
+            document.getElementById('totalLocations').textContent = locations.length;
+            document.getElementById('totalCountries').textContent = countries;
+            document.getElementById('totalVisitors').textContent = formatVisitors(totalVisitors);
+        }
+
+        // Initialize
+        function init() {
+            populateFilters();
+            updateStats();
+            renderLocations();
+
+            // Add filter event listeners
+            ['regionFilter', 'speciesFilter', 'monthFilter', 'sortFilter'].forEach(id => {
+                document.getElementById(id).addEventListener('change', renderLocations);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

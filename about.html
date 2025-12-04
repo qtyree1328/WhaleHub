@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>About - Whale Migration Guide</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="description" content="Learn about the data sources, methodology, and scoring systems used in the Whale Migration Guide.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .about-page {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 32px 24px 64px;
+        }
+
+        .about-hero {
+            text-align: center;
+            margin-bottom: 48px;
+            padding: 48px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-lg);
+            color: white;
+        }
+
+        .about-hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 0 0 16px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .about-hero p {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .about-section {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .about-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 20px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .about-section h2 .icon {
+            font-size: 28px;
+        }
+
+        .about-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 24px 0 12px 0;
+        }
+
+        .about-section p {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text);
+            margin: 0 0 16px 0;
+        }
+
+        .about-section ul {
+            margin: 0 0 16px 0;
+            padding-left: 24px;
+        }
+
+        .about-section li {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .about-section a {
+            color: var(--primary-light);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all var(--transition-fast);
+        }
+
+        .about-section a:hover {
+            border-bottom-color: var(--primary-light);
+        }
+
+        .methodology-card {
+            background: var(--surface-alt);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin: 16px 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        .methodology-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0 0 8px 0;
+        }
+
+        .methodology-card p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .score-explanation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .score-card {
+            background: var(--surface-alt);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .score-card .score-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+        }
+
+        .score-card.experience .score-icon {
+            background: rgba(255, 107, 107, 0.15);
+            color: #FF6B6B;
+        }
+
+        .score-card.sighting .score-icon {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4CAF50;
+        }
+
+        .score-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 8px 0;
+        }
+
+        .score-card .score-range {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .score-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .data-source {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            background: var(--surface-alt);
+            border-radius: var(--radius-md);
+            margin: 12px 0;
+        }
+
+        .data-source .source-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .data-source .source-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 4px 0;
+        }
+
+        .data-source .source-info p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .tech-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--surface-alt);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .credits-section {
+            text-align: center;
+            padding: 32px;
+            background: var(--surface-alt);
+            border-radius: var(--radius-lg);
+            margin-top: 32px;
+        }
+
+        .credits-section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0 0 8px 0;
+        }
+
+        .credits-section p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .about-hero h1 {
+                font-size: 32px;
+            }
+
+            .about-section {
+                padding: 24px;
+            }
+
+            .score-explanation {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="page-enter">
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <span class="whale-icon">🐋</span>
+                <span class="brand-text">Whale Migration Guide</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link">Species Tracking</a>
+                <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
+                <a href="whale-locations-gallery.html" class="nav-link">Locations</a>
+                <a href="about.html" class="nav-link active">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="about-page">
+        <div class="about-hero">
+            <h1>About This Project</h1>
+            <p>
+                The Whale Migration Guide combines scientific observation data with curated location information 
+                to help whale enthusiasts discover the best places and times to observe these magnificent creatures.
+            </p>
+        </div>
+
+        <!-- Data Sources Section -->
+        <section class="about-section">
+            <h2><span class="icon">📊</span> Data Sources</h2>
+            
+            <h3>Whale Observation Data</h3>
+            <p>
+                The heatmaps and species distribution visualizations are powered by occurrence data from the 
+                Global Biodiversity Information Facility (GBIF), one of the world's largest open-access 
+                biodiversity databases.
+            </p>
+
+            <div class="data-source">
+                <div class="source-icon">🌍</div>
+                <div class="source-info">
+                    <h4>GBIF - Global Biodiversity Information Facility</h4>
+                    <p>
+                        <a href="https://www.gbif.org" target="_blank" rel="noopener noreferrer">gbif.org</a> — 
+                        Open-access database containing millions of species occurrence records contributed by 
+                        researchers, citizen scientists, and institutions worldwide.
+                    </p>
+                </div>
+            </div>
+
+            <div class="methodology-card">
+                <h4>Data Processing Pipeline</h4>
+                <p>
+                    Raw GBIF occurrence records are filtered for quality (coordinate precision, date accuracy), 
+                    deduplicated, and processed into monthly aggregations. The data is then converted to 
+                    Mapbox vector tilesets for efficient web visualization.
+                </p>
+            </div>
+
+            <h3>Species Coverage</h3>
+            <p>Currently, the following species have heatmap data available:</p>
+            <ul>
+                <li><strong>Blue Whale</strong> (Balaenoptera musculus) — 2006-2025 occurrence data</li>
+                <li><strong>Humpback Whale</strong> (Megaptera novaeangliae) — 2017-2025 occurrence data</li>
+                <li><strong>Sperm Whale</strong> (Physeter macrocephalus) — 2006-2025 occurrence data</li>
+            </ul>
+            <p>
+                Additional species (Orca, Gray Whale, Fin Whale, etc.) have informational pages but await 
+                sufficient quality observation data for mapping.
+            </p>
+
+            <h3>Whale Watching Location Data</h3>
+            <p>
+                The 38 whale watching destinations were curated from multiple sources including tourism boards, 
+                whale watching operator associations, scientific literature on cetacean distribution, and 
+                verified traveler reports. Location data includes:
+            </p>
+            <ul>
+                <li>Geographic coordinates and regional classification</li>
+                <li>Species present and their seasonal availability</li>
+                <li>Industry size (number of operators and vessels)</li>
+                <li>Annual visitor estimates from tourism statistics</li>
+                <li>Accessibility ratings based on transportation infrastructure</li>
+            </ul>
+        </section>
+
+        <!-- Scoring Methodology Section -->
+        <section class="about-section">
+            <h2><span class="icon">⭐</span> Scoring Methodology</h2>
+            
+            <p>
+                Each whale watching location is rated on two primary metrics, both scored on a scale of 0-100. 
+                These scores are designed to help visitors choose destinations that match their priorities.
+            </p>
+
+            <div class="score-explanation">
+                <div class="score-card experience">
+                    <div class="score-icon">🎯</div>
+                    <h4>Experience Score</h4>
+                    <div class="score-range">0 – 100</div>
+                    <p>
+                        Measures the quality and memorability of whale encounters, including behavior diversity, 
+                        proximity to whales, and overall encounter satisfaction.
+                    </p>
+                </div>
+
+                <div class="score-card sighting">
+                    <div class="score-icon">👁️</div>
+                    <h4>Sighting Rate</h4>
+                    <div class="score-range">0 – 100</div>
+                    <p>
+                        Represents the probability of seeing whales during optimal season visits, based on 
+                        operator success rates and environmental conditions.
+                    </p>
+                </div>
+            </div>
+
+            <h3>Experience Score Components</h3>
+            <p>The Experience Score (labeled "Entertainment" in the data) is a composite metric considering:</p>
+            <ul>
+                <li><strong>Behavior Diversity (25%)</strong> — Variety of observable behaviors (breaching, feeding, singing, social interaction)</li>
+                <li><strong>Proximity Quality (25%)</strong> — Typical distance to whales; some locations allow closer approaches</li>
+                <li><strong>Species Diversity (20%)</strong> — Number of different whale species regularly observed</li>
+                <li><strong>Unique Features (15%)</strong> — Special phenomena like bubble-net feeding, friendly whale interactions, or beach hunting</li>
+                <li><strong>Supporting Wildlife (15%)</strong> — Presence of other marine life (dolphins, seals, seabirds) enhancing the experience</li>
+            </ul>
+
+            <h3>Sighting Rate Components</h3>
+            <p>The Sighting Rate (labeled "Visibility" in the data) factors in:</p>
+            <ul>
+                <li><strong>Success Rate (40%)</strong> — Reported whale sighting success from operators (many guarantee 90%+ during peak season)</li>
+                <li><strong>Season Length (20%)</strong> — Longer reliable seasons indicate more stable populations</li>
+                <li><strong>Weather Reliability (20%)</strong> — Frequency of weather-related trip cancellations</li>
+                <li><strong>Water Clarity (10%)</strong> — Visibility conditions affecting underwater viewing where applicable</li>
+                <li><strong>Whale Density (10%)</strong> — Typical number of whales encountered per trip</li>
+            </ul>
+
+            <div class="methodology-card">
+                <h4>Score Interpretation Guide</h4>
+                <p>
+                    <strong>90-100:</strong> World-class destination, exceptional experiences<br>
+                    <strong>80-89:</strong> Excellent destination, highly recommended<br>
+                    <strong>70-79:</strong> Very good destination, reliable experiences<br>
+                    <strong>60-69:</strong> Good destination, solid choice for whale watching<br>
+                    <strong>Below 60:</strong> Emerging or seasonal destination with variable results
+                </p>
+            </div>
+        </section>
+
+        <!-- Monthly Density Data Section -->
+        <section class="about-section">
+            <h2><span class="icon">📅</span> Monthly Activity Data</h2>
+            
+            <p>
+                Each location includes monthly whale density ratings (0-5 scale) and species-specific 
+                presence/absence data for all 12 months.
+            </p>
+
+            <h3>Monthly Density Scale</h3>
+            <ul>
+                <li><strong>0:</strong> Off-season — Whales absent or extremely rare</li>
+                <li><strong>1:</strong> Low activity — Some whales present, unpredictable sightings</li>
+                <li><strong>2:</strong> Moderate activity — Regular sightings possible</li>
+                <li><strong>3:</strong> Good activity — Reliable sightings, recommended visiting period</li>
+                <li><strong>4:</strong> High activity — Peak season, excellent sighting rates</li>
+                <li><strong>5:</strong> Peak activity — Best possible time, exceptional concentrations</li>
+            </ul>
+
+            <h3>Best Months Designation</h3>
+            <p>
+                The "Best Months" for each location are determined by combining peak whale density periods 
+                with favorable weather conditions and operator availability. These represent the optimal 
+                planning window for visitors.
+            </p>
+        </section>
+
+        <!-- Map Technology Section -->
+        <section class="about-section">
+            <h2><span class="icon">🗺️</span> Map Technology</h2>
+            
+            <p>
+                The interactive maps are built using Mapbox GL JS, a powerful JavaScript library for 
+                rendering vector maps with WebGL. This enables smooth animations, dynamic styling, 
+                and efficient handling of large datasets.
+            </p>
+
+            <h3>Heatmap Visualization</h3>
+            <p>
+                The density heatmaps represent aggregated whale observation points. Brighter/warmer colors 
+                indicate higher concentrations of recorded sightings. The monthly animation interpolates 
+                between months to show migration patterns over the year.
+            </p>
+
+            <div class="methodology-card">
+                <h4>Important Note on Heatmaps</h4>
+                <p>
+                    Heatmap density reflects <em>observation effort</em> as much as actual whale presence. 
+                    Areas with more whale watching activity, research stations, or shipping traffic will 
+                    have more recorded sightings. Remote areas may have fewer records despite healthy 
+                    whale populations.
+                </p>
+            </div>
+
+            <h3>Technology Stack</h3>
+            <div class="tech-stack">
+                <span class="tech-badge">🗺️ Mapbox GL JS v3</span>
+                <span class="tech-badge">📊 GBIF Occurrence Data</span>
+                <span class="tech-badge">🎨 CSS3 Animations</span>
+                <span class="tech-badge">⚡ Vanilla JavaScript</span>
+                <span class="tech-badge">🔤 Google Fonts (Inter)</span>
+            </div>
+        </section>
+
+        <!-- Limitations Section -->
+        <section class="about-section">
+            <h2><span class="icon">⚠️</span> Data Limitations & Caveats</h2>
+            
+            <ul>
+                <li>
+                    <strong>Observation Bias:</strong> GBIF data is contributed by researchers, citizen 
+                    scientists, and institutions. Coverage is uneven globally, with better data in 
+                    well-studied regions.
+                </li>
+                <li>
+                    <strong>Temporal Gaps:</strong> Historical data quality varies. Recent years 
+                    (2015-present) generally have better coverage than earlier periods.
+                </li>
+                <li>
+                    <strong>Species Identification:</strong> Some records may have identification 
+                    uncertainties, particularly for species that are difficult to distinguish at sea.
+                </li>
+                <li>
+                    <strong>Location Ratings:</strong> Scores are based on available information and 
+                    may not reflect recent changes in whale populations or tourism infrastructure.
+                </li>
+                <li>
+                    <strong>Seasonal Variation:</strong> Whale presence can vary significantly 
+                    year-to-year based on oceanographic conditions, prey availability, and climate patterns.
+                </li>
+            </ul>
+
+            <p>
+                This guide is intended for educational and trip-planning purposes. For the most current 
+                information, always consult local whale watching operators and tourism authorities.
+            </p>
+        </section>
+
+        <!-- Credits Section -->
+        <div class="credits-section">
+            <h3>Created by Quintin Tyree</h3>
+            <p>
+                Whale observation data provided by <a href="https://www.gbif.org" target="_blank" rel="noopener noreferrer">GBIF.org</a><br>
+                Maps powered by <a href="https://www.mapbox.com" target="_blank" rel="noopener noreferrer">Mapbox</a>
+            </p>
+        </div>
+    </main>
+</body>
+</html>

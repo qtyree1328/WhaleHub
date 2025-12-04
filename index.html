@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Whale Migration & Observation Guide</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="description" content="Explore whale migration patterns, species diversity, and discover the best whale watching locations worldwide.">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Make sure map can host absolutely positioned children (panel, controls, etc.) */
+        #map {
+            position: relative;
+        }
+
+        /* SIDE PANEL – overlays from right, map stays same size */
+        .info-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 400px;
+            max-width: 90vw;
+            background: #ffffff;
+            box-shadow: -4px 0 18px rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            z-index: 5;
+        }
+
+        .info-panel.open {
+            transform: translateX(0);
+        }
+
+        .info-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-panel-title-group h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .info-panel-title-group p {
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        #infoPanelClose {
+            border: none;
+            background: transparent;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* Body fills the rest of panel height and scrolls as needed */
+        .info-panel-body {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Full-width media header inside panel */
+        .location-panel-header-media {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .location-panel-header-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Image carousel navigation for panel */
+        .panel-image-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 8px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .panel-image-nav.hidden {
+            display: none;
+        }
+        
+        .panel-nav-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            transition: all 0.2s ease;
+        }
+        
+        .panel-nav-btn:hover {
+            background: rgba(0,0,0,0.7);
+        }
+        
+        .panel-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .panel-image-counter {
+            position: absolute;
+            bottom: 50px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            z-index: 5;
+        }
+        
+        .panel-image-counter.hidden {
+            display: none;
+        }
+
+        .location-name-overlay-panel {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 24px 18px 10px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.85));
+            color: #fff;
+        }
+
+        .location-name-overlay-panel .location-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .location-name-overlay-panel .location-region {
+            font-size: 13px;
+            margin: 4px 0 0 0;
+            opacity: 0.95;
+        }
+
+        /* Main content uses full width of panel */
+        .location-panel-content {
+            padding: 18px;
+        }
+
+        .score-container {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 18px;
+            justify-content: center;
+        }
+
+        .score-circle {
+            text-align: center;
+            position: relative;
+            cursor: help;
+        }
+        
+        .score-circle:hover .score-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .score-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: normal;
+            max-width: 200px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            margin-top: 8px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .score-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-bottom-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .circle-svg {
+            width: 50px;
+            height: 50px;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #f0f0f0;
+            stroke-width: 5;
+        }
+
+        .circle-progress {
+            fill: none;
+            stroke-width: 5;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.6s ease;
+            transform-origin: center;
+            transform: rotate(-90deg);
+        }
+
+        .score-value {
+            font-size: 14px;
+            font-weight: 700;
+            fill: #333;
+        }
+
+        .score-label {
+            font-size: 10px;
+            color: #666;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .species-list {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        .species-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 7px;
+        }
+
+        .species-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .species-tag {
+            background: white;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 11px;
+            color: #2c7ab8;
+            border: 1px solid #e0e0e0;
+            font-weight: 500;
+        }
+
+        .info-section {
+            margin-bottom: 14px;
+        }
+
+        .info-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-text {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .best-months {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .month-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .accessibility-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .excellent { background: #d4edda; color: #155724; }
+        .good { background: #d1ecf1; color: #0c5460; }
+        .moderate { background: #fff3cd; color: #856404; }
+
+        /* Monthly density chart styles */
+        .monthly-density-chart {
+            background: #f8f9fa;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+        
+        .chart-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        
+        .month-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 80px;
+            gap: 2px;
+            padding: 0 4px;
+        }
+        
+        .month-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .bar-wrapper {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        
+        .bar-fill {
+            width: 100%;
+            background: linear-gradient(to top, #2c7ab8, #4a9fd8);
+            border-radius: 2px 2px 0 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .month-bar:hover .bar-fill {
+            background: linear-gradient(to top, #1e5a8a, #2c7ab8);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .bar-label {
+            font-size: 8px;
+            color: #666;
+            font-weight: 600;
+            line-height: 1;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        /* Stacked species bar-specific styles */
+        .stacked-bar {
+            width: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+            border-radius: 2px 2px 0 0;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .species-segment {
+            width: 100%;
+        }
+        
+        .bar-count {
+            font-size: 9px;
+            color: #444;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .month-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            min-width: 120px;
+            max-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 20;
+        }
+        
+        .month-bar {
+            position: relative;
+        }
+        
+        .month-bar:hover .month-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .tooltip-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+        
+        .tooltip-species {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            margin-bottom: 2px;
+        }
+        
+        .tooltip-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .species-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 10px;
+            color: #555;
+        }
+        
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 4px;
+            border: 1px solid rgba(0,0,0,0.15);
+        }
+
+        /* Tourism stats section */
+        .tourism-stats {
+            background: #f0f7ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            font-size: 13px;
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        /* Scrollbar styling inside panel content (optional) */
+        .info-panel-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .info-panel-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .info-panel-body::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+        .info-panel-body::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+    </style>
+</head>
+<body class="page-enter">
+    <!-- Navigation Bar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <span class="whale-icon">🐋</span>
+                <span class="brand-text">Whale Migration Guide</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Density Map</a>
+                <a href="species.html" class="nav-link">Species Tracking</a>
+                <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
+                <a href="whale-locations-gallery.html" class="nav-link">Locations</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Description Section -->
+    <div id="description">
+        <h1>Whale Species Diversity & Watching Locations</h1>
+        <p>
+            This interactive map reveals where different whale species overlap throughout the year,
+            combined with <strong>premier whale watching locations</strong> worldwide.
+            Click the <span style="color: #000000; font-weight: 600;">black POI pins</span> to discover top viewing spots with detailed information.
+        </p>
+        <p>
+            <strong>How to use:</strong> Drag the month slider to see seasonal patterns, or click play for animation. 
+            Brighter colors show where multiple species overlap.
+        </p>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map">
+        <!-- Month Controls -->
+        <div id="controls">
+            <div class="control-header">Month Controls</div>
+            <div class="month-display">
+                <span id="monthLabel">January</span>
+            </div>
+            <input id="monthSlider" type="range" min="1" max="12" step="1" value="1">
+            <button id="playPause" class="control-button">Play</button>
+        </div>
+
+        <!-- Month Display (bottom center) -->
+        <div id="monthBottom">January</div>
+
+        <!-- Legend -->
+        <div id="legend">
+            <div class="legend-title">Species Diversity</div>
+            <div class="legend-gradient">
+                <div class="gradient-bar" style="background: linear-gradient(to right, 
+                    rgba(0,0,80,0.4),
+                    rgba(0,100,255,0.6),
+                    rgba(0,200,255,0.7),
+                    rgba(100,255,200,0.8),
+                    rgba(255,220,0,0.9),
+                    rgba(255,100,0,0.95),
+                    rgba(255,0,150,1));"></div>
+                <div class="gradient-labels">
+                    <span>Lower</span>
+                    <span>Higher</span>
+                </div>
+            </div>
+            <div class="legend-note">
+                <span style="color: #000000;">●</span> Click pins for whale watching locations
+            </div>
+        </div>
+
+        <!-- Side Info Panel (overlay) -->
+        <div id="infoPanel" class="info-panel">
+            <div class="info-panel-header">
+                <div class="info-panel-title-group">
+                    <h3 id="infoPanelTitle">Location</h3>
+                    <p id="infoPanelSubtitle"></p>
+                </div>
+                <button id="infoPanelClose" aria-label="Close">&times;</button>
+            </div>
+            <div id="infoPanelBody" class="info-panel-body">
+                <!-- filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="whale-locations.js"></script>
+    <script>
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoicXR5cmVlIiwiYSI6ImNtaHl5eHNmeDBoY3oybXEwNTIxNGgxYmsifQ.VqoAKKHQxQX-lNNPwVKHmw';
+        const TILESET_URL = 'mapbox://qtyree.3unq4gqu';
+        const SOURCE_LAYER = 'whale_density_weighted_1-2leax1';
+        
+        const MONTH_NAMES = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        
+        const MONTH_ABBREV = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        const SPECIES_COLORS = {
+            "Humpback whale": "#3498db",
+            "Blue whale": "#2980b9",
+            "Gray whale": "#7f8c8d",
+            "Orca": "#2c3e50",
+            "Fin whale": "#8e44ad",
+            "Sperm whale": "#c0392b",
+            "Minke whale": "#27ae60",
+            "Southern right whale": "#d35400",
+            "North Atlantic right whale": "#d35400",
+            "Right whale": "#d35400",
+            "Beluga whale": "#ecf0f1",
+            "Sei whale": "#9b59b6",
+            "Bryde's whale": "#1abc9c",
+            "Pilot whale": "#34495e",
+            "Beaked whale": "#f39c12",
+            "default": "#95a5a6"
+        };
+
+        function getSpeciesColor(name) {
+            if (!name) return SPECIES_COLORS.default;
+            return SPECIES_COLORS[name] || SPECIES_COLORS.default;
+        }
+
+        let monthA = 1;
+        let monthB = 2;
+        let phase = 0;
+        let startTime = null;
+        let animFrame = null;
+        let isPlaying = false;
+        let morphDuration = 1800;
+
+        mapboxgl.accessToken = MAPBOX_TOKEN;
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v11',
+            projection: 'globe',
+            center: [-130, 35],
+            zoom: 3
+        });
+
+        const infoPanel = document.getElementById('infoPanel');
+        const infoPanelTitle = document.getElementById('infoPanelTitle');
+        const infoPanelSubtitle = document.getElementById('infoPanelSubtitle');
+        const infoPanelBody = document.getElementById('infoPanelBody');
+        const infoPanelClose = document.getElementById('infoPanelClose');
+
+        function updateLabels() {
+            const label = MONTH_NAMES[monthA - 1];
+            document.getElementById('monthLabel').textContent = label;
+            document.getElementById('monthBottom').textContent = label;
+            document.getElementById('monthSlider').value = String(monthA);
+        }
+
+        function setFilterAll() {
+            if (map.getLayer('density-heatmap')) {
+                map.setFilter('density-heatmap', [
+                    'in', ['get', 'month'], ['literal', [monthA, monthB]]
+                ]);
+            }
+        }
+
+        function setWeightAll(phaseVal) {
+            if (map.getLayer('density-heatmap')) {
+                const weightExpr = [
+                    'case',
+                    ['==', ['get', 'month'], monthA], 1 - phaseVal,
+                    ['==', ['get', 'month'], monthB], phaseVal,
+                    0
+                ];
+                map.setPaintProperty('density-heatmap', 'heatmap-weight', weightExpr);
+            }
+        }
+
+        function stepAnimation(timestamp) {
+            if (!isPlaying) return;
+            
+            if (startTime === null) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            phase = elapsed / morphDuration;
+            
+            if (phase > 1) phase = 1;
+            
+            setWeightAll(phase);
+            
+            if (phase < 1) {
+                animFrame = requestAnimationFrame(stepAnimation);
+            } else {
+                monthA = monthB;
+                monthB = (monthB % 12) + 1;
+                setFilterAll();
+                updateLabels();
+                startTime = null;
+                phase = 0;
+                
+                if (isPlaying) {
+                    animFrame = requestAnimationFrame(stepAnimation);
+                }
+            }
+        }
+
+        function startAnimation() {
+            if (isPlaying) return;
+            isPlaying = true;
+            document.getElementById('playPause').textContent = 'Pause';
+            monthB = (monthA % 12) + 1;
+            setFilterAll();
+            startTime = null;
+            phase = 0;
+            animFrame = requestAnimationFrame(stepAnimation);
+        }
+
+        function stopAnimation() {
+            isPlaying = false;
+            document.getElementById('playPause').textContent = 'Play';
+            if (animFrame) {
+                cancelAnimationFrame(animFrame);
+                animFrame = null;
+            }
+            startTime = null;
+        }
+        
+        // Create circular progress SVG (smaller size)
+        function createCircularProgress(value, color) {
+            const radius = 21;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (value / 100) * circumference;
+            
+            return `
+                <svg class="circle-svg" viewBox="0 0 50 50">
+                    <circle class="circle-bg" cx="25" cy="25" r="${radius}"></circle>
+                    <circle class="circle-progress" cx="25" cy="25" r="${radius}"
+                        stroke="${color}"
+                        stroke-dasharray="${circumference}"
+                        stroke-dashoffset="${offset}">
+                    </circle>
+                    <text x="25" y="28.5" text-anchor="middle" class="score-value" fill="${color}">
+                        ${value}
+                    </text>
+                </svg>
+            `;
+        }
+        
+  
+        // Global max species levels for bar height
+        const MAX_SPECIES_LEVELS = 5;
+
+        function createMonthlyDensityChart(location) {
+            const speciesMonthly = location.speciesMonthly;
+
+            if (!speciesMonthly || typeof speciesMonthly !== "object") {
+                return "";
+            }
+
+            // Preserve EXACT order from object literal
+            const orderedSpecies = Object.keys(speciesMonthly);
+
+            const numMonths = 12;
+            const MAX_SPECIES_LEVELS = 5;
+
+            // Compute species counts per month
+            const monthlyCounts = new Array(numMonths).fill(0);
+            orderedSpecies.forEach(sp => {
+                const arr = speciesMonthly[sp] || [];
+                for (let m = 0; m < numMonths; m++) {
+                    if (arr[m] > 0) monthlyCounts[m] += 1;
+                }
+            });
+
+            const anyCount = monthlyCounts.some(c => c > 0);
+            if (!anyCount) return "";
+
+            const bars = monthlyCounts.map((count, monthIndex) => {
+                if (!count) {
+                    return `
+                        <div class="month-bar">
+                            <div class="bar-wrapper">
+                                <div class="stacked-bar" style="height:0%;"></div>
+                            </div>
+                            <div class="bar-label">${MONTH_ABBREV[monthIndex]}</div>
+                        </div>
+                    `;
+                }
+
+                const presentSpecies = orderedSpecies.filter(sp => {
+                    const arr = speciesMonthly[sp];
+                    return Array.isArray(arr) && arr[monthIndex] > 0;
+                });
+
+                const clampedCount = Math.min(count, MAX_SPECIES_LEVELS);
+                const barHeightPercent = (clampedCount / MAX_SPECIES_LEVELS) * 100;
+
+                const segments = presentSpecies.map(sp => {
+                    const color = getSpeciesColor(sp);
+                    return `
+                        <div class="species-segment"
+                            style="background:${color}; height:${100 / presentSpecies.length}%"
+                            title="${sp}">
+                        </div>
+                    `;
+                }).join("");
+
+                const tooltipSpecies = presentSpecies.map(sp => {
+                    const color = getSpeciesColor(sp);
+                    return `
+                        <div class="tooltip-species">
+                            <span class="tooltip-color" style="background:${color};"></span>${sp}
+                        </div>
+                    `;
+                }).join("");
+
+                return `
+                    <div class="month-bar">
+                        <div class="month-tooltip">
+                            <div class="tooltip-title">${MONTH_NAMES[monthIndex]}</div>
+                            <div style="font-size:11px;margin-bottom:4px;">${count} species</div>
+                            ${tooltipSpecies}
+                        </div>
+
+                        <div class="bar-count">${count}</div>
+
+                        <div class="bar-wrapper">
+                            <div class="stacked-bar"
+                                style="height:${barHeightPercent}%; min-height:4px;">
+                                ${segments}
+                            </div>
+                        </div>
+
+                        <div class="bar-label">${MONTH_ABBREV[monthIndex]}</div>
+                    </div>
+                `;
+            }).join("");
+
+            const legendItems = orderedSpecies.map(sp => {
+                const color = getSpeciesColor(sp);
+                return `
+                    <div class="legend-item">
+                        <span class="legend-color" style="background:${color};"></span>
+                        ${sp.replace(" whale", "")}
+                    </div>
+                `;
+            }).join("");
+
+            return `
+                <div class="monthly-density-chart">
+                    <div class="chart-title">
+                        Species Stacked by Month
+                        <span style="display:block;font-size:10px;color:#777;margin-top:2px;">
+                            Stack order = dataset order (bottom = first species listed).
+                        </span>
+                    </div>
+
+                    <div class="month-bars">${bars}</div>
+
+                    <div class="species-legend">${legendItems}</div>
+                </div>
+            `;
+        }
+
+
+
+        // Format number with commas
+        function formatNumber(num) {
+            if (!num) return 'N/A';
+            return num.toLocaleString();
+        }
+        
+        // HTML for the full-width side panel
+        function createLocationPanelHTML(location) {
+            const accessibilityClass = location.accessibility.toLowerCase();
+            const bestMonthsHTML = location.bestMonths.map(m => 
+                `<span class="month-badge">${MONTH_NAMES[m-1].substring(0,3)}</span>`
+            ).join('');
+            
+            const monthlyChartHTML = createMonthlyDensityChart(location);
+            
+            // Get images array (support both imageUrl and imageUrls)
+            const images = location.imageUrls && Array.isArray(location.imageUrls) && location.imageUrls.length > 0 
+                ? location.imageUrls 
+                : [location.imageUrl || 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop'];
+            
+            const hasMultipleImages = images.length > 1;
+            const imageUrl = images[0];
+            
+            return `
+                <div class="location-panel-header-media" data-images='${JSON.stringify(images)}' data-current-index="0">
+                    <img src="${imageUrl}" alt="${location.name}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop';">
+                    <div class="panel-image-nav ${hasMultipleImages ? '' : 'hidden'}">
+                        <button class="panel-nav-btn panel-prev-btn" disabled onclick="panelPrevImage(event)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button class="panel-nav-btn panel-next-btn" onclick="panelNextImage(event)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="panel-image-counter ${hasMultipleImages ? '' : 'hidden'}">1 / ${images.length}</div>
+                    <div class="location-name-overlay-panel">
+                        <h3 class="location-name">${location.name}</h3>
+                        <p class="location-region">${location.location}</p>
+                    </div>
+                </div>
+                <div class="location-panel-content">
+                    <div class="score-container">
+                        <div class="score-circle">
+                            <div class="score-tooltip">Quality of whale behaviors and interactions (breaching, feeding, etc.)</div>
+                            ${createCircularProgress(location.entertainment, '#FF6B6B')}
+                            <div class="score-label">Experience</div>
+                        </div>
+                        <div class="score-circle">
+                            <div class="score-tooltip">Likelihood of seeing whales clearly based on success rate and conditions</div>
+                            ${createCircularProgress(location.visibility, '#4CAF50')}
+                            <div class="score-label">Sighting Rate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">What Makes It Special</div>
+                        <div class="info-text">${location.specialNotes}</div>
+                    </div>
+                    
+                    ${monthlyChartHTML}
+                    
+                    <div class="species-list">
+                        <div class="species-title">Species Present</div>
+                        <div class="species-tags">
+                            ${location.species.map(s => `<span class="species-tag">${s}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">Best Months</div>
+                        <div class="best-months">${bestMonthsHTML}</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">Accessibility</div>
+                        <span class="accessibility-badge ${accessibilityClass}">${location.accessibility}</span>
+                    </div>
+                    
+                    <div class="tourism-stats">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">Industry Size</div>
+                                <div class="stat-value">${location.industrySize || 'N/A'}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Annual Visitors</div>
+                                <div class="stat-value">${formatNumber(location.annualVisitors)}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Panel image carousel functions
+        function panelPrevImage(event) {
+            event.stopPropagation();
+            const mediaContainer = document.querySelector('.location-panel-header-media');
+            if (!mediaContainer) return;
+            
+            const images = JSON.parse(mediaContainer.dataset.images);
+            let currentIndex = parseInt(mediaContainer.dataset.currentIndex);
+            
+            if (currentIndex > 0) {
+                currentIndex--;
+                mediaContainer.dataset.currentIndex = currentIndex;
+                updatePanelImage(mediaContainer, images, currentIndex);
+            }
+        }
+        
+        function panelNextImage(event) {
+            event.stopPropagation();
+            const mediaContainer = document.querySelector('.location-panel-header-media');
+            if (!mediaContainer) return;
+            
+            const images = JSON.parse(mediaContainer.dataset.images);
+            let currentIndex = parseInt(mediaContainer.dataset.currentIndex);
+            
+            if (currentIndex < images.length - 1) {
+                currentIndex++;
+                mediaContainer.dataset.currentIndex = currentIndex;
+                updatePanelImage(mediaContainer, images, currentIndex);
+            }
+        }
+        
+        function updatePanelImage(container, images, index) {
+            const img = container.querySelector('img');
+            const counter = container.querySelector('.panel-image-counter');
+            const prevBtn = container.querySelector('.panel-prev-btn');
+            const nextBtn = container.querySelector('.panel-next-btn');
+            
+            img.style.opacity = '0';
+            setTimeout(() => {
+                img.src = images[index];
+                img.style.opacity = '1';
+            }, 150);
+            
+            counter.textContent = `${index + 1} / ${images.length}`;
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === images.length - 1;
+        }
+
+        function openInfoPanel(location) {
+            infoPanelTitle.textContent = location.name;
+            infoPanelSubtitle.textContent = location.location;
+            infoPanelBody.innerHTML = createLocationPanelHTML(location);
+            infoPanel.classList.add('open');
+        }
+
+        function closeInfoPanel() {
+            infoPanel.classList.remove('open');
+        }
+
+        infoPanelClose.addEventListener('click', closeInfoPanel);
+
+        map.on('load', () => {
+            // Heatmap source + layer
+            map.addSource('density-points', {
+                type: 'vector',
+                url: TILESET_URL
+            });
+            
+            map.addLayer({
+                'id': 'density-heatmap',
+                'type': 'heatmap',
+                'source': 'density-points',
+                'source-layer': SOURCE_LAYER,
+                'maxzoom': 9,
+                'paint': {
+                    'heatmap-weight': 1,
+                    'heatmap-intensity': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 0.8,
+                        5, 1.2,
+                        8, 1.8
+                    ],
+                    'heatmap-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['heatmap-density'],
+                        0.0, 'rgba(0,0,0,0)',
+                        0.1, 'rgba(0,0,80,0.3)',
+                        0.25, 'rgba(0,100,255,0.5)',
+                        0.4, 'rgba(0,200,255,0.65)',
+                        0.55, 'rgba(100,255,200,0.75)',
+                        0.7, 'rgba(255,220,0,0.85)',
+                        0.85, 'rgba(255,100,0,0.95)',
+                        1.0, 'rgba(255,0,150,1)'
+                    ],
+                    'heatmap-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 3,
+                        4, 15,
+                        8, 30
+                    ],
+                    'heatmap-opacity': 0.85,
+                    'heatmap-opacity-transition': { duration: 0, delay: 0 },
+                    'heatmap-radius-transition': { duration: 0, delay: 0 },
+                    'heatmap-weight-transition': { duration: 0, delay: 0 }
+                },
+                'filter': ['in', ['get', 'month'], ['literal', [monthA, monthB]]]
+            });
+
+            // Whale watching locations as GeoJSON
+            const whaleGeoJSON = {
+                type: 'FeatureCollection',
+                features: WHALE_WATCHING_LOCATIONS.map((loc, idx) => ({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: loc.coordinates
+                    },
+                    properties: {
+                        index: idx
+                    }
+                }))
+            };
+
+            map.addSource('whale-locations', {
+                type: 'geojson',
+                data: whaleGeoJSON
+            });
+
+            // POI-style halo
+            map.addLayer({
+                id: 'whale-locations-halo',
+                type: 'circle',
+                source: 'whale-locations',
+                paint: {
+                    'circle-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 6,
+                        4, 8,
+                        8, 10
+                    ],
+                    'circle-color': 'rgba(0,0,0,0.3)',
+                    'circle-stroke-width': 0
+                }
+            });
+            
+            // Main POI pin
+            map.addLayer({
+                id: 'whale-locations-layer',
+                type: 'circle',
+                source: 'whale-locations',
+                paint: {
+                    'circle-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 4,
+                        4, 5,
+                        8, 7
+                    ],
+                    'circle-color': '#000000',
+                    'circle-stroke-color': '#ffffff',
+                    'circle-stroke-width': 1.5
+                }
+            });
+
+            // Hover cursor
+            map.on('mouseenter', 'whale-locations-layer', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'whale-locations-layer', () => {
+                map.getCanvas().style.cursor = '';
+            });
+
+            // Click → open side panel
+            map.on('click', 'whale-locations-layer', (e) => {
+                if (!e.features || !e.features.length) return;
+                const feature = e.features[0];
+                const idx = parseInt(feature.properties.index, 10);
+                const location = WHALE_WATCHING_LOCATIONS[idx];
+                openInfoPanel(location);
+            });
+
+            setFilterAll();
+            setWeightAll(0);
+            updateLabels();
+        });
+        
+        document.getElementById('monthSlider').addEventListener('input', (e) => {
+            stopAnimation();
+            monthA = parseInt(e.target.value, 10);
+            monthB = (monthA % 12) + 1;
+            setFilterAll();
+            phase = 0;
+            setWeightAll(0);
+            updateLabels();
+        });
+
+        document.getElementById('playPause').addEventListener('click', () => {
+            if (isPlaying) {
+                stopAnimation();
+            } else {
+                startAnimation();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Whale Species - Whale Migration Guide</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Enhanced map styles for expandable functionality */
+        .species-map-card {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .species-map-card.expanded {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            border-radius: 0;
+            margin: 0;
+        }
+        
+        .species-map-card.expanded .species-map-container {
+            height: calc(100vh - 64px - 56px) !important;
+        }
+        
+        .species-map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+        }
+        
+        .species-map-header h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .map-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .map-view-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .map-view-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.8);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .map-view-btn.active {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+        
+        .map-view-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .year-select {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            appearance: none;
+            padding-right: 24px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+        }
+        
+        .year-select option {
+            background: #0a4a7c;
+            color: white;
+        }
+        
+        .year-select.hidden {
+            display: none;
+        }
+        
+        .expand-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        
+        .expand-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .species-map-container {
+            height: 300px;
+            position: relative;
+            transition: height 0.3s ease;
+        }
+        
+        /* Hero image carousel */
+        .species-hero {
+            position: relative;
+        }
+        
+        .hero-image-nav {
+            position: absolute;
+            bottom: 140px;
+            right: 40px;
+            display: none;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .hero-image-nav.visible {
+            display: flex;
+        }
+        
+        .hero-nav-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            transition: all 0.15s ease;
+        }
+        
+        .hero-nav-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .hero-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .hero-image-counter {
+            position: absolute;
+            bottom: 150px;
+            right: 140px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            backdrop-filter: blur(8px);
+            display: none;
+        }
+        
+        .hero-image-counter.visible {
+            display: block;
+        }
+        
+        .species-hero-image {
+            transition: opacity 0.3s ease;
+        }
+
+        /* Map overlay for expanded state */
+        .map-overlay-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+        }
+        
+        .map-overlay-bg.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body class="page-enter">
+    <!-- Navigation Bar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <span class="whale-icon">🐋</span>
+                <span class="brand-text">Whale Migration Guide</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link">Species Tracking</a>
+                <a href="whale-species-gallery.html" class="nav-link active">Whale Species</a>
+                <a href="whale-locations-gallery.html" class="nav-link">Locations</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Map overlay background -->
+    <div class="map-overlay-bg" id="mapOverlay"></div>
+
+    <!-- Detail Page Content -->
+    <main class="species-detail">
+        <!-- Hero Section -->
+        <div class="species-hero" id="speciesHero">
+            <img class="species-hero-image" id="heroImage" src="" alt="">
+            <div class="species-hero-overlay"></div>
+            <a href="whale-species-gallery.html" class="species-back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Species
+            </a>
+            <div class="hero-image-counter" id="imageCounter">1 / 1</div>
+            <div class="hero-image-nav" id="heroNav">
+                <button class="hero-nav-btn" id="prevImage" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="hero-nav-btn" id="nextImage">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+            </div>
+            <div class="species-hero-content">
+                <div class="species-hero-category" id="heroCategory"></div>
+                <h1 class="species-hero-title" id="heroTitle"></h1>
+                <p class="species-hero-scientific" id="heroScientific"></p>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="species-content">
+            <!-- Main Content -->
+            <div class="species-main">
+                <section class="species-section">
+                    <h2 class="species-section-title">About This Species</h2>
+                    <p class="species-description" id="speciesDescription"></p>
+                </section>
+
+                <section class="species-section">
+                    <h2 class="species-section-title">Migration Pattern</h2>
+                    <p class="species-description" id="migrationPattern"></p>
+                </section>
+
+                <section class="species-section">
+                    <h2 class="species-section-title">Fun Facts</h2>
+                    <ul class="fun-facts-list" id="funFactsList"></ul>
+                </section>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="species-sidebar">
+                <!-- Stats Card -->
+                <div class="species-stats-card">
+                    <h3 class="species-stats-title">Quick Facts</h3>
+                    <div id="statsContainer"></div>
+                </div>
+
+                <!-- Map Card -->
+                <div class="species-map-card" id="mapCard">
+                    <div class="species-map-header">
+                        <h3>Distribution Map</h3>
+                        <div class="map-controls" id="mapControls" style="display: none;">
+                            <div class="map-view-toggle">
+                                <button class="map-view-btn active" data-view="heatmap">Heatmap</button>
+                                <button class="map-view-btn" data-view="points">Points</button>
+                            </div>
+                            <select class="year-select hidden" id="yearSelect">
+                                <option value="all">All Years</option>
+                            </select>
+                            <button class="expand-btn" id="expandBtn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                                </svg>
+                                Expand
+                            </button>
+                        </div>
+                    </div>
+                    <div class="species-map-container" id="mapContainer">
+                        <!-- Map or placeholder will be rendered here -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script src="whale-species.js"></script>
+    <script src="config.js"></script>
+    <script>
+        // ============== STATE ==============
+        let speciesMap = null;
+        let speciesConfig = null;
+        let currentView = 'heatmap';
+        let currentYear = 'all';
+        let isMapExpanded = false;
+        let availableYears = [];
+        let currentImageIndex = 0;
+        let speciesImages = [];
+
+        // ============== UTILITY FUNCTIONS ==============
+        function getSpeciesId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        function findSpecies(id) {
+            return WHALE_SPECIES.find(s => s.id === id);
+        }
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'Endangered': 'status-endangered',
+                'Vulnerable': 'status-vulnerable',
+                'Least Concern': 'status-least-concern',
+                'Data Deficient': 'status-data-deficient'
+            };
+            return statusMap[status] || 'status-data-deficient';
+        }
+
+        function getSpeciesImages(species) {
+            if (species.heroImages && Array.isArray(species.heroImages) && species.heroImages.length > 0) {
+                return species.heroImages;
+            }
+            return [species.heroImage];
+        }
+
+        // Get species config from config.js if available
+        function getSpeciesConfigForId(speciesId) {
+            const configMap = {
+                'blue-whale': SPECIES_CONFIG.find(s => s.id === 'blue_2008_heat'),
+                'humpback-whale': SPECIES_CONFIG.find(s => s.id === 'humpback_2019_heat'),
+                'sperm-whale': SPECIES_CONFIG.find(s => s.id === 'sperm_2019_heat')
+            };
+            return configMap[speciesId];
+        }
+
+        // ============== RENDER FUNCTIONS ==============
+        function renderStats(stats) {
+            const container = document.getElementById('statsContainer');
+            const statsHTML = Object.entries(stats).map(([key, value]) => {
+                const label = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+                
+                if (key === 'status') {
+                    return `
+                        <div class="species-stat">
+                            <span class="species-stat-label">${label}</span>
+                            <span class="species-status ${getStatusClass(value)}">${value}</span>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="species-stat">
+                        <span class="species-stat-label">${label}</span>
+                        <span class="species-stat-value">${value}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = statsHTML;
+        }
+
+        function renderFunFacts(facts) {
+            const list = document.getElementById('funFactsList');
+            list.innerHTML = facts.map(fact => `<li>${fact}</li>`).join('');
+        }
+
+        // ============== IMAGE CAROUSEL ==============
+        function updateHeroImage() {
+            const img = document.getElementById('heroImage');
+            img.style.opacity = '0';
+            
+            setTimeout(() => {
+                img.src = speciesImages[currentImageIndex];
+                img.style.opacity = '1';
+            }, 150);
+            
+            document.getElementById('prevImage').disabled = currentImageIndex === 0;
+            document.getElementById('nextImage').disabled = currentImageIndex === speciesImages.length - 1;
+            document.getElementById('imageCounter').textContent = `${currentImageIndex + 1} / ${speciesImages.length}`;
+        }
+
+        function setupImageCarousel() {
+            const heroNav = document.getElementById('heroNav');
+            const imageCounter = document.getElementById('imageCounter');
+            
+            if (speciesImages.length > 1) {
+                heroNav.classList.add('visible');
+                imageCounter.classList.add('visible');
+                
+                document.getElementById('prevImage').addEventListener('click', () => {
+                    if (currentImageIndex > 0) {
+                        currentImageIndex--;
+                        updateHeroImage();
+                    }
+                });
+                
+                document.getElementById('nextImage').addEventListener('click', () => {
+                    if (currentImageIndex < speciesImages.length - 1) {
+                        currentImageIndex++;
+                        updateHeroImage();
+                    }
+                });
+            }
+        }
+
+        // ============== MAP FUNCTIONS ==============
+        function initMap(species) {
+            const container = document.getElementById('mapContainer');
+            speciesConfig = getSpeciesConfigForId(species.id);
+            
+            if (!species.hasMapData || !speciesConfig) {
+                container.innerHTML = `
+                    <div class="species-map-placeholder">
+                        <div class="species-map-placeholder-icon">🗺️</div>
+                        <p>Migration map data coming soon.<br>Check back later for updates!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Show map controls
+            document.getElementById('mapControls').style.display = 'flex';
+
+            // Create map
+            mapboxgl.accessToken = MAPBOX_TOKEN;
+            speciesMap = new mapboxgl.Map({
+                container: container,
+                style: 'mapbox://styles/mapbox/light-v11',
+                center: [-130, 35],
+                zoom: 2,
+                interactive: true
+            });
+
+            speciesMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+            speciesMap.on('load', () => {
+                // Add source
+                speciesMap.addSource('species-data', {
+                    type: 'vector',
+                    url: speciesConfig.url
+                });
+
+                // Add heatmap layer
+                speciesMap.addLayer({
+                    id: 'species-heatmap',
+                    type: 'heatmap',
+                    source: 'species-data',
+                    'source-layer': speciesConfig.sourceLayer,
+                    maxzoom: 9,
+                    paint: {
+                        'heatmap-weight': 1,
+                        'heatmap-intensity': [
+                            'interpolate', ['linear'], ['zoom'],
+                            0, 0.5, 5, 1.0, 8, 1.5
+                        ],
+                        'heatmap-color': speciesConfig.color.heatmap,
+                        'heatmap-radius': [
+                            'interpolate', ['linear'], ['zoom'],
+                            0, 2, 4, 12, 8, 24
+                        ],
+                        'heatmap-opacity': 0.85
+                    }
+                }, 'waterway-label');
+
+                // Add points layer (hidden by default)
+                speciesMap.addLayer({
+                    id: 'species-points',
+                    type: 'circle',
+                    source: 'species-data',
+                    'source-layer': speciesConfig.sourceLayer,
+                    paint: {
+                        'circle-radius': [
+                            'interpolate', ['linear'], ['zoom'],
+                            0, 1, 4, 3, 8, 6
+                        ],
+                        'circle-color': speciesConfig.color.base,
+                        'circle-opacity': 0.7,
+                        'circle-stroke-width': 1,
+                        'circle-stroke-color': 'white'
+                    },
+                    layout: {
+                        'visibility': 'none'
+                    }
+                }, 'waterway-label');
+
+                // Extract unique years from the data
+                extractYears();
+            });
+
+            // Setup controls
+            setupMapControls();
+        }
+
+        function extractYears() {
+            // Query the source for unique years
+            const features = speciesMap.querySourceFeatures('species-data', {
+                sourceLayer: speciesConfig.sourceLayer
+            });
+
+            const yearsSet = new Set();
+            features.forEach(f => {
+                if (f.properties && f.properties.year) {
+                    yearsSet.add(f.properties.year);
+                }
+            });
+
+            availableYears = Array.from(yearsSet).sort((a, b) => b - a);
+            
+            // If we found years, populate the dropdown
+            if (availableYears.length > 0) {
+                const yearSelect = document.getElementById('yearSelect');
+                yearSelect.innerHTML = '<option value="all">All Years</option>' + 
+                    availableYears.map(y => `<option value="${y}">${y}</option>`).join('');
+            }
+            
+            // Try again after tiles load more data
+            speciesMap.once('idle', () => {
+                const moreFeatures = speciesMap.querySourceFeatures('species-data', {
+                    sourceLayer: speciesConfig.sourceLayer
+                });
+                
+                moreFeatures.forEach(f => {
+                    if (f.properties && f.properties.year) {
+                        yearsSet.add(f.properties.year);
+                    }
+                });
+                
+                availableYears = Array.from(yearsSet).sort((a, b) => b - a);
+                
+                if (availableYears.length > 0) {
+                    const yearSelect = document.getElementById('yearSelect');
+                    yearSelect.innerHTML = '<option value="all">All Years</option>' + 
+                        availableYears.map(y => `<option value="${y}">${y}</option>`).join('');
+                }
+            });
+        }
+
+        function setupMapControls() {
+            // View toggle buttons
+            document.querySelectorAll('.map-view-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const view = btn.dataset.view;
+                    if (view === currentView) return;
+                    
+                    currentView = view;
+                    document.querySelectorAll('.map-view-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Toggle year selector visibility
+                    const yearSelect = document.getElementById('yearSelect');
+                    if (view === 'points') {
+                        yearSelect.classList.remove('hidden');
+                    } else {
+                        yearSelect.classList.add('hidden');
+                    }
+                    
+                    updateMapView();
+                });
+            });
+
+            // Year selector
+            document.getElementById('yearSelect').addEventListener('change', (e) => {
+                currentYear = e.target.value;
+                updateMapFilter();
+            });
+
+            // Expand button
+            document.getElementById('expandBtn').addEventListener('click', toggleMapExpand);
+            
+            // Overlay click to close
+            document.getElementById('mapOverlay').addEventListener('click', () => {
+                if (isMapExpanded) toggleMapExpand();
+            });
+            
+            // Escape key to close expanded map
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isMapExpanded) {
+                    toggleMapExpand();
+                }
+            });
+        }
+
+        function updateMapView() {
+            if (!speciesMap) return;
+            
+            if (currentView === 'heatmap') {
+                speciesMap.setLayoutProperty('species-heatmap', 'visibility', 'visible');
+                speciesMap.setLayoutProperty('species-points', 'visibility', 'none');
+            } else {
+                speciesMap.setLayoutProperty('species-heatmap', 'visibility', 'none');
+                speciesMap.setLayoutProperty('species-points', 'visibility', 'visible');
+            }
+            
+            updateMapFilter();
+        }
+
+        function updateMapFilter() {
+            if (!speciesMap) return;
+            
+            const layerId = currentView === 'heatmap' ? 'species-heatmap' : 'species-points';
+            
+            if (currentYear === 'all') {
+                speciesMap.setFilter(layerId, null);
+            } else {
+                speciesMap.setFilter(layerId, ['==', ['get', 'year'], parseInt(currentYear)]);
+            }
+        }
+
+        function toggleMapExpand() {
+            const mapCard = document.getElementById('mapCard');
+            const overlay = document.getElementById('mapOverlay');
+            const expandBtn = document.getElementById('expandBtn');
+            
+            isMapExpanded = !isMapExpanded;
+            
+            if (isMapExpanded) {
+                mapCard.classList.add('expanded');
+                overlay.classList.add('visible');
+                expandBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 14h6v6M14 4h6v6M20 20l-7-7M4 4l7 7"/>
+                    </svg>
+                    Collapse
+                `;
+            } else {
+                mapCard.classList.remove('expanded');
+                overlay.classList.remove('visible');
+                expandBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                    </svg>
+                    Expand
+                `;
+            }
+            
+            // Trigger map resize after transition
+            setTimeout(() => {
+                if (speciesMap) speciesMap.resize();
+            }, 350);
+        }
+
+        // ============== INITIALIZATION ==============
+        function initPage() {
+            const speciesId = getSpeciesId();
+            const species = findSpecies(speciesId);
+
+            if (!species) {
+                window.location.href = 'whale-species-gallery.html';
+                return;
+            }
+
+            // Update page title
+            document.title = `${species.commonName} - Whale Migration Guide`;
+
+            // Setup images
+            speciesImages = getSpeciesImages(species);
+            document.getElementById('heroImage').src = speciesImages[0];
+            document.getElementById('heroImage').alt = species.commonName;
+            setupImageCarousel();
+
+            // Update hero section
+            document.getElementById('heroCategory').textContent = species.category;
+            document.getElementById('heroTitle').textContent = species.commonName;
+            document.getElementById('heroScientific').textContent = species.scientificName;
+
+            // Update content
+            document.getElementById('speciesDescription').textContent = species.fullDescription;
+            document.getElementById('migrationPattern').textContent = species.migrationPattern;
+
+            // Render stats and facts
+            renderStats(species.stats);
+            renderFunFacts(species.funFacts);
+
+            // Initialize map
+            initMap(species);
+        }
+
+        // Start when DOM is ready
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

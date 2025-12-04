@@ -22,8 +22,8 @@ const WHALE_SPECIES = [
             'https://whalewatchersatlas.com/images/whales/Blue_whale2.jpg'
         ],
         color: '#0066ff',
-        shortDescription: 'The largest animal ever known to exist on Earth.',
-        fullDescription: `The blue whale is the largest animal known to have ever existed, reaching lengths of up to 100 feet (30 meters) and weights of up to 200 tons. Despite their enormous size, blue whales feed almost exclusively on tiny shrimp-like animals called krill.
+        shortDescription: 'WOW The largest animal ever known to exist on Earth.',
+        fullDescription: `WOW The blue whale is the largest animal known to have ever existed, reaching lengths of up to 100 feet (30 meters) and weights of up to 200 tons. Despite their enormous size, blue whales feed almost exclusively on tiny shrimp-like animals called krill.
 
 Blue whales are found in all oceans except the Arctic. They migrate seasonally between summer feeding grounds in polar waters and winter breeding grounds in tropical and subtropical waters.
 

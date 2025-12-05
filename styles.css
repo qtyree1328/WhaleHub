@@ -278,7 +278,7 @@ html, body {
    =========================== */
 #controls {
     position: absolute;
-    top: 16px;
+    bottom: 16px;
     left: 16px;
     z-index: 4;
     background: rgba(255, 255, 255, 0.96);
@@ -638,7 +638,7 @@ html, body {
    =========================== */
 #legend {
     position: absolute;
-    bottom: 16px;
+    top: 16px;
     left: 16px;
     z-index: 3;
     background: rgba(255, 255, 255, 0.96);

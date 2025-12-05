@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Whale Species - Whale Migration Guide</title>
+    <title>Whale Species - Whale Watchers Atlas</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
@@ -204,6 +207,14 @@
         .map-overlay-bg.visible {
             display: block;
         }
+        .map-month-control { display: flex; align-items: center; gap: 8px; }
+        .map-month-label { font-size: 11px; font-weight: 600; min-width: 28px; text-align: center; }
+        .map-month-slider { width: 80px; height: 4px; -webkit-appearance: none; background: rgba(255,255,255,0.3); border-radius: 2px; cursor: pointer; }
+        .map-month-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: white; border-radius: 50%; cursor: pointer; }
+        .mapboxgl-popup-content { padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .popup-title { font-weight: 600; font-size: 14px; color: #1a2b3c; margin-bottom: 6px; }
+        .popup-row { font-size: 12px; color: #5a6d7e; margin-bottom: 2px; }
+        
     </style>
 </head>
 <body class="page-enter">
@@ -295,6 +306,10 @@
                             <select class="year-select hidden" id="yearSelect">
                                 <option value="all">All Years</option>
                             </select>
+                            <div class="map-month-control">
+                                <span class="map-month-label" id="mapMonthLabel">Jan</span>
+                                <input type="range" min="1" max="12" value="1" class="map-month-slider" id="mapMonthSlider">
+                            </div>
                             <button class="expand-btn" id="expandBtn">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
@@ -315,6 +330,10 @@
     <script src="config.js"></script>
     <script>
         // ============== STATE ==============
+        let currentMonth = 1;
+        let currentPopup = null;
+        const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
         let speciesMap = null;
         let speciesConfig = null;
         let currentView = 'heatmap';
@@ -510,8 +529,8 @@
                         'visibility': 'none'
                     }
                 }, 'waterway-label');
-
                 // Extract unique years from the data
+                setupPointClicks();
                 extractYears();
             });
 
@@ -562,7 +581,73 @@
                 }
             });
         }
+        function setupPointClicks() {
+            // Change cursor on hover
+            speciesMap.on('mouseenter', 'species-points', () => {
+                speciesMap.getCanvas().style.cursor = 'pointer';
+            });
+            speciesMap.on('mouseleave', 'species-points', () => {
+                speciesMap.getCanvas().style.cursor = '';
+            });
+            
+            // Show popup on click
+            speciesMap.on('click', 'species-points', (e) => {
+                if (e.features.length === 0) return;
+                
+                const feature = e.features[0];
+                const props = feature.properties;
+                const coords = e.lngLat;
+                
+                if (currentPopup) currentPopup.remove();
+                
+                let popupHTML = `<div class="popup-title">${speciesConfig.name}</div>`;
+                if (props.year) popupHTML += `<div class="popup-row"><strong>Year:</strong> ${props.year}</div>`;
+                if (props.month) popupHTML += `<div class="popup-row"><strong>Month:</strong> ${MONTH_NAMES[props.month - 1]}</div>`;
+                if (props.count) popupHTML += `<div class="popup-row"><strong>Count:</strong> ${props.count}</div>`;
+                popupHTML += `<div class="popup-row"><strong>Location:</strong> ${coords.lat.toFixed(4)}°, ${coords.lng.toFixed(4)}°</div>`;
+                
+                currentPopup = new mapboxgl.Popup({ closeOnClick: true, maxWidth: '280px' })
+                    .setLngLat(coords)
+                    .setHTML(popupHTML)
+                    .addTo(speciesMap);
+            });
+        }
 
+        function updateMapFilter() {
+            if (!speciesMap) return;
+            
+            let filter;
+            if (currentYear === 'all') {
+                filter = ['==', ['get', 'month'], currentMonth];
+            } else {
+                filter = ['all',
+                    ['==', ['get', 'month'], currentMonth],
+                    ['==', ['get', 'year'], parseInt(currentYear)]
+                ];
+            }
+            
+            // Apply filter to BOTH layers
+            if (speciesMap.getLayer('species-heatmap')) {
+                speciesMap.setFilter('species-heatmap', filter);
+            }
+            if (speciesMap.getLayer('species-points')) {
+                speciesMap.setFilter('species-points', filter);
+            }
+        }
+
+        function updateMapView() {
+            if (!speciesMap) return;
+            
+            if (currentView === 'heatmap') {
+                speciesMap.setLayoutProperty('species-heatmap', 'visibility', 'visible');
+                speciesMap.setLayoutProperty('species-points', 'visibility', 'none');
+            } else {
+                speciesMap.setLayoutProperty('species-heatmap', 'visibility', 'none');
+                speciesMap.setLayoutProperty('species-points', 'visibility', 'visible');
+            }
+            
+            updateMapFilter();
+        }
         function setupMapControls() {
             // View toggle buttons
             document.querySelectorAll('.map-view-btn').forEach(btn => {
@@ -585,7 +670,11 @@
                     updateMapView();
                 });
             });
-
+            document.getElementById('mapMonthSlider').addEventListener('input', (e) => {
+                currentMonth = parseInt(e.target.value);
+                document.getElementById('mapMonthLabel').textContent = MONTH_ABBR[currentMonth - 1];
+                updateMapFilter();
+            });
             // Year selector
             document.getElementById('yearSelect').addEventListener('change', (e) => {
                 currentYear = e.target.value;
@@ -608,31 +697,8 @@
             });
         }
 
-        function updateMapView() {
-            if (!speciesMap) return;
-            
-            if (currentView === 'heatmap') {
-                speciesMap.setLayoutProperty('species-heatmap', 'visibility', 'visible');
-                speciesMap.setLayoutProperty('species-points', 'visibility', 'none');
-            } else {
-                speciesMap.setLayoutProperty('species-heatmap', 'visibility', 'none');
-                speciesMap.setLayoutProperty('species-points', 'visibility', 'visible');
-            }
-            
-            updateMapFilter();
-        }
 
-        function updateMapFilter() {
-            if (!speciesMap) return;
-            
-            const layerId = currentView === 'heatmap' ? 'species-heatmap' : 'species-points';
-            
-            if (currentYear === 'all') {
-                speciesMap.setFilter(layerId, null);
-            } else {
-                speciesMap.setFilter(layerId, ['==', ['get', 'year'], parseInt(currentYear)]);
-            }
-        }
+
 
         function toggleMapExpand() {
             const mapCard = document.getElementById('mapCard');

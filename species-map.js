@@ -17,8 +17,8 @@ let extraBlur = 0.5;
 const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11',
-    center: [-130, 35],
-    zoom: 3
+    center: [-110, 35],
+    zoom: 2
 });
 
 // Add navigation controls

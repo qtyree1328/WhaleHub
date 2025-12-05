@@ -403,11 +403,11 @@ html, body {
 
 @media (max-width: 768px) {
     #controls {
-        top: 10px;
+        bottom: 10px;
         left: 10px;
         right: 10px;
         padding: 14px;
-        font-size: 13px;
+        font-size: 10px;
     }
 }
 
@@ -711,9 +711,9 @@ html, body {
 
 @media (max-width: 768px) {
     #legend {
-        bottom: 10px;
+        top: 10px;
         left: 10px;
-        font-size: 12px;
+        font-size: 10px;
         padding: 12px 14px;
     }
 }

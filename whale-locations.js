@@ -9,6 +9,13 @@
 // Both formats are supported. Use imageUrls array for multiple images per location.
 // If both are provided, imageUrls takes precedence.
 
+
+// imageUrls: [
+//             'https://whalewatchersatlas.com/images/',
+//             'https://whalewatchersatlas.com/images/'
+//         ],
+
+
 const WHALE_WATCHING_LOCATIONS = [
     {
         name: "Juneau",
@@ -22,7 +29,12 @@ const WHALE_WATCHING_LOCATIONS = [
         accessibility: "Good",
         // Use imageUrls (array) for multiple images, or imageUrl (string) for single image
         imageUrls: [
-            "https://www.juneauwhalewatch.com/wp-content/uploads/2022/03/Juneau-Whale-Watching-Tour-and-Tracys-King-Crab-Combo_8.jpg"
+            'https://whalewatchersatlas.com/images/Juneau1.jpg',
+            'https://whalewatchersatlas.com/images/Juneau2.jpg',
+            'https://whalewatchersatlas.com/images/Juneau3.jpeg',
+            'https://whalewatchersatlas.com/images/Juneau4.jpg',
+            'https://whalewatchersatlas.com/images/Juneau5.avif',
+            'https://whalewatchersatlas.com/images/Juneau6.jpg'
         ],
         industrySize: "20 operators, 68 vessels",
         annualVisitors: 400000,
@@ -39,7 +51,12 @@ const WHALE_WATCHING_LOCATIONS = [
         bestMonths: [1, 2, 3, 4, 12],
         specialNotes: "Friendliest whales; touching distance; mothers & calves",
         accessibility: "Good",
-        imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop",
+        imageUrls: [
+            'https://whalewatchersatlas.com/images/SanIgnacio4.jpg',
+            'https://whalewatchersatlas.com/images/SanIgnacio1.jpg',
+            'https://whalewatchersatlas.com/images/SanIgnacio2.jpg',
+            'https://whalewatchersatlas.com/images/SanIgnacio3.jpg'
+        ],
         industrySize: "Multiple small operators",
         annualVisitors: 50000,
         monthlyDensity: [3, 4, 4, 2, 0, 0, 0, 0, 0, 0, 0, 2],
@@ -55,7 +72,12 @@ const WHALE_WATCHING_LOCATIONS = [
         bestMonths: [4, 5, 6, 7, 8, 9, 10],
         specialNotes: "Whale Capital of Europe; 24 cetaceans spotted; traditional oak boats",
         accessibility: "Good",
-        imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop",
+        imageUrls: [
+            'https://whalewatchersatlas.com/images/Husavik1.webp',
+            'https://whalewatchersatlas.com/images/Husavik2.jpeg',
+            'https://whalewatchersatlas.com/images/Husavik3.jpg',
+            'https://whalewatchersatlas.com/images/Husavik4.jpeg'
+        ],
         industrySize: "4 major operators",
         annualVisitors: 100000,
         monthlyDensity: [0, 0, 0, 3, 4, 5, 5, 5, 4, 3, 0, 0],
@@ -71,7 +93,12 @@ const WHALE_WATCHING_LOCATIONS = [
         bestMonths: [6, 7, 8, 9, 10, 11],
         specialNotes: "Main town for Peninsula Valdés; combines with orca beach-hunting",
         accessibility: "Excellent",
-        imageUrl: "https://media.timeout.com/images/106176947/image.webp",
+        imageUrls: [
+            'https://whalewatchersatlas.com/images/Puerto1.jpg',
+            'https://whalewatchersatlas.com/images/Puerto2.jpg',
+            'https://whalewatchersatlas.com/images/Puerto4.jpg',
+            'https://whalewatchersatlas.com/images/Puerto5.jpg'
+        ],
         industrySize: "6-10 operators",
         annualVisitors: 157000,
         monthlyDensity: [0, 0, 0, 0, 0, 1, 2, 3, 3, 3, 2, 1],
@@ -87,7 +114,13 @@ const WHALE_WATCHING_LOCATIONS = [
         bestMonths: [7, 8, 9, 10, 11, 12],
         specialNotes: "UNESCO World Heritage; orcas beach-hunting; right whale nursery",
         accessibility: "Good",
-        imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Whale_Watching_in_Valdes_Peninsula_-_panoramio_-_Ecohotel.jpg",
+        imageUrls: [
+            'https://whalewatchersatlas.com/images/Valdes1.jpg',
+            'https://whalewatchersatlas.com/images/Valdes2.jpg',
+            'https://whalewatchersatlas.com/images/Valdes3.jpg',
+            'https://whalewatchersatlas.com/images/Valdes4.jpg',
+            'https://whalewatchersatlas.com/images/Valdes5.jpg'
+        ],
         industrySize: "6-10 operators",
         annualVisitors: 244000,
         monthlyDensity: [0, 0, 0, 0, 0, 0, 2, 3, 3, 3, 3, 2],

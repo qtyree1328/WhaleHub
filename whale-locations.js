@@ -138,9 +138,12 @@ const WHALE_WATCHING_LOCATIONS = [
         accessibility: "Excellent",
         // Example with multiple images - arrows will appear to navigate
         imageUrls: [
-            "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop",
-            "https://images.unsplash.com/photo-1564979045531-fa386a275b27?w=600&h=400&fit=crop",
-            "https://images.unsplash.com/photo-1568430462989-44163eb1752f?w=600&h=400&fit=crop"
+            'https://whalewatchersatlas.com/images/Monteray1.jpg',
+            'https://whalewatchersatlas.com/images/Monteray2.jpg',
+            'https://whalewatchersatlas.com/images/Monteray3.webp',
+            'https://whalewatchersatlas.com/images/Monteray4.webp',
+            'https://whalewatchersatlas.com/images/Monteray5.jpeg',
+            'https://whalewatchersatlas.com/images/Monteray6.jpg'
         ],
         industrySize: "10-15 operators",
         annualVisitors: 300000,
@@ -157,7 +160,13 @@ const WHALE_WATCHING_LOCATIONS = [
         bestMonths: [1, 2, 3, 12],
         specialNotes: "Dolphin & whale capital; 10,000+ dolphins resident; gray whale migration peak",
         accessibility: "Excellent",
-        imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Dana_Point_Whale_Watch_Charter_Boat_4.jpg",
+        imageUrls: [
+            'https://whalewatchersatlas.com/images/Dana1.webp',
+            'https://whalewatchersatlas.com/images/Dana5.jpg',
+            'https://whalewatchersatlas.com/images/Dana2.webp',
+            'https://whalewatchersatlas.com/images/Dana3.webp',
+            'https://whalewatchersatlas.com/images/Dana4.webp'
+        ],
         industrySize: "5-8 operators",
         annualVisitors: 150000,
         monthlyDensity: [2, 2, 2, 2, 3, 4, 4, 4, 3, 3, 2, 2],

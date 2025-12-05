@@ -38,7 +38,7 @@
         #navbar { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); padding: 0 24px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 64px; }
         .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; font-weight: 700; font-size: 18px; }
-        .whale-icon { font-size: 24px; }
+        .whale-icon { font-size: 28px; }
         .nav-links { display: flex; gap: 8px; }
         .nav-link { color: rgba(255,255,255,0.85); text-decoration: none; padding: 8px 16px; border-radius: 8px; font-weight: 500; font-size: 14px; transition: all var(--transition-fast); }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
@@ -313,7 +313,9 @@
     <nav id="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-brand">
-                <span class="whale-icon">🐋</span>
+                <span class="whale-icon">
+                    <img src="favicon.ico" alt="Whale Icon" class="whale-icon-img">
+                </span>
                 <span class="brand-text">Whale Migration Guide</span>
             </a>
             <div class="nav-links">
@@ -657,7 +659,7 @@
             const seasons = getSpeciesSeasons(location);
             grid.innerHTML = location.species.map(species => `
                 <div class="species-item">
-                    <div class="species-icon">🐋</div>
+                    <div class="species-icon"><img src="favicon.ico" alt="Whale Icon" class="whale-icon-img"></div>
                     <div>
                         <div class="species-name">${species}</div>
                         <div class="species-season">${seasons[species] || 'Seasonal'}</div>

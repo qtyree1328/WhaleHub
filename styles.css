@@ -77,8 +77,8 @@ html, body {
 }
 
 .whale-icon {
-    font-size: 28px;
-    animation: whale-swim 3s ease-in-out infinite;
+    font-size: 50px;
+    /* animation: whale-swim 5s ease-in-out infinite; */
 }
 
 @keyframes whale-swim {

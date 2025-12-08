@@ -8,6 +8,11 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <meta name="description" content="Explore the world's best whale watching destinations with detailed information about species, best seasons, and visitor experiences.">
+
+    <!-- Mapbox GL -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -118,6 +123,21 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+
+        /* Simple locations map */
+        .locations-map {
+            width: 100%;
+            height: 420px;
+            border-radius: var(--radius-lg);
+
+            overflow: hidden;
+            /* box-shadow: var(--shadow-md); */
+            margin-bottom: 32px;
+            background: transparent;
+            box-shadow: none;
+            overflow: hidden;
+        }
+        
 
         /* Location Grid */
         .locations-grid {
@@ -330,6 +350,10 @@
             .filter-select {
                 width: 100%;
             }
+
+            .locations-map {
+                height: 320px;
+            }
         }
     </style>
 </head>
@@ -422,6 +446,9 @@
             </div>
         </div>
 
+        <!-- Simple map with only locations -->
+        <div id="locationsMap" class="locations-map"></div>
+
         <!-- Location Grid -->
         <div class="locations-grid" id="locationsGrid">
             <!-- Cards generated dynamically -->
@@ -441,9 +468,11 @@
             'July', 'August', 'September', 'October', 'November', 'December'
         ];
 
+        // Mapbox token
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoicXR5cmVlIiwiYSI6ImNtaHl5eHNmeDBoY3oybXEwNTIxNGgxYmsifQ.VqoAKKHQxQX-lNNPwVKHmw';
+
         // Generate URL-safe ID from location name - handles special characters
         function generateLocationId(name) {
-            // Normalize unicode characters to their base form (é -> e, ü -> u, ō -> o, etc.)
             const normalized = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
             return normalized.toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-')
@@ -603,11 +632,101 @@
             document.getElementById('totalVisitors').textContent = formatVisitors(totalVisitors);
         }
 
+        // Build GeoJSON for map
+        function buildLocationsGeoJSON() {
+            return {
+                type: 'FeatureCollection',
+                features: WHALE_WATCHING_LOCATIONS.map((loc, idx) => ({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: loc.coordinates  // [lon, lat]
+                    },
+                    properties: {
+                        index: idx
+                    }
+                }))
+            };
+        }
+
+        // Initialize simple locations map
+        function initLocationsMap() {
+            if (!mapboxgl || !document.getElementById('locationsMap')) return;
+
+            mapboxgl.accessToken = MAPBOX_TOKEN;
+
+            const geojson = buildLocationsGeoJSON();
+            if (!geojson.features.length) return;
+
+            const map = new mapboxgl.Map({
+                container: 'locationsMap',
+                style: 'mapbox://styles/mapbox/light-v11',
+                center: [-110, 35],
+                zoom:1,
+                projection: 'globe'
+            });
+
+            map.on('load', () => {
+                map.addSource('whale-locations', {
+                    type: 'geojson',
+                    data: geojson
+                });
+
+                // Fit to all locations
+                const bounds = new mapboxgl.LngLatBounds();
+                geojson.features.forEach(f => bounds.extend(f.geometry.coordinates));
+                // map.fitBounds(bounds, { padding: 0, maxZoom: 1 });
+                // map.fitBounds(bounds, { padding: 60, maxZoom: 4, duration: 2 });
+
+
+                map.loadImage('https://whalewatchersatlas.com/favicon-32.png', (error, image) => {
+                    if (error) {
+                        console.error('Error loading pin icon:', error);
+                        return;
+                    }
+                    if (!map.hasImage('whale-pin')) {
+                        map.addImage('whale-pin', image);
+                    }
+
+                    map.addLayer({
+                        id: 'whale-location-pins',
+                        type: 'symbol',
+                        source: 'whale-locations',
+                        layout: {
+                            'icon-image': 'whale-pin',
+                            'icon-size': 1,
+                            'icon-allow-overlap': true,
+                            'icon-ignore-placement': true
+                        }
+                    });
+
+                    map.on('mouseenter', 'whale-location-pins', () => {
+                        map.getCanvas().style.cursor = 'pointer';
+                    });
+                    map.on('mouseleave', 'whale-location-pins', () => {
+                        map.getCanvas().style.cursor = '';
+                    });
+
+                    // Click → navigate to location-detail page
+                    map.on('click', 'whale-location-pins', (e) => {
+                        if (!e.features || !e.features.length) return;
+                        const feature = e.features[0];
+                        const idx = feature.properties.index;
+                        const loc = WHALE_WATCHING_LOCATIONS[idx];
+                        if (!loc) return;
+                        const id = generateLocationId(loc.name);
+                        window.location.href = `location-detail.html?id=${id}`;
+                    });
+                });
+            });
+        }
+
         // Initialize
         function init() {
             populateFilters();
             updateStats();
             renderLocations();
+            initLocationsMap();
 
             // Add filter event listeners
             ['regionFilter', 'speciesFilter', 'monthFilter', 'sortFilter'].forEach(id => {

@@ -1150,8 +1150,30 @@
                     'circle-stroke-width': 0
                 }
             });
-            
+            // map.loadImage('https://whalewatchersatlas.com/favicon-32.png', (error, image) => {
+            //     if (error) {
+            //         console.error('Error loading pin icon:', error);
+            //         // Keep circles as fallback
+            //         return;
+            //     }
+            //     map.addImage('whale-pin', image);
+
+            //     // Remove circle layer and add symbol layer
+                
+            //     map.addLayer({
+            //         id: 'whale-locations-pin',
+            //         type: 'symbol',
+            //         source: 'whale-locations',
+            //         layout: {
+            //             'icon-image': 'whale-pin',
+            //             'icon-size': 1,
+            //             'icon-allow-overlap': true,
+            //             'icon-ignore-placement': true
+            //         }
+            //     });
+            // });
             // Main POI pin
+
             map.addLayer({
                 id: 'whale-locations-layer',
                 type: 'circle',

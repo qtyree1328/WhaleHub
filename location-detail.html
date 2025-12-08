@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,13 +43,6 @@
         .hero-score.sighting .hero-score-value { color: #4CAF50; }
         .location-back-link { position: absolute; top: 24px; left: 24px; display: flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-weight: 500; font-size: 14px; padding: 10px 16px; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); border-radius: var(--radius-md); transition: all var(--transition-base); }
         .location-back-link:hover { background: rgba(0,0,0,0.5); transform: translateX(-4px); }
-        .hero-nav { position: absolute; bottom: 120px; right: 40px; display: none; gap: 8px; z-index: 10; }
-        .hero-nav.visible { display: flex; }
-        .hero-nav-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.25); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); transition: all var(--transition-fast); }
-        .hero-nav-btn:hover { background: rgba(255,255,255,0.4); }
-        .hero-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .hero-image-counter { position: absolute; bottom: 130px; right: 140px; background: rgba(0,0,0,0.5); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(8px); display: none; }
-        .hero-image-counter.visible { display: block; }
         .location-content { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
         @media (max-width: 960px) { .location-content { grid-template-columns: 1fr; } }
         .location-main { display: flex; flex-direction: column; gap: 24px; }
@@ -122,6 +116,8 @@
         .map-legend-color { width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .map-legend-label { color: #555; }
         .mapboxgl-popup-content { padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .description-text p {margin: 0 0 1rem 0;   /* bottom space between paragraphs */}
+
         .popup-title { font-weight: 600; font-size: 14px; color: #1a2b3c; margin-bottom: 6px; }
         .popup-row { font-size: 12px; color: #5a6d7e; margin-bottom: 2px; }
         .popup-row:last-child { margin-bottom: 0; }
@@ -131,6 +127,23 @@
         .nearby-distance { font-size: 11px; color: var(--text-muted); min-width: 60px; }
         .nearby-name { font-weight: 600; color: var(--text); font-size: 14px; }
         .nearby-region { font-size: 12px; color: var(--text-muted); }
+        .description-text { font-size: 15px; line-height: 1.8; color: var(--text); }
+        .photo-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+        .gallery-item { position: relative; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 4/3; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all var(--transition-fast); }
+        .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        .gallery-item:hover img { transform: scale(1.05); }
+        .gallery-lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; }
+        .gallery-lightbox.active { display: flex; }
+        .lightbox-content { position: relative; max-width: 90vw; max-height: 90vh; }
+        .lightbox-content img { max-width: 100%; max-height: 90vh; border-radius: var(--radius-md); }
+        .lightbox-close { position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 32px; cursor: pointer; padding: 8px; opacity: 0.8; transition: opacity 0.2s; }
+        .lightbox-close:hover { opacity: 1; }
+        .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); transition: all 0.2s; }
+        .lightbox-nav:hover { background: rgba(255,255,255,0.3); }
+        .lightbox-nav.prev { left: -70px; }
+        .lightbox-nav.next { right: -70px; }
+        .lightbox-counter { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; font-weight: 500; }
         @media (max-width: 768px) { .location-hero { height: 350px; } .location-hero-title { font-size: 32px; } .location-hero-tagline { font-size: 15px; } .location-hero-content { padding: 24px; } .species-grid { grid-template-columns: 1fr; } .nav-links { display: none; } }
     </style>
 </head>
@@ -151,6 +164,15 @@
         </div>
     </nav>
     <div class="map-overlay-bg" id="mapOverlay"></div>
+    <div class="gallery-lightbox" id="galleryLightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightboxClose">&times;</button>
+            <button class="lightbox-nav prev" id="lightboxPrev"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <img id="lightboxImage" src="" alt="">
+            <button class="lightbox-nav next" id="lightboxNext"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+            <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+        </div>
+    </div>
     <main class="location-detail">
         <div class="location-hero">
             <img class="location-hero-image" id="heroImage" src="" alt="">
@@ -163,11 +185,6 @@
                 <div class="hero-score experience"><div class="hero-score-value" id="experienceScore">--</div><div class="hero-score-label">Experience</div></div>
                 <div class="hero-score sighting"><div class="hero-score-value" id="sightingScore">--</div><div class="hero-score-label">Sighting Rate</div></div>
             </div>
-            <div class="hero-image-counter" id="imageCounter">1 / 1</div>
-            <div class="hero-nav" id="heroNav">
-                <button class="hero-nav-btn" id="prevImage" disabled><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
-                <button class="hero-nav-btn" id="nextImage"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
-            </div>
             <div class="location-hero-content">
                 <span class="location-hero-region">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -179,6 +196,8 @@
         </div>
         <div class="location-content">
             <div class="location-main">
+                <section class="location-section" id="descriptionSection" style="display:none;"><h2 class="section-title">About This Location</h2><div class="description-text" id="locationDescription"></div></section>
+                <section class="location-section" id="gallerySection" style="display:none;"><h2 class="section-title">Photo Gallery</h2><div class="photo-gallery" id="photoGallery"></div></section>
                 <section class="location-section"><h2 class="section-title">Species You Can See</h2><div class="species-grid" id="speciesGrid"></div></section>
                 <section class="location-section"><h2 class="section-title">Monthly Whale Activity</h2><div class="monthly-chart" id="monthlyChart"></div><p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 8px;">Higher bars indicate more whale activity.</p></section>
                 <section class="location-section"><h2 class="section-title">Nearby Destinations</h2><div class="nearby-locations" id="nearbyLocations"></div></section>
@@ -196,7 +215,7 @@
                             <button class="expand-btn" id="expandBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Expand</button>
                         </div>
                     </div>
-                    <div class="location-map-container" id="mapContainer"><div class="map-legend hidden" id="mapLegend"><div class="map-legend-title">Species</div><div id="legendItems"></div></div></div>
+                    <div class="location-map-container" id="mapContainer"><div class="map-legend" id="mapLegend"><div class="map-legend-title">Species</div><div id="legendItems"></div></div></div>
                 </div>
             </aside>
         </div>
@@ -204,7 +223,7 @@
     <script>
         const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const SPECIES_COLORS = {"Humpback whale": "#3498db", "Blue whale": "#2980b9", "Gray whale": "#7f8c8d", "Orca": "#2c3e50", "Fin whale": "#8e44ad", "Sperm whale": "#c0392b", "Minke whale": "#27ae60", "Southern right whale": "#d35400", "North Atlantic right whale": "#d35400", "Right whale": "#d35400", "Beluga whale": "#ecf0f1", "Sei whale": "#9b59b6", "Bryde's whale": "#1abc9c", "Pilot whale": "#34495e", "Beaked whale": "#f39c12", "default": "#95a5a6"};
-        let currentImageIndex = 0, locationImages = [], densityMap = null, currentMapMonth = 1, currentView = 'heatmap', currentYear = 'all', isMapExpanded = false, availableYears = [], currentPopup = null;
+        let currentImageIndex = 0, locationImages = [], galleryImages = [], densityMap = null, currentMapMonth = 1, currentView = 'heatmap', currentYear = 'all', isMapExpanded = false, availableYears = [], currentPopup = null, currentGalleryIndex = 0;
 
         function getSpeciesColor(name) { return name ? (SPECIES_COLORS[name] || SPECIES_COLORS.default) : SPECIES_COLORS.default; }
         function generateLocationId(name) { return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
@@ -216,24 +235,97 @@
         function getSpeciesSeasons(location) { const seasons = {}; if (location.speciesMonthly) { Object.entries(location.speciesMonthly).forEach(([species, months]) => { const activeMonths = months.map((active, i) => active ? MONTH_ABBR[i] : null).filter(Boolean); seasons[species] = activeMonths.length === 12 ? 'Year-round' : activeMonths.length > 0 ? `${activeMonths[0]}-${activeMonths[activeMonths.length - 1]}` : 'Seasonal'; }); } return seasons; }
 
         function updateHeroImage() {
+            // Hero image is now static - only set the first image
             const img = document.getElementById('heroImage');
-            img.style.opacity = '0';
-            setTimeout(() => { img.src = locationImages[currentImageIndex]; img.style.opacity = '1'; }, 150);
-            document.getElementById('prevImage').disabled = currentImageIndex === 0;
-            document.getElementById('nextImage').disabled = currentImageIndex === locationImages.length - 1;
-            document.getElementById('imageCounter').textContent = `${currentImageIndex + 1} / ${locationImages.length}`;
+            img.src = locationImages[0];
         }
 
         function setupImageCarousel() {
-            const heroNav = document.getElementById('heroNav');
-            const imageCounter = document.getElementById('imageCounter');
-            if (locationImages.length > 1) {
-                heroNav.classList.add('visible');
-                imageCounter.classList.add('visible');
-                document.getElementById('prevImage').addEventListener('click', () => { if (currentImageIndex > 0) { currentImageIndex--; updateHeroImage(); } });
-                document.getElementById('nextImage').addEventListener('click', () => { if (currentImageIndex < locationImages.length - 1) { currentImageIndex++; updateHeroImage(); } });
-            }
+            // Hero image carousel removed - now static cover image
+            // Gallery images (excluding cover) handled separately
         }
+
+        function renderPhotoGallery(location) {
+            const allImages = location.imageUrls || [location.imageUrl];
+            galleryImages = allImages.slice(1); // Exclude cover image
+            
+            if (galleryImages.length === 0) {
+                document.getElementById('gallerySection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('gallerySection').style.display = 'block';
+            const gallery = document.getElementById('photoGallery');
+            gallery.innerHTML = galleryImages.map((url, index) => 
+                `<div class="gallery-item" data-index="${index}"><img src="${url}" alt="Gallery image ${index + 1}" loading="lazy"></div>`
+            ).join('');
+            
+            // Add click handlers
+            gallery.querySelectorAll('.gallery-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    currentGalleryIndex = parseInt(item.dataset.index);
+                    openLightbox();
+                });
+            });
+        }
+
+        function openLightbox() {
+            const lightbox = document.getElementById('galleryLightbox');
+            lightbox.classList.add('active');
+            updateLightboxImage();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('galleryLightbox');
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function updateLightboxImage() {
+            const img = document.getElementById('lightboxImage');
+            img.src = galleryImages[currentGalleryIndex];
+            document.getElementById('lightboxCounter').textContent = `${currentGalleryIndex + 1} / ${galleryImages.length}`;
+        }
+
+        function setupGalleryLightbox() {
+            document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+            document.getElementById('lightboxPrev').addEventListener('click', () => {
+                if (currentGalleryIndex > 0) {
+                    currentGalleryIndex--;
+                    updateLightboxImage();
+                }
+            });
+            document.getElementById('lightboxNext').addEventListener('click', () => {
+                if (currentGalleryIndex < galleryImages.length - 1) {
+                    currentGalleryIndex++;
+                    updateLightboxImage();
+                }
+            });
+            document.getElementById('galleryLightbox').addEventListener('click', (e) => {
+                if (e.target.id === 'galleryLightbox') closeLightbox();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (!document.getElementById('galleryLightbox').classList.contains('active')) return;
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft' && currentGalleryIndex > 0) { currentGalleryIndex--; updateLightboxImage(); }
+                if (e.key === 'ArrowRight' && currentGalleryIndex < galleryImages.length - 1) { currentGalleryIndex++; updateLightboxImage(); }
+            });
+        }
+
+        function renderDescription(location) {
+            const section = document.getElementById('descriptionSection');
+            const descEl = document.getElementById('locationDescription');
+
+            const html = location.fullDescription
+                .split(/\n\s*\n/)              // split on blank lines
+                .map(p => `<p>${p.trim()}</p>`)
+                .join("");
+
+            section.style.display = 'block';
+            descEl.innerHTML = html;
+        }
+
 
         const MAX_SPECIES_LEVELS = 5;
         function createMonthlyDensityChart(location) {
@@ -319,9 +411,9 @@
                     currentView = view;
                     document.querySelectorAll('.map-view-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    const yearSelect = document.getElementById('yearSelect'), mapLegend = document.getElementById('mapLegend');
-                    if (view === 'points') { yearSelect.classList.remove('hidden'); mapLegend.classList.remove('hidden'); }
-                    else { yearSelect.classList.add('hidden'); mapLegend.classList.add('hidden'); }
+                    const yearSelect = document.getElementById('yearSelect');
+                    if (view === 'points') { yearSelect.classList.remove('hidden'); }
+                    else { yearSelect.classList.add('hidden'); }
                     updateMapView();
                 });
             });
@@ -367,12 +459,12 @@
             locationImages = location.imageUrls || [location.imageUrl];
             document.getElementById('heroImage').src = locationImages[0];
             document.getElementById('heroImage').alt = location.name;
-            setupImageCarousel();
             document.getElementById('regionName').textContent = location.location;
             document.getElementById('heroTitle').textContent = location.name;
             document.getElementById('heroTagline').textContent = location.specialNotes;
             document.getElementById('experienceScore').textContent = location.entertainment;
             document.getElementById('sightingScore').textContent = location.visibility;
+            renderDescription(location); renderPhotoGallery(location); setupGalleryLightbox();
             renderSpecies(location); renderMonthlyChart(location); renderQuickFacts(location); renderMonthsGrid(location); renderNearbyLocations(location); initMap(location);
             if (location.bestMonths && location.bestMonths.length > 0) { const bestMonth = location.bestMonths[0]; document.getElementById('mapMonthSlider').value = bestMonth; currentMapMonth = bestMonth; document.getElementById('mapMonthLabel').textContent = MONTH_ABBR[bestMonth - 1]; }
         }

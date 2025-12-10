@@ -19,7 +19,6 @@
         #map {
             position: relative;
         }
-
         /* SIDE PANEL – overlays from right, map stays same size */
         .info-panel {
             position: absolute;
@@ -37,11 +36,9 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             z-index: 5;
         }
-
         .info-panel.open {
             transform: translateX(0);
         }
-
         .info-panel-header {
             display: flex;
             align-items: center;
@@ -49,18 +46,15 @@
             padding: 10px 16px;
             border-bottom: 1px solid #eee;
         }
-
         .info-panel-title-group h3 {
             margin: 0;
             font-size: 18px;
         }
-
         .info-panel-title-group p {
             margin: 2px 0 0 0;
             font-size: 12px;
             color: #666;
         }
-
         #infoPanelClose {
             border: none;
             background: transparent;
@@ -69,13 +63,11 @@
             cursor: pointer;
             padding: 4px 8px;
         }
-
         /* Body fills the rest of panel height and scrolls as needed */
         .info-panel-body {
             flex: 1;
             overflow-y: auto;
         }
-
         /* Full-width media header inside panel */
         .location-panel-header-media {
             position: relative;
@@ -83,7 +75,6 @@
             height: 180px;
             overflow: hidden;
         }
-
         .location-panel-header-media img {
             width: 100%;
             height: 100%;
@@ -91,7 +82,6 @@
             display: block;
             transition: opacity 0.3s ease;
         }
-
         /* Image carousel navigation for panel */
         .panel-image-nav {
             position: absolute;
@@ -149,7 +139,6 @@
         .panel-image-counter.hidden {
             display: none;
         }
-
         .location-name-overlay-panel {
             position: absolute;
             left: 0;
@@ -159,32 +148,27 @@
             background: linear-gradient(transparent, rgba(0,0,0,0.85));
             color: #fff;
         }
-
         .location-name-overlay-panel .location-name {
             font-size: 22px;
             font-weight: 700;
             margin: 0;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
-
         .location-name-overlay-panel .location-region {
             font-size: 13px;
             margin: 4px 0 0 0;
             opacity: 0.95;
         }
-
         /* Main content uses full width of panel */
         .location-panel-content {
             padding: 18px;
         }
-
         .score-container {
             display: flex;
             gap: 16px;
             margin-bottom: 18px;
             justify-content: center;
         }
-
         .score-circle {
             text-align: center;
             position: relative;
@@ -226,18 +210,15 @@
             border: 5px solid transparent;
             border-bottom-color: rgba(0, 0, 0, 0.9);
         }
-
         .circle-svg {
             width: 50px;
             height: 50px;
         }
-
         .circle-bg {
             fill: none;
             stroke: #f0f0f0;
             stroke-width: 5;
         }
-
         .circle-progress {
             fill: none;
             stroke-width: 5;
@@ -246,27 +227,23 @@
             transform-origin: center;
             transform: rotate(-90deg);
         }
-
         .score-value {
             font-size: 14px;
             font-weight: 700;
             fill: #333;
         }
-
         .score-label {
             font-size: 10px;
             color: #666;
             margin-top: 4px;
             font-weight: 600;
         }
-
         .species-list {
             background: #f8f9fa;
             padding: 10px 12px;
             border-radius: 8px;
             margin-bottom: 14px;
         }
-
         .species-title {
             font-size: 11px;
             font-weight: 700;
@@ -275,13 +252,11 @@
             letter-spacing: 0.5px;
             margin-bottom: 7px;
         }
-
         .species-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 5px;
         }
-
         .species-tag {
             background: white;
             padding: 4px 10px;
@@ -291,11 +266,9 @@
             border: 1px solid #e0e0e0;
             font-weight: 500;
         }
-
         .info-section {
             margin-bottom: 14px;
         }
-
         .info-label {
             font-size: 10px;
             font-weight: 700;
@@ -304,19 +277,16 @@
             letter-spacing: 0.5px;
             margin-bottom: 5px;
         }
-
         .info-text {
             font-size: 13px;
             color: #333;
             line-height: 1.5;
         }
-
         .best-months {
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
         }
-
         .month-badge {
             background: #e3f2fd;
             color: #1976d2;
@@ -325,7 +295,6 @@
             font-size: 10px;
             font-weight: 600;
         }
-
         .accessibility-badge {
             display: inline-block;
             padding: 4px 10px;
@@ -333,11 +302,9 @@
             font-size: 11px;
             font-weight: 600;
         }
-
         .excellent { background: #d4edda; color: #155724; }
         .good { background: #d1ecf1; color: #0c5460; }
         .moderate { background: #fff3cd; color: #856404; }
-
         /* Monthly density chart styles */
         .monthly-density-chart {
             background: #f8f9fa;
@@ -401,7 +368,6 @@
             margin-top: 3px;
             flex-shrink: 0;
         }
-
         /* Stacked species bar-specific styles */
         .stacked-bar {
             width: 100%;
@@ -493,7 +459,6 @@
             margin-right: 4px;
             border: 1px solid rgba(0,0,0,0.15);
         }
-
         /* Tourism stats section */
         .tourism-stats {
             background: #f0f7ff;
@@ -527,7 +492,6 @@
             color: #1976d2;
             font-weight: 600;
         }
-
         /* Scrollbar styling inside panel content (optional) */
         .info-panel-body::-webkit-scrollbar {
             width: 6px;
@@ -564,7 +528,6 @@
             </div>
         </div>
     </nav>
-
     <!-- Description Section -->
     <div id="description">
         <h1>Whale Species Diversity & Watching Locations</h1>
@@ -578,7 +541,6 @@
             Brighter colors show where multiple species overlap.
         </p>
     </div>
-
     <!-- Map Container -->
     <div id="map">
         <!-- Month Controls -->
@@ -587,13 +549,11 @@
             <div class="month-display">
                 <span id="monthLabel">January</span>
             </div>
-            <input id="monthSlider" type="range" min="1" max="12" step="1" value="1">
+            <input id="monthSlider" type="range" min="1" max="24" step="1" value="1">
             <button id="playPause" class="control-button">Play</button>
         </div>
-
         <!-- Month Display (bottom center) -->
         <div id="monthBottom">January</div>
-
         <!-- Legend -->
         <div id="legend">
             <div class="legend-title">Species Diversity</div>
@@ -615,7 +575,6 @@
                 <span style="color: #000000;">●</span> Click pins for whale watching locations
             </div>
         </div>
-
         <!-- Side Info Panel (overlay) -->
         <div id="infoPanel" class="info-panel">
             <div class="info-panel-header">
@@ -630,37 +589,52 @@
             </div>
         </div>
     </div>
-
     <script src="whale-locations.js"></script>
     <script>
+        // ============================================================
+        // CONFIGURATION - UPDATE THESE WITH YOUR NEW 24-BIN TILESET
+        // ============================================================
         const MAPBOX_TOKEN = 'pk.eyJ1IjoicXR5cmVlIiwiYSI6ImNtaHl5eHNmeDBoY3oybXEwNTIxNGgxYmsifQ.VqoAKKHQxQX-lNNPwVKHmw';
-        // const TILESET_URL = 'mapbox://qtyree.boz4q4aa';
-        // const SOURCE_LAYER = 'whale_density_weighted_1-ct85nq';
-        // // gaussian
-        // const TILESET_URL = 'mapbox://qtyree.7l71yvtr';
-        // const SOURCE_LAYER = 'whale_density_METHOD2_gaussia-56u93g';
-        // persistence
-        const TILESET_URL = 'mapbox://qtyree.6rru0f1u';
-        const SOURCE_LAYER = 'whale_density_METHOD1_persist-6tfzuh';
-
-
+        const TILESET_URL = 'mapbox://qtyree.dt33upzk';
+        const SOURCE_LAYER = 'WD9_24bin_Per_20_by_1-64nsiw';
+        // const TILESET_URL = 'mapbox://qtyree.whale-density-v2';
+        // const SOURCE_LAYER = 'whale_density';
+        
+        // ============================================================
+        // CONSTANTS
+        // ============================================================
+        const TOTAL_BINS = 24;
+        const BINS_PER_MONTH = 2;
+        
         const MONTH_NAMES = [
             'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'
         ];
         
         const MONTH_ABBREV = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
+        
         const SPECIES_COLORS = {
+            // Exact names from Python species_files
+            "Blue Whale": "#2980b9",
+            "Sperm Whale": "#c0392b",
+            "Humpback Whale": "#3498db",
+            "Grey Whale": "#7f8c8d",
+            "Fin Whale": "#8e44ad",
+            "Minke Whale": "#27ae60",
+            "Beluga Whale": "#ecf0f1",
+            "Southern Right Whale": "#d35400",
+            "North Atlantic Right Whale": "#e67e22",
+            // Lowercase variants for compatibility
             "Humpback whale": "#3498db",
             "Blue whale": "#2980b9",
             "Gray whale": "#7f8c8d",
+            "Grey whale": "#7f8c8d",
             "Orca": "#2c3e50",
             "Fin whale": "#8e44ad",
             "Sperm whale": "#c0392b",
             "Minke whale": "#27ae60",
             "Southern right whale": "#d35400",
-            "North Atlantic right whale": "#d35400",
+            "North Atlantic right whale": "#e67e22",
             "Right whale": "#d35400",
             "Beluga whale": "#ecf0f1",
             "Sei whale": "#9b59b6",
@@ -669,23 +643,36 @@
             "Beaked whale": "#f39c12",
             "default": "#95a5a6"
         };
-
+        
         function getSpeciesColor(name) {
             if (!name) return SPECIES_COLORS.default;
             return SPECIES_COLORS[name] || SPECIES_COLORS.default;
         }
-
-
-        let monthA = 1;
-        let monthB = 2;
+        
+        // ============================================================
+        // HELPER FUNCTIONS FOR 24-BIN SYSTEM
+        // ============================================================
+        function binToMonth(bin) {
+            return Math.floor((bin - 1) / BINS_PER_MONTH) + 1;
+        }
+        
+        function binToHalf(bin) {
+            return ((bin - 1) % BINS_PER_MONTH) + 1;
+        }
+        
+        // ============================================================
+        // ANIMATION STATE
+        // ============================================================
+        let binA = 1;
+        let binB = 2;
         let phase = 0;
         let startTime = null;
         let animFrame = null;
         let isPlaying = false;
-        let morphDuration = 500;
-
+        let morphDuration = 1000; // 1000ms per bin (24 bins = 24 second full loop)
+        
         mapboxgl.accessToken = MAPBOX_TOKEN;
-
+        
         const map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/light-v11',
@@ -693,40 +680,63 @@
             center: [-110, 35],
             zoom: 2
         });
-
+        
         const infoPanel = document.getElementById('infoPanel');
         const infoPanelTitle = document.getElementById('infoPanelTitle');
         const infoPanelSubtitle = document.getElementById('infoPanelSubtitle');
         const infoPanelBody = document.getElementById('infoPanelBody');
         const infoPanelClose = document.getElementById('infoPanelClose');
-
+        
+        // ============================================================
+        // ANIMATION FUNCTIONS (FOR 24-BIN SYSTEM)
+        // ============================================================
         function updateLabels() {
-            const label = MONTH_NAMES[monthA - 1];
+            const month = binToMonth(binA);
+            const label = MONTH_NAMES[month - 1];
             document.getElementById('monthLabel').textContent = label;
             document.getElementById('monthBottom').textContent = label;
-            document.getElementById('monthSlider').value = String(monthA);
+            document.getElementById('monthSlider').value = String(binA);
         }
-
+        
         function setFilterAll() {
             if (map.getLayer('density-heatmap')) {
                 map.setFilter('density-heatmap', [
-                    'in', ['get', 'month'], ['literal', [monthA, monthB]]
+                    'in', ['get', 'bin'], ['literal', [binA, binB]]
                 ]);
             }
         }
-
+        
         function setWeightAll(phaseVal) {
             if (map.getLayer('density-heatmap')) {
+                // Combine density-based weight with animation phase
+                // Exponential curve matches the layer paint property
+                const densityWeight = [
+                    'interpolate',
+                    ['exponential', 1.5],
+                    ['get', 'density'],
+                    1, 0.2,
+                    2, 0.3,
+                    3, 0.6,
+                    4, 0.8,
+                    5, 0.9,
+                    6, 0.95,
+                    7, 1.0
+                ];
+                
                 const weightExpr = [
-                    'case',
-                    ['==', ['get', 'month'], monthA], 1 - phaseVal,
-                    ['==', ['get', 'month'], monthB], phaseVal,
-                    0
+                    '*',
+                    densityWeight,
+                    [
+                        'case',
+                        ['==', ['get', 'bin'], binA], 1 - phaseVal,
+                        ['==', ['get', 'bin'], binB], phaseVal,
+                        0
+                    ]
                 ];
                 map.setPaintProperty('density-heatmap', 'heatmap-weight', weightExpr);
             }
         }
-
+        
         function stepAnimation(timestamp) {
             if (!isPlaying) return;
             
@@ -741,8 +751,8 @@
             if (phase < 1) {
                 animFrame = requestAnimationFrame(stepAnimation);
             } else {
-                monthA = monthB;
-                monthB = (monthB % 12) + 1;
+                binA = binB;
+                binB = (binB % TOTAL_BINS) + 1;
                 setFilterAll();
                 updateLabels();
                 startTime = null;
@@ -753,18 +763,18 @@
                 }
             }
         }
-
+        
         function startAnimation() {
             if (isPlaying) return;
             isPlaying = true;
             document.getElementById('playPause').textContent = 'Pause';
-            monthB = (monthA % 12) + 1;
+            binB = (binA % TOTAL_BINS) + 1;
             setFilterAll();
             startTime = null;
             phase = 0;
             animFrame = requestAnimationFrame(stepAnimation);
         }
-
+        
         function stopAnimation() {
             isPlaying = false;
             document.getElementById('playPause').textContent = 'Play';
@@ -774,6 +784,10 @@
             }
             startTime = null;
         }
+        
+        // ============================================================
+        // PANEL FUNCTIONS (UNCHANGED)
+        // ============================================================
         
         // Create circular progress SVG (smaller size)
         function createCircularProgress(value, color) {
@@ -796,23 +810,18 @@
             `;
         }
         
-  
         // Global max species levels for bar height
         const MAX_SPECIES_LEVELS = 5;
-
+        
         function createMonthlyDensityChart(location) {
             const speciesMonthly = location.speciesMonthly;
-
             if (!speciesMonthly || typeof speciesMonthly !== "object") {
                 return "";
             }
-
             // Preserve EXACT order from object literal
             const orderedSpecies = Object.keys(speciesMonthly);
-
             const numMonths = 12;
             const MAX_SPECIES_LEVELS = 5;
-
             // Compute species counts per month
             const monthlyCounts = new Array(numMonths).fill(0);
             orderedSpecies.forEach(sp => {
@@ -821,10 +830,8 @@
                     if (arr[m] > 0) monthlyCounts[m] += 1;
                 }
             });
-
             const anyCount = monthlyCounts.some(c => c > 0);
             if (!anyCount) return "";
-
             const bars = monthlyCounts.map((count, monthIndex) => {
                 if (!count) {
                     return `
@@ -836,15 +843,12 @@
                         </div>
                     `;
                 }
-
                 const presentSpecies = orderedSpecies.filter(sp => {
                     const arr = speciesMonthly[sp];
                     return Array.isArray(arr) && arr[monthIndex] > 0;
                 });
-
                 const clampedCount = Math.min(count, MAX_SPECIES_LEVELS);
                 const barHeightPercent = (clampedCount / MAX_SPECIES_LEVELS) * 100;
-
                 const segments = presentSpecies.map(sp => {
                     const color = getSpeciesColor(sp);
                     return `
@@ -854,7 +858,6 @@
                         </div>
                     `;
                 }).join("");
-
                 const tooltipSpecies = presentSpecies.map(sp => {
                     const color = getSpeciesColor(sp);
                     return `
@@ -863,7 +866,6 @@
                         </div>
                     `;
                 }).join("");
-
                 return `
                     <div class="month-bar">
                         <div class="month-tooltip">
@@ -871,21 +873,17 @@
                             <div style="font-size:11px;margin-bottom:4px;">${count} species</div>
                             ${tooltipSpecies}
                         </div>
-
                         <div class="bar-count">${count}</div>
-
                         <div class="bar-wrapper">
                             <div class="stacked-bar"
                                 style="height:${barHeightPercent}%; min-height:4px;">
                                 ${segments}
                             </div>
                         </div>
-
                         <div class="bar-label">${MONTH_ABBREV[monthIndex]}</div>
                     </div>
                 `;
             }).join("");
-
             const legendItems = orderedSpecies.map(sp => {
                 const color = getSpeciesColor(sp);
                 return `
@@ -895,7 +893,6 @@
                     </div>
                 `;
             }).join("");
-
             return `
                 <div class="monthly-density-chart">
                     <div class="chart-title">
@@ -904,16 +901,12 @@
                             Stack order = dataset order (bottom = first species listed).
                         </span>
                     </div>
-
                     <div class="month-bars">${bars}</div>
-
                     <div class="species-legend">${legendItems}</div>
                 </div>
             `;
         }
-
-
-
+        
         // Format number with commas
         function formatNumber(num) {
             if (!num) return 'N/A';
@@ -1055,20 +1048,23 @@
             prevBtn.disabled = index === 0;
             nextBtn.disabled = index === images.length - 1;
         }
-
+        
         function openInfoPanel(location) {
             infoPanelTitle.textContent = location.name;
             infoPanelSubtitle.textContent = location.location;
             infoPanelBody.innerHTML = createLocationPanelHTML(location);
             infoPanel.classList.add('open');
         }
-
+        
         function closeInfoPanel() {
             infoPanel.classList.remove('open');
         }
-
+        
         infoPanelClose.addEventListener('click', closeInfoPanel);
-
+        
+        // ============================================================
+        // MAP LOAD
+        // ============================================================
         map.on('load', () => {
             // Heatmap source + layer
             map.addSource('density-points', {
@@ -1083,14 +1079,27 @@
                 'source-layer': SOURCE_LAYER,
                 'maxzoom': 9,
                 'paint': {
-                    'heatmap-weight': 1,
+                    // Weight based on density property (1-7 species in practice)
+                    // Exponential curve: 1 species is visible, higher diversity pops more
+                    'heatmap-weight': [
+                        'interpolate',
+                        ['exponential', 1.5],
+                        ['get', 'density'],
+                        1, 0.4,
+                        2, 0.55,
+                        3, 0.7,
+                        4, 0.8,
+                        5, 0.9,
+                        6, 0.95,
+                        7, 1.0
+                    ],
                     'heatmap-intensity': [
                         'interpolate',
                         ['linear'],
                         ['zoom'],
-                        0, 0.8,
-                        5, 1.2,
-                        8, 1.8
+                        0, 1.0,
+                        5, 1.5,
+                        8, 2.0
                     ],
                     'heatmap-color': [
                         'interpolate',
@@ -1118,9 +1127,9 @@
                     'heatmap-radius-transition': { duration: 0, delay: 0 },
                     'heatmap-weight-transition': { duration: 0, delay: 0 }
                 },
-                'filter': ['in', ['get', 'month'], ['literal', [monthA, monthB]]]
+                'filter': ['in', ['get', 'bin'], ['literal', [binA, binB]]]
             });
-
+            
             // Whale watching locations as GeoJSON
             const whaleGeoJSON = {
                 type: 'FeatureCollection',
@@ -1135,12 +1144,12 @@
                     }
                 }))
             };
-
+            
             map.addSource('whale-locations', {
                 type: 'geojson',
                 data: whaleGeoJSON
             });
-
+            
             // POI-style halo
             map.addLayer({
                 id: 'whale-locations-halo',
@@ -1159,30 +1168,8 @@
                     'circle-stroke-width': 0
                 }
             });
-            // map.loadImage('https://whalewatchersatlas.com/favicon-32.png', (error, image) => {
-            //     if (error) {
-            //         console.error('Error loading pin icon:', error);
-            //         // Keep circles as fallback
-            //         return;
-            //     }
-            //     map.addImage('whale-pin', image);
-
-            //     // Remove circle layer and add symbol layer
-                
-            //     map.addLayer({
-            //         id: 'whale-locations-pin',
-            //         type: 'symbol',
-            //         source: 'whale-locations',
-            //         layout: {
-            //             'icon-image': 'whale-pin',
-            //             'icon-size': 1,
-            //             'icon-allow-overlap': true,
-            //             'icon-ignore-placement': true
-            //         }
-            //     });
-            // });
+            
             // Main POI pin
-
             map.addLayer({
                 id: 'whale-locations-layer',
                 type: 'circle',
@@ -1201,7 +1188,7 @@
                     'circle-stroke-width': 1.5
                 }
             });
-
+            
             // Hover cursor
             map.on('mouseenter', 'whale-locations-layer', () => {
                 map.getCanvas().style.cursor = 'pointer';
@@ -1209,7 +1196,7 @@
             map.on('mouseleave', 'whale-locations-layer', () => {
                 map.getCanvas().style.cursor = '';
             });
-
+            
             // Click → open side panel
             map.on('click', 'whale-locations-layer', (e) => {
                 if (!e.features || !e.features.length) return;
@@ -1218,22 +1205,25 @@
                 const location = WHALE_WATCHING_LOCATIONS[idx];
                 openInfoPanel(location);
             });
-
+            
             setFilterAll();
             setWeightAll(0);
             updateLabels();
         });
         
+        // ============================================================
+        // EVENT LISTENERS (UPDATED FOR 48 BINS)
+        // ============================================================
         document.getElementById('monthSlider').addEventListener('input', (e) => {
             stopAnimation();
-            monthA = parseInt(e.target.value, 10);
-            monthB = (monthA % 12) + 1;
+            binA = parseInt(e.target.value, 10);
+            binB = (binA % TOTAL_BINS) + 1;
             setFilterAll();
             phase = 0;
             setWeightAll(0);
             updateLabels();
         });
-
+        
         document.getElementById('playPause').addEventListener('click', () => {
             if (isPlaying) {
                 stopAnimation();

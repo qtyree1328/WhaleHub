@@ -634,8 +634,16 @@
     <script src="whale-locations.js"></script>
     <script>
         const MAPBOX_TOKEN = 'pk.eyJ1IjoicXR5cmVlIiwiYSI6ImNtaHl5eHNmeDBoY3oybXEwNTIxNGgxYmsifQ.VqoAKKHQxQX-lNNPwVKHmw';
-        const TILESET_URL = 'mapbox://qtyree.boz4q4aa';
-        const SOURCE_LAYER = 'whale_density_weighted_1-ct85nq';
+        // const TILESET_URL = 'mapbox://qtyree.boz4q4aa';
+        // const SOURCE_LAYER = 'whale_density_weighted_1-ct85nq';
+        // // gaussian
+        // const TILESET_URL = 'mapbox://qtyree.7l71yvtr';
+        // const SOURCE_LAYER = 'whale_density_METHOD2_gaussia-56u93g';
+        // persistence
+        const TILESET_URL = 'mapbox://qtyree.6rru0f1u';
+        const SOURCE_LAYER = 'whale_density_METHOD1_persist-6tfzuh';
+
+
         const MONTH_NAMES = [
             'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'
@@ -667,13 +675,14 @@
             return SPECIES_COLORS[name] || SPECIES_COLORS.default;
         }
 
+
         let monthA = 1;
         let monthB = 2;
         let phase = 0;
         let startTime = null;
         let animFrame = null;
-        let isPlaying = true;
-        let morphDuration = 2000;
+        let isPlaying = false;
+        let morphDuration = 500;
 
         mapboxgl.accessToken = MAPBOX_TOKEN;
 

@@ -19,6 +19,952 @@
         #map {
             position: relative;
         }
+        
+        /* CIRCULAR MONTH CONTROLS - Force absolute positioning */
+        #controls {
+            position: absolute !important;
+            bottom: 30px !important;
+            left: 30px !important;
+            top: auto !important;
+            right: auto !important;
+            z-index: 10 !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            width: auto !important;
+            max-width: 220px;
+        }
+        
+        /* ANIMATION SETTINGS DROPDOWN PANEL */
+        .settings-panel {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 10;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .settings-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+        
+        .settings-toggle:hover {
+            background: #fff;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .settings-toggle svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .settings-panel.open .settings-toggle svg {
+            transform: rotate(90deg);
+        }
+        
+        .settings-toggle .chevron {
+            width: 14px;
+            height: 14px;
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .settings-panel.open .settings-toggle .chevron {
+            transform: rotate(180deg);
+        }
+        
+        .settings-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .settings-panel.open .settings-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .settings-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .settings-content {
+            padding: 16px 18px;
+        }
+        
+        .setting-group {
+            margin-bottom: 18px;
+        }
+        
+        .setting-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .setting-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .setting-label span {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .setting-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c7ab8;
+            background: #e3f2fd;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+        
+        .setting-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, #2c7ab8 0%, #e0e0e0 0%);
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .setting-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #2c7ab8;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        
+        .setting-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(44, 122, 184, 0.3);
+        }
+        
+        .setting-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #2c7ab8;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .setting-description {
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        
+        .setting-presets {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .preset-btn:hover {
+            border-color: #2c7ab8;
+            color: #2c7ab8;
+            background: #f0f7ff;
+        }
+        
+        .preset-btn.active {
+            border-color: #2c7ab8;
+            background: #2c7ab8;
+            color: #fff;
+        }
+        
+        .settings-divider {
+            height: 1px;
+            background: #eee;
+            margin: 16px 0;
+        }
+        
+        .reset-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background: #f5f5f5;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .reset-btn:hover {
+            background: #e74c3c;
+            color: #fff;
+        }
+        
+        /* Colormap grid styles */
+        .colormap-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .colormap-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 6px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .colormap-btn:hover {
+            border-color: #2c7ab8;
+            transform: translateY(-1px);
+        }
+        
+        .colormap-btn.active {
+            border-color: #2c7ab8;
+            background: #f0f7ff;
+            box-shadow: 0 2px 8px rgba(44, 122, 184, 0.2);
+        }
+        
+        .colormap-preview {
+            width: 100%;
+            height: 12px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .colormap-btn span {
+            font-size: 9px;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .colormap-btn.active span {
+            color: #2c7ab8;
+        }
+        
+        /* ============================================================
+           RESPONSIVE STYLES FOR MOBILE AND NARROW SCREENS
+           ============================================================ */
+        
+        /* Tablet and smaller */
+        @media (max-width: 768px) {
+            #controls {
+                bottom: 20px !important;
+                left: 20px !important;
+                padding: 12px !important;
+                border-radius: 16px !important;
+                max-width: 180px !important;
+            }
+            
+            .control-header {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+            
+            .circular-selector {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .month-marker {
+                width: 28px;
+                height: 28px;
+                font-size: 8px;
+            }
+            
+            .center-display {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .center-month {
+                font-size: 11px;
+            }
+            
+            .center-hint {
+                font-size: 7px;
+            }
+            
+            .nav-arrows {
+                gap: 8px;
+                margin-top: 8px;
+            }
+            
+            .nav-arrow {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .nav-arrow svg {
+                width: 14px;
+                height: 14px;
+            }
+            
+            .play-controls {
+                margin-top: 10px;
+            }
+            
+            .control-button {
+                padding: 6px 16px;
+                font-size: 11px;
+            }
+            
+            #legend {
+                max-width: 120px !important;
+                padding: 8px !important;
+                bottom: 30px !important;
+            }
+            
+            .legend-title {
+                font-size: 10px;
+            }
+            
+            .legend-note {
+                font-size: 9px;
+            }
+            
+            #monthBottom {
+                font-size: 14px !important;
+                padding: 6px 14px !important;
+            }
+            
+            .settings-panel {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .settings-toggle {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+            
+            .settings-toggle span {
+                display: none;
+            }
+            
+            .settings-toggle svg:first-child {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .settings-toggle .chevron {
+                display: none;
+            }
+            
+            .settings-dropdown {
+                width: 240px;
+            }
+            
+            /* Info panel adjustments */
+            .info-panel {
+                width: 320px;
+                max-width: 85vw;
+            }
+        }
+        
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            #controls {
+                bottom: 12px !important;
+                left: 12px !important;
+                padding: 10px !important;
+                border-radius: 14px !important;
+                max-width: 150px !important;
+            }
+            
+            .control-header {
+                font-size: 9px;
+                margin-bottom: 6px;
+            }
+            
+            .circular-selector {
+                width: 105px;
+                height: 105px;
+            }
+            
+            .month-marker {
+                width: 22px;
+                height: 22px;
+                font-size: 7px;
+            }
+            
+            .center-display {
+                width: 52px;
+                height: 52px;
+            }
+            
+            .center-month {
+                font-size: 9px;
+            }
+            
+            .center-hint {
+                font-size: 6px;
+            }
+            
+            .rotation-indicator {
+                display: none;
+            }
+            
+            .nav-arrows {
+                gap: 6px;
+                margin-top: 6px;
+            }
+            
+            .nav-arrow {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .nav-arrow svg {
+                width: 12px;
+                height: 12px;
+            }
+            
+            .play-controls {
+                margin-top: 8px;
+            }
+            
+            .control-button {
+                padding: 5px 12px;
+                font-size: 10px;
+                border-radius: 14px;
+            }
+            
+            #legend {
+                max-width: 100px !important;
+                padding: 6px !important;
+                bottom: 12px !important;
+                right: 12px !important;
+            }
+            
+            .legend-title {
+                font-size: 9px;
+                margin-bottom: 4px;
+            }
+            
+            .gradient-bar {
+                height: 8px;
+            }
+            
+            .gradient-labels {
+                font-size: 8px;
+            }
+            
+            .legend-note {
+                font-size: 8px;
+                margin-top: 4px;
+            }
+            
+            #monthBottom {
+                font-size: 11px !important;
+                padding: 4px 10px !important;
+                bottom: 12px !important;
+            }
+            
+            .settings-panel {
+                top: 8px;
+                right: 8px;
+            }
+            
+            .settings-toggle {
+                padding: 6px 10px;
+            }
+            
+            .settings-dropdown {
+                width: 200px;
+                right: 0;
+            }
+            
+            .settings-header {
+                padding: 10px 12px;
+                font-size: 10px;
+            }
+            
+            .settings-content {
+                padding: 10px 12px;
+            }
+            
+            .setting-label span {
+                font-size: 11px;
+            }
+            
+            .setting-value {
+                font-size: 10px;
+                padding: 2px 6px;
+            }
+            
+            .setting-description {
+                font-size: 9px;
+            }
+            
+            .setting-presets {
+                gap: 4px;
+            }
+            
+            .preset-btn {
+                padding: 5px 6px;
+                font-size: 9px;
+            }
+            
+            .colormap-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4px;
+            }
+            
+            .colormap-btn {
+                padding: 5px 3px;
+            }
+            
+            .colormap-preview {
+                height: 8px;
+            }
+            
+            .colormap-btn span {
+                font-size: 7px;
+            }
+            
+            .reset-btn {
+                padding: 6px;
+                font-size: 10px;
+            }
+            
+            .settings-divider {
+                margin: 10px 0;
+            }
+            
+            /* Info panel adjustments */
+            .info-panel {
+                width: 100%;
+                max-width: 100vw;
+            }
+        }
+        
+        /* Very small screens */
+        @media (max-width: 360px) {
+            #controls {
+                bottom: 8px !important;
+                left: 8px !important;
+                padding: 8px !important;
+                max-width: 130px !important;
+            }
+            
+            .control-header {
+                display: none;
+            }
+            
+            .circular-selector {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .month-marker {
+                width: 18px;
+                height: 18px;
+                font-size: 6px;
+            }
+            
+            .center-display {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .center-month {
+                font-size: 8px;
+            }
+            
+            .center-hint {
+                display: none;
+            }
+            
+            .nav-arrows {
+                gap: 4px;
+                margin-top: 4px;
+            }
+            
+            .nav-arrow {
+                width: 22px;
+                height: 22px;
+            }
+            
+            .play-controls {
+                margin-top: 6px;
+            }
+            
+            .control-button {
+                padding: 4px 10px;
+                font-size: 9px;
+            }
+            
+            #legend {
+                display: none !important;
+            }
+            
+            #monthBottom {
+                font-size: 10px !important;
+                padding: 3px 8px !important;
+            }
+        }
+        
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #controls {
+                bottom: 8px !important;
+                left: 8px !important;
+                padding: 6px !important;
+                max-width: 120px !important;
+            }
+            
+            .control-header {
+                display: none;
+            }
+            
+            .circular-selector {
+                width: 85px;
+                height: 85px;
+            }
+            
+            .month-marker {
+                width: 18px;
+                height: 18px;
+                font-size: 6px;
+            }
+            
+            .center-display {
+                width: 42px;
+                height: 42px;
+            }
+            
+            .center-month {
+                font-size: 8px;
+            }
+            
+            .center-hint {
+                display: none;
+            }
+            
+            .rotation-indicator {
+                display: none;
+            }
+            
+            .nav-arrows {
+                margin-top: 4px;
+                gap: 4px;
+            }
+            
+            .nav-arrow {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .play-controls {
+                margin-top: 4px;
+            }
+            
+            .control-button {
+                padding: 3px 8px;
+                font-size: 8px;
+            }
+            
+            #legend {
+                max-width: 90px !important;
+                padding: 5px !important;
+            }
+            
+            #monthBottom {
+                font-size: 10px !important;
+                padding: 3px 8px !important;
+            }
+        }
+        
+        /* CIRCULAR MONTH SELECTOR STYLES */
+        #controls {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .control-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .circular-selector {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+        }
+        
+        .month-wheel {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .month-marker {
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            user-select: none;
+            z-index: 2;
+        }
+        
+        .month-marker:hover {
+            background: rgba(44, 122, 184, 0.15);
+            color: #2c7ab8;
+            transform: scale(1.1);
+        }
+        
+        .month-marker.active {
+            background: #2c7ab8;
+            color: white;
+            box-shadow: 0 2px 8px rgba(44, 122, 184, 0.4);
+            transform: scale(1.15);
+        }
+        
+        .center-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+        }
+        
+        .center-month {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c7ab8;
+            margin-bottom: 2px;
+        }
+        
+        .center-hint {
+            font-size: 8px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Rotation indicator line */
+        .rotation-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #2c7ab8 60%, #2c7ab8 100%);
+            transform-origin: left center;
+            z-index: 1;
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .rotation-indicator::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #2c7ab8;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(44, 122, 184, 0.5);
+        }
+        
+        /* Drag ring for rotation */
+        .drag-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            cursor: grab;
+            z-index: 4;
+        }
+        
+        .drag-ring:active {
+            cursor: grabbing;
+        }
+        
+        .drag-ring::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border-radius: 50%;
+            border: 2px dashed rgba(44, 122, 184, 0.2);
+            pointer-events: none;
+        }
+        
+        /* Play button below wheel */
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 14px;
+            gap: 8px;
+        }
+        
+        .control-button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #2c7ab8;
+            color: white;
+        }
+        
+        .control-button:hover {
+            background: #1e5a8a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(44, 122, 184, 0.3);
+        }
+        
+        .control-button.playing {
+            background: #e74c3c;
+        }
+        
+        .control-button.playing:hover {
+            background: #c0392b;
+        }
+        
+        /* Navigation arrows */
+        .nav-arrows {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .nav-arrow {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #666;
+        }
+        
+        .nav-arrow:hover {
+            background: #2c7ab8;
+            color: white;
+        }
+        
+        .nav-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Hide the old slider */
+        #monthSlider {
+            display: none;
+        }
+        
+        .month-display {
+            display: none;
+        }
+        
         /* SIDE PANEL – overlays from right, map stays same size */
         .info-panel {
             position: absolute;
@@ -31,20 +977,23 @@
             box-shadow: -4px 0 18px rgba(0,0,0,0.18);
             display: flex;
             flex-direction: column;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
+            transform: translateX(calc(100% + 5px)); /* Extra 5px to ensure fully hidden */
+            transition: transform 0.3s ease, visibility 0.3s ease;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            z-index: 5;
+            z-index: 15; /* Higher than settings panel (z-index: 10) */
+            visibility: hidden; /* Hide when closed */
         }
         .info-panel.open {
             transform: translateX(0);
+            visibility: visible;
         }
         .info-panel-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             padding: 10px 16px;
             border-bottom: 1px solid #eee;
+            min-height: 50px;
         }
         .info-panel-title-group h3 {
             margin: 0;
@@ -55,13 +1004,44 @@
             font-size: 12px;
             color: #666;
         }
-        #infoPanelClose {
+        
+        /* Fold tab close button - top left corner */
+        .info-panel-close-fold {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f0f0f0 50%, transparent 50%);
             border: none;
-            background: transparent;
-            font-size: 22px;
-            line-height: 1;
             cursor: pointer;
-            padding: 4px 8px;
+            z-index: 20;
+            transition: all 0.2s ease;
+        }
+        
+        .info-panel-close-fold::before {
+            content: '×';
+            position: absolute;
+            top: 6px;
+            left: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            line-height: 1;
+            transition: all 0.2s ease;
+        }
+        
+        .info-panel-close-fold:hover {
+            background: linear-gradient(135deg, #e0e0e0 50%, transparent 50%);
+        }
+        
+        .info-panel-close-fold:hover::before {
+            color: #333;
+        }
+        
+        /* Adjust header to account for fold */
+        .info-panel-header {
+            padding-left: 50px;
         }
         /* Body fills the rest of panel height and scrolls as needed */
         .info-panel-body {
@@ -538,20 +1518,135 @@
             Click the <span style="color: #000000; font-weight: 600;">black POI pins</span> to discover top viewing spots with detailed information.
         </p>
         <p>
-            <strong>How to use:</strong> Drag the month slider to see seasonal patterns, or click play for animation. 
+            <strong>How to use:</strong> Drag the circular dial to rotate through months, click month labels, or use the arrows. 
             Brighter colors show where multiple species overlap.
         </p>
     </div>
     <!-- Map Container -->
     <div id="map">
-        <!-- Month Controls -->
-        <div id="controls">
-            <div class="control-header">Month Controls</div>
-            <div class="month-display">
-                <span id="monthLabel">January</span>
+        <!-- Animation Settings Panel -->
+        <div class="settings-panel" id="settingsPanel">
+            <button class="settings-toggle" id="settingsToggle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+                </svg>
+                <span>Animation</span>
+                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </button>
+            <div class="settings-dropdown">
+                <div class="settings-header">Animation Settings</div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Transition Speed</span>
+                            <span class="setting-value" id="speedValue">1.0s</span>
+                        </div>
+                        <input type="range" class="setting-slider" id="speedSlider" min="200" max="3000" value="1000" step="100">
+                        <div class="setting-description">Time to transition between months</div>
+                        <div class="setting-presets">
+                            <button class="preset-btn" data-speed="400">Fast</button>
+                            <button class="preset-btn active" data-speed="1000">Normal</button>
+                            <button class="preset-btn" data-speed="2000">Slow</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-divider"></div>
+                    
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Color Scheme</span>
+                        </div>
+                        <div class="colormap-grid" id="colormapGrid">
+                            <button class="colormap-btn active" data-colormap="default" title="Default">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, rgba(0,0,80,1), rgba(0,100,255,1), rgba(0,200,255,1), rgba(100,255,200,1), rgba(255,220,0,1), rgba(255,100,0,1), rgba(255,0,150,1));"></div>
+                                <span>Spectrum</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="ocean" title="Ocean">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #0a1628, #0d3b66, #1a759f, #34a0a4, #76c893, #b5e48c);"></div>
+                                <span>Ocean</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="thermal" title="Thermal">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #000033, #1a0066, #4d0099, #9900cc, #ff3366, #ffcc00);"></div>
+                                <span>Thermal</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="viridis" title="Viridis">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #440154, #3b528b, #21918c, #5ec962, #fde725);"></div>
+                                <span>Viridis</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="magma" title="Magma">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #000004, #3b0f70, #8c2981, #de4968, #fea16e, #fcfdbf);"></div>
+                                <span>Magma</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="cool" title="Cool">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #0d0887, #5302a3, #8b0aa5, #b83289, #db5c68, #f48849, #febd2a);"></div>
+                                <span>Plasma</span>
+                            </button>
+                        </div>
+                        <div class="setting-description">Visual style for density visualization</div>
+                    </div>
+                    
+                    <div class="settings-divider"></div>
+                    
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Heatmap Intensity</span>
+                            <span class="setting-value" id="intensityValue">100%</span>
+                        </div>
+                        <input type="range" class="setting-slider" id="intensitySlider" min="20" max="200" value="100" step="10">
+                        <div class="setting-description">Brightness of species density overlay</div>
+                    </div>
+                    
+                    <div class="settings-divider"></div>
+                    
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Heatmap Radius</span>
+                            <span class="setting-value" id="radiusValue">100%</span>
+                        </div>
+                        <input type="range" class="setting-slider" id="radiusSlider" min="50" max="200" value="100" step="10">
+                        <div class="setting-description">Spread of each data point</div>
+                    </div>
+                    
+                    <div class="settings-divider"></div>
+                    
+                    <button class="reset-btn" id="resetSettings">Reset to Defaults</button>
+                </div>
             </div>
-            <input id="monthSlider" type="range" min="1" max="24" step="1" value="1">
-            <button id="playPause" class="control-button">Play</button>
+        </div>
+        
+        <!-- Circular Month Controls -->
+        <div id="controls">
+            <div class="control-header">Month Selector</div>
+            <div class="circular-selector">
+                <div class="month-wheel"></div>
+                <div class="rotation-indicator" id="rotationIndicator"></div>
+                <!-- Month markers will be generated by JS -->
+                <div class="center-display">
+                    <div class="center-month" id="centerMonth">January</div>
+                    <div class="center-hint">Current Month</div>
+                </div>
+                <div class="drag-ring" id="dragRing"></div>
+            </div>
+            <div class="nav-arrows">
+                <button class="nav-arrow" id="prevMonth" aria-label="Previous month">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+                <button class="nav-arrow" id="nextMonth" aria-label="Next month">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="play-controls">
+                <button id="playPause" class="control-button">▶ Play</button>
+            </div>
+            <!-- Hidden slider for compatibility -->
+            <input id="monthSlider" type="range" min="1" max="12" step="1" value="1">
         </div>
         <!-- Month Display (bottom center) -->
         <div id="monthBottom">January</div>
@@ -578,12 +1673,12 @@
         </div>
         <!-- Side Info Panel (overlay) -->
         <div id="infoPanel" class="info-panel">
+            <button id="infoPanelClose" class="info-panel-close-fold" aria-label="Close"></button>
             <div class="info-panel-header">
                 <div class="info-panel-title-group">
                     <h3 id="infoPanelTitle">Location</h3>
                     <p id="infoPanelSubtitle"></p>
                 </div>
-                <button id="infoPanelClose" aria-label="Close">&times;</button>
             </div>
             <div id="infoPanelBody" class="info-panel-body">
                 <!-- filled dynamically -->
@@ -593,21 +1688,17 @@
     <script src="whale-locations.js"></script>
     <script>
         // ============================================================
-        // CONFIGURATION - UPDATE THESE WITH YOUR NEW 24-BIN TILESET
+        // CONFIGURATION
         // ============================================================
         const MAPBOX_TOKEN = 'pk.eyJ1IjoicXR5cmVlIiwiYSI6ImNtaHl5eHNmeDBoY3oybXEwNTIxNGgxYmsifQ.VqoAKKHQxQX-lNNPwVKHmw';
-        // const TILESET_URL = 'mapbox://qtyree.dt33upzk';
-        // const SOURCE_LAYER = 'WD9_24bin_Per_20_by_1-64nsiw';
-        // const TILESET_URL = 'mapbox://qtyree.wd11_24bin_15_x_1_5';
-        // const SOURCE_LAYER = 'WD11_24bin_15_x_1.5';
-        const TILESET_URL = 'mapbox://qtyree.wd11_24bin_per_20_x_1_5';
-        const SOURCE_LAYER = 'WD11_24bin_Per_20_x_1.5';
+        const TILESET_URL = 'mapbox://qtyree.wd11_12bin_p_hex2_40';
+        const SOURCE_LAYER = 'WD11_12bin_p_hex2_40';
         
         // ============================================================
         // CONSTANTS
         // ============================================================
-        const TOTAL_BINS = 24;
-        const BINS_PER_MONTH = 2;
+        const TOTAL_BINS = 12;
+        const BINS_PER_MONTH = 1;
         
         const MONTH_NAMES = [
             'January', 'February', 'March', 'April', 'May', 'June',
@@ -617,7 +1708,6 @@
         const MONTH_ABBREV = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         
         const SPECIES_COLORS = {
-            // Exact names from Python species_files
             "Blue Whale": "#2980b9",
             "Sperm Whale": "#c0392b",
             "Humpback Whale": "#3498db",
@@ -627,7 +1717,6 @@
             "Beluga Whale": "#ecf0f1",
             "Southern Right Whale": "#d35400",
             "North Atlantic Right Whale": "#e67e22",
-            // Lowercase variants for compatibility
             "Humpback whale": "#3498db",
             "Blue whale": "#2980b9",
             "Gray whale": "#7f8c8d",
@@ -653,7 +1742,7 @@
         }
         
         // ============================================================
-        // HELPER FUNCTIONS FOR 24-BIN SYSTEM
+        // HELPER FUNCTIONS
         // ============================================================
         function binToMonth(bin) {
             return Math.floor((bin - 1) / BINS_PER_MONTH) + 1;
@@ -672,7 +1761,7 @@
         let startTime = null;
         let animFrame = null;
         let isPlaying = false;
-        let morphDuration = 1000; // 1000ms per bin (24 bins = 24 second full loop)
+        let morphDuration = 1000;
         
         mapboxgl.accessToken = MAPBOX_TOKEN;
         
@@ -691,14 +1780,201 @@
         const infoPanelClose = document.getElementById('infoPanelClose');
         
         // ============================================================
-        // ANIMATION FUNCTIONS (FOR 24-BIN SYSTEM)
+        // CIRCULAR SELECTOR SETUP
+        // ============================================================
+        const circularSelector = document.querySelector('.circular-selector');
+        const rotationIndicator = document.getElementById('rotationIndicator');
+        const centerMonth = document.getElementById('centerMonth');
+        const dragRing = document.getElementById('dragRing');
+        
+        // Create month markers around the circle
+        function createMonthMarkers() {
+            // Clear existing markers first
+            const existingMarkers = circularSelector.querySelectorAll('.month-marker');
+            existingMarkers.forEach(m => m.remove());
+            
+            // Get actual size of the circular selector
+            const selectorRect = circularSelector.getBoundingClientRect();
+            const selectorSize = selectorRect.width;
+            
+            // Calculate dimensions based on actual size
+            const centerX = selectorSize / 2;
+            const centerY = selectorSize / 2;
+            const radius = selectorSize * 0.4; // 40% of container size
+            const markerSize = Math.max(16, selectorSize * 0.2); // Responsive marker size
+            const markerOffset = markerSize / 2;
+            
+            MONTH_ABBREV.forEach((month, index) => {
+                const angle = (index * 30 - 90) * (Math.PI / 180); // Start from top (12 o'clock)
+                const x = centerX + radius * Math.cos(angle) - markerOffset;
+                const y = centerY + radius * Math.sin(angle) - markerOffset;
+                
+                const marker = document.createElement('div');
+                marker.className = 'month-marker';
+                marker.textContent = month;
+                marker.dataset.month = index + 1;
+                marker.style.left = `${x}px`;
+                marker.style.top = `${y}px`;
+                
+                if (index + 1 === binA) {
+                    marker.classList.add('active');
+                }
+                
+                marker.addEventListener('click', () => {
+                    setMonth(index + 1);
+                });
+                
+                circularSelector.appendChild(marker);
+            });
+        }
+        
+        createMonthMarkers();
+        
+        // Recalculate marker positions on window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                createMonthMarkers();
+            }, 150);
+        });
+        
+        // Update rotation indicator position
+        let currentRotationAngle = -90; // Track actual rotation to handle wrap-around
+        
+        function updateRotationIndicator(monthIndex) {
+            const targetAngle = (monthIndex - 1) * 30 - 90; // -90 to start from top
+            
+            // Calculate the shortest path to the target angle
+            // Normalize currentRotationAngle to 0-360 range for comparison
+            const normalizedCurrent = ((currentRotationAngle % 360) + 360) % 360;
+            const normalizedTarget = ((targetAngle % 360) + 360) % 360;
+            
+            let diff = normalizedTarget - normalizedCurrent;
+            
+            // Choose the shortest path (max 180 degrees either direction)
+            if (diff > 180) diff -= 360;
+            if (diff < -180) diff += 360;
+            
+            // Apply the shortest rotation
+            currentRotationAngle += diff;
+            
+            rotationIndicator.style.transform = `rotate(${currentRotationAngle}deg)`;
+        }
+        
+        // Update all UI elements for current month
+        function setMonth(month) {
+            stopAnimation();
+            binA = month;
+            binB = (binA % TOTAL_BINS) + 1;
+            
+            // Update markers
+            document.querySelectorAll('.month-marker').forEach((marker, idx) => {
+                marker.classList.toggle('active', idx + 1 === month);
+            });
+            
+            // Update rotation indicator
+            updateRotationIndicator(month);
+            
+            // Update center display
+            centerMonth.textContent = MONTH_NAMES[month - 1];
+            
+            // Update other displays
+            document.getElementById('monthLabel')?.textContent && (document.getElementById('monthLabel').textContent = MONTH_NAMES[month - 1]);
+            document.getElementById('monthBottom').textContent = MONTH_NAMES[month - 1];
+            document.getElementById('monthSlider').value = String(month);
+            
+            // Snap map to this month cleanly
+            snapToCurrentMonth();
+        }
+        
+        // Drag functionality for the ring
+        let isDragging = false;
+        let lastAngle = 0;
+        
+        function getAngleFromEvent(e) {
+            const rect = circularSelector.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+        }
+        
+        function getMonthFromAngle(angle) {
+            // Normalize angle to 0-360, starting from top
+            let normalizedAngle = (angle + 90 + 360) % 360;
+            // Convert to month (0-11), then add 1 for 1-12
+            return Math.floor(normalizedAngle / 30) + 1;
+        }
+        
+        dragRing.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastAngle = getAngleFromEvent(e);
+            e.preventDefault();
+        });
+        
+        dragRing.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            lastAngle = getAngleFromEvent(e);
+        }, { passive: true });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const currentAngle = getAngleFromEvent(e);
+            const month = getMonthFromAngle(currentAngle);
+            if (month !== binA) {
+                setMonth(month);
+            }
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const currentAngle = getAngleFromEvent(e);
+            const month = getMonthFromAngle(currentAngle);
+            if (month !== binA) {
+                setMonth(month);
+            }
+        }, { passive: true });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+        
+        // Arrow navigation
+        document.getElementById('prevMonth').addEventListener('click', () => {
+            const newMonth = binA === 1 ? 12 : binA - 1;
+            setMonth(newMonth);
+        });
+        
+        document.getElementById('nextMonth').addEventListener('click', () => {
+            const newMonth = binA === 12 ? 1 : binA + 1;
+            setMonth(newMonth);
+        });
+        
+        // ============================================================
+        // ANIMATION FUNCTIONS
         // ============================================================
         function updateLabels() {
             const month = binToMonth(binA);
             const label = MONTH_NAMES[month - 1];
-            document.getElementById('monthLabel').textContent = label;
+            centerMonth.textContent = label;
             document.getElementById('monthBottom').textContent = label;
             document.getElementById('monthSlider').value = String(binA);
+            
+            // Update markers
+            document.querySelectorAll('.month-marker').forEach((marker, idx) => {
+                marker.classList.toggle('active', idx + 1 === month);
+            });
+            
+            // Update rotation indicator
+            updateRotationIndicator(month);
         }
         
         function setFilterAll() {
@@ -711,8 +1987,6 @@
         
         function setWeightAll(phaseVal) {
             if (map.getLayer('density-heatmap')) {
-                // Combine density-based weight with animation phase
-                // Exponential curve matches the layer paint property
                 const densityWeight = [
                     'interpolate',
                     ['exponential', 1.5],
@@ -741,20 +2015,51 @@
             }
         }
         
+        // Snap to a clean state (no transition, just show binA)
+        function snapToCurrentMonth() {
+            if (map.getLayer('density-heatmap')) {
+                // Set filter to only show current month
+                map.setFilter('density-heatmap', [
+                    '==', ['get', 'bin'], binA
+                ]);
+                
+                // Set weight to full density weight (no phase blending)
+                const densityWeight = [
+                    'interpolate',
+                    ['exponential', 1.5],
+                    ['get', 'density'],
+                    1, 0.3,
+                    2, 0.45,
+                    3, 0.55,
+                    4, 0.65,
+                    5, 0.75,
+                    6, 0.85,
+                    7, 0.92,
+                    8, 1.0
+                ];
+                map.setPaintProperty('density-heatmap', 'heatmap-weight', densityWeight);
+            }
+        }
+        
         function stepAnimation(timestamp) {
-            if (!isPlaying) return;
+            // Check isPlaying at the very start - exit immediately if stopped
+            if (!isPlaying) {
+                return;
+            }
             
             if (startTime === null) startTime = timestamp;
             const elapsed = timestamp - startTime;
-            phase = elapsed / morphDuration;
-            
-            if (phase > 1) phase = 1;
+            phase = Math.min(elapsed / morphDuration, 1);
             
             setWeightAll(phase);
             
             if (phase < 1) {
-                animFrame = requestAnimationFrame(stepAnimation);
+                // Only schedule next frame if still playing
+                if (isPlaying) {
+                    animFrame = requestAnimationFrame(stepAnimation);
+                }
             } else {
+                // Transition complete - move to next month
                 binA = binB;
                 binB = (binB % TOTAL_BINS) + 1;
                 setFilterAll();
@@ -762,6 +2067,7 @@
                 startTime = null;
                 phase = 0;
                 
+                // Only continue if still playing
                 if (isPlaying) {
                     animFrame = requestAnimationFrame(stepAnimation);
                 }
@@ -771,7 +2077,8 @@
         function startAnimation() {
             if (isPlaying) return;
             isPlaying = true;
-            document.getElementById('playPause').textContent = 'Pause';
+            document.getElementById('playPause').textContent = '⏸ Pause';
+            document.getElementById('playPause').classList.add('playing');
             binB = (binA % TOTAL_BINS) + 1;
             setFilterAll();
             startTime = null;
@@ -780,20 +2087,31 @@
         }
         
         function stopAnimation() {
+            // Immediately set flag to stop
             isPlaying = false;
-            document.getElementById('playPause').textContent = 'Play';
+            
+            // Cancel any pending frame
             if (animFrame) {
                 cancelAnimationFrame(animFrame);
                 animFrame = null;
             }
+            
+            // Reset timing
             startTime = null;
+            phase = 0;
+            
+            // Snap to clean state showing only current month
+            snapToCurrentMonth();
+            
+            // Update UI
+            document.getElementById('playPause').textContent = '▶ Play';
+            document.getElementById('playPause').classList.remove('playing');
         }
         
         // ============================================================
-        // PANEL FUNCTIONS (UNCHANGED)
+        // PANEL FUNCTIONS
         // ============================================================
         
-        // Create circular progress SVG (smaller size)
         function createCircularProgress(value, color) {
             const radius = 21;
             const circumference = 2 * Math.PI * radius;
@@ -814,7 +2132,6 @@
             `;
         }
         
-        // Global max species levels for bar height
         const MAX_SPECIES_LEVELS = 5;
         
         function createMonthlyDensityChart(location) {
@@ -822,11 +2139,9 @@
             if (!speciesMonthly || typeof speciesMonthly !== "object") {
                 return "";
             }
-            // Preserve EXACT order from object literal
             const orderedSpecies = Object.keys(speciesMonthly);
             const numMonths = 12;
             const MAX_SPECIES_LEVELS = 5;
-            // Compute species counts per month
             const monthlyCounts = new Array(numMonths).fill(0);
             orderedSpecies.forEach(sp => {
                 const arr = speciesMonthly[sp] || [];
@@ -911,13 +2226,11 @@
             `;
         }
         
-        // Format number with commas
         function formatNumber(num) {
             if (!num) return 'N/A';
             return num.toLocaleString();
         }
         
-        // HTML for the full-width side panel
         function createLocationPanelHTML(location) {
             const accessibilityClass = location.accessibility.toLowerCase();
             const bestMonthsHTML = location.bestMonths.map(m => 
@@ -926,7 +2239,6 @@
             
             const monthlyChartHTML = createMonthlyDensityChart(location);
             
-            // Get images array (support both imageUrl and imageUrls)
             const images = location.imageUrls && Array.isArray(location.imageUrls) && location.imageUrls.length > 0 
                 ? location.imageUrls 
                 : [location.imageUrl || 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop'];
@@ -1005,7 +2317,6 @@
             `;
         }
         
-        // Panel image carousel functions
         function panelPrevImage(event) {
             event.stopPropagation();
             const mediaContainer = document.querySelector('.location-panel-header-media');
@@ -1054,6 +2365,9 @@
         }
         
         function openInfoPanel(location) {
+            // Close settings panel if open
+            settingsPanel.classList.remove('open');
+            
             infoPanelTitle.textContent = location.name;
             infoPanelSubtitle.textContent = location.location;
             infoPanelBody.innerHTML = createLocationPanelHTML(location);
@@ -1070,7 +2384,6 @@
         // MAP LOAD
         // ============================================================
         map.on('load', () => {
-            // Heatmap source + layer
             map.addSource('density-points', {
                 type: 'vector',
                 url: TILESET_URL
@@ -1083,8 +2396,6 @@
                 'source-layer': SOURCE_LAYER,
                 'maxzoom': 9,
                 'paint': {
-                    // Weight based on density property (1-7 species in practice)
-                    // Exponential curve: 1 species is visible, higher diversity pops more
                     'heatmap-weight': [
                         'interpolate',
                         ['exponential', 1.5],
@@ -1135,7 +2446,6 @@
                 'filter': ['in', ['get', 'bin'], ['literal', [binA, binB]]]
             });
             
-            // Whale watching locations as GeoJSON
             const whaleGeoJSON = {
                 type: 'FeatureCollection',
                 features: WHALE_WATCHING_LOCATIONS.map((loc, idx) => ({
@@ -1155,7 +2465,6 @@
                 data: whaleGeoJSON
             });
             
-            // POI-style halo
             map.addLayer({
                 id: 'whale-locations-halo',
                 type: 'circle',
@@ -1174,7 +2483,6 @@
                 }
             });
             
-            // Main POI pin
             map.addLayer({
                 id: 'whale-locations-layer',
                 type: 'circle',
@@ -1194,7 +2502,6 @@
                 }
             });
             
-            // Hover cursor
             map.on('mouseenter', 'whale-locations-layer', () => {
                 map.getCanvas().style.cursor = 'pointer';
             });
@@ -1202,7 +2509,6 @@
                 map.getCanvas().style.cursor = '';
             });
             
-            // Click → open side panel
             map.on('click', 'whale-locations-layer', (e) => {
                 if (!e.features || !e.features.length) return;
                 const feature = e.features[0];
@@ -1217,16 +2523,10 @@
         });
         
         // ============================================================
-        // EVENT LISTENERS (UPDATED FOR 48 BINS)
+        // EVENT LISTENERS
         // ============================================================
         document.getElementById('monthSlider').addEventListener('input', (e) => {
-            stopAnimation();
-            binA = parseInt(e.target.value, 10);
-            binB = (binA % TOTAL_BINS) + 1;
-            setFilterAll();
-            phase = 0;
-            setWeightAll(0);
-            updateLabels();
+            setMonth(parseInt(e.target.value, 10));
         });
         
         document.getElementById('playPause').addEventListener('click', () => {
@@ -1236,6 +2536,313 @@
                 startAnimation();
             }
         });
+        
+        // ============================================================
+        // ANIMATION SETTINGS PANEL
+        // ============================================================
+        const settingsPanel = document.getElementById('settingsPanel');
+        const settingsToggle = document.getElementById('settingsToggle');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        const intensitySlider = document.getElementById('intensitySlider');
+        const intensityValue = document.getElementById('intensityValue');
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusValue = document.getElementById('radiusValue');
+        const resetSettings = document.getElementById('resetSettings');
+        const presetBtns = document.querySelectorAll('.preset-btn[data-speed]');
+        const colormapBtns = document.querySelectorAll('.colormap-btn');
+        
+        // Colormap definitions
+        const COLORMAPS = {
+            default: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(0,0,80,0.3)'],
+                [0.25, 'rgba(0,100,255,0.5)'],
+                [0.4, 'rgba(0,200,255,0.65)'],
+                [0.55, 'rgba(100,255,200,0.75)'],
+                [0.7, 'rgba(255,220,0,0.85)'],
+                [0.85, 'rgba(255,100,0,0.95)'],
+                [1.0, 'rgba(255,0,150,1)']
+            ],
+            ocean: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(10,22,40,0.4)'],
+                [0.25, 'rgba(13,59,102,0.55)'],
+                [0.4, 'rgba(26,117,159,0.65)'],
+                [0.55, 'rgba(52,160,164,0.75)'],
+                [0.7, 'rgba(118,200,147,0.85)'],
+                [0.85, 'rgba(181,228,140,0.92)'],
+                [1.0, 'rgba(217,249,187,1)']
+            ],
+            thermal: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(0,0,51,0.4)'],
+                [0.25, 'rgba(26,0,102,0.55)'],
+                [0.4, 'rgba(77,0,153,0.65)'],
+                [0.55, 'rgba(153,0,204,0.75)'],
+                [0.7, 'rgba(255,51,102,0.85)'],
+                [0.85, 'rgba(255,153,51,0.92)'],
+                [1.0, 'rgba(255,204,0,1)']
+            ],
+            viridis: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(68,1,84,0.4)'],
+                [0.25, 'rgba(59,82,139,0.55)'],
+                [0.4, 'rgba(33,145,140,0.65)'],
+                [0.55, 'rgba(94,201,98,0.75)'],
+                [0.7, 'rgba(170,220,50,0.85)'],
+                [0.85, 'rgba(212,235,30,0.92)'],
+                [1.0, 'rgba(253,231,37,1)']
+            ],
+            magma: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(0,0,4,0.4)'],
+                [0.25, 'rgba(59,15,112,0.55)'],
+                [0.4, 'rgba(140,41,129,0.65)'],
+                [0.55, 'rgba(222,73,104,0.75)'],
+                [0.7, 'rgba(254,161,110,0.85)'],
+                [0.85, 'rgba(254,220,175,0.92)'],
+                [1.0, 'rgba(252,253,191,1)']
+            ],
+            cool: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(13,8,135,0.4)'],
+                [0.25, 'rgba(83,2,163,0.55)'],
+                [0.4, 'rgba(139,10,165,0.65)'],
+                [0.55, 'rgba(185,50,137,0.75)'],
+                [0.7, 'rgba(219,92,104,0.85)'],
+                [0.85, 'rgba(244,136,73,0.92)'],
+                [1.0, 'rgba(254,189,42,1)']
+            ]
+        };
+        
+        let currentColormap = 'default';
+        
+        // Default values
+        const defaults = {
+            speed: 1000,
+            intensity: 100,
+            radius: 100,
+            colormap: 'default'
+        };
+        
+        // Toggle panel open/close
+        settingsToggle.addEventListener('click', () => {
+            settingsPanel.classList.toggle('open');
+        });
+        
+        // Close panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!settingsPanel.contains(e.target)) {
+                settingsPanel.classList.remove('open');
+            }
+        });
+        
+        // Update slider track fill
+        function updateSliderFill(slider) {
+            const min = parseFloat(slider.min);
+            const max = parseFloat(slider.max);
+            const val = parseFloat(slider.value);
+            const percentage = ((val - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, #2c7ab8 ${percentage}%, #e0e0e0 ${percentage}%)`;
+        }
+        
+        // Apply colormap to heatmap layer
+        function applyColormap(colormapName) {
+            if (!map.getLayer('density-heatmap')) return;
+            
+            const colormap = COLORMAPS[colormapName] || COLORMAPS.default;
+            const colorExpr = ['interpolate', ['linear'], ['heatmap-density']];
+            
+            colormap.forEach(([stop, color]) => {
+                colorExpr.push(stop, color);
+            });
+            
+            map.setPaintProperty('density-heatmap', 'heatmap-color', colorExpr);
+            currentColormap = colormapName;
+        }
+        
+        // Colormap selection
+        colormapBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const colormapName = btn.dataset.colormap;
+                applyColormap(colormapName);
+                
+                colormapBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Speed slider
+        speedSlider.addEventListener('input', () => {
+            const value = parseInt(speedSlider.value);
+            morphDuration = value;
+            speedValue.textContent = (value / 1000).toFixed(1) + 's';
+            updateSliderFill(speedSlider);
+            
+            // Update preset buttons
+            presetBtns.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.speed) === value);
+            });
+        });
+        
+        // Speed presets
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const speed = parseInt(btn.dataset.speed);
+                speedSlider.value = speed;
+                morphDuration = speed;
+                speedValue.textContent = (speed / 1000).toFixed(1) + 's';
+                updateSliderFill(speedSlider);
+                
+                presetBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Intensity slider
+        intensitySlider.addEventListener('input', () => {
+            const value = parseInt(intensitySlider.value);
+            intensityValue.textContent = value + '%';
+            updateSliderFill(intensitySlider);
+            
+            if (map.getLayer('density-heatmap')) {
+                const intensityMultiplier = value / 100;
+                map.setPaintProperty('density-heatmap', 'heatmap-intensity', [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    0, 1.0 * intensityMultiplier,
+                    5, 1.5 * intensityMultiplier,
+                    8, 2.0 * intensityMultiplier
+                ]);
+            }
+        });
+        
+        // Radius slider
+        radiusSlider.addEventListener('input', () => {
+            const value = parseInt(radiusSlider.value);
+            radiusValue.textContent = value + '%';
+            updateSliderFill(radiusSlider);
+            
+            if (map.getLayer('density-heatmap')) {
+                const radiusMultiplier = value / 100;
+                map.setPaintProperty('density-heatmap', 'heatmap-radius', [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    0, 3 * radiusMultiplier,
+                    4, 15 * radiusMultiplier,
+                    8, 30 * radiusMultiplier
+                ]);
+            }
+        });
+        
+        // Opacity slider
+        opacitySlider.addEventListener('input', () => {
+            const value = parseInt(opacitySlider.value);
+            opacityValue.textContent = value + '%';
+            updateSliderFill(opacitySlider);
+            
+            if (map.getLayer('density-heatmap')) {
+                map.setPaintProperty('density-heatmap', 'heatmap-opacity', value / 100);
+            }
+        });
+        
+        // Reset to defaults
+        resetSettings.addEventListener('click', () => {
+            // Reset speed
+            speedSlider.value = defaults.speed;
+            morphDuration = defaults.speed;
+            speedValue.textContent = '1.0s';
+            updateSliderFill(speedSlider);
+            presetBtns.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.speed) === defaults.speed);
+            });
+            
+            // Reset colormap
+            applyColormap(defaults.colormap);
+            colormapBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.colormap === defaults.colormap);
+            });
+            
+            // Reset intensity
+            intensitySlider.value = defaults.intensity;
+            intensityValue.textContent = '100%';
+            updateSliderFill(intensitySlider);
+            if (map.getLayer('density-heatmap')) {
+                map.setPaintProperty('density-heatmap', 'heatmap-intensity', [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    0, 1.0,
+                    5, 1.5,
+                    8, 2.0
+                ]);
+            }
+            
+            // Reset radius
+            radiusSlider.value = defaults.radius;
+            radiusValue.textContent = '100%';
+            updateSliderFill(radiusSlider);
+            if (map.getLayer('density-heatmap')) {
+                map.setPaintProperty('density-heatmap', 'heatmap-radius', [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    0, 3,
+                    4, 15,
+                    8, 30
+                ]);
+            }
+        });
+        
+        // Initialize slider fills on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSliderFill(speedSlider);
+            updateSliderFill(intensitySlider);
+            updateSliderFill(radiusSlider);
+        });
+        
+        // Also initialize when map loads (in case DOMContentLoaded already fired)
+        map.on('load', () => {
+            updateSliderFill(speedSlider);
+            updateSliderFill(intensitySlider);
+            updateSliderFill(radiusSlider);
+        });
     </script>
+    
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p class="footer-attribution">Data collected and processed by <strong>Quintin Tyree</strong></p>
+        </div>
+    </footer>
+    
+    <style>
+        .site-footer {
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            border-top: 1px solid #dee2e6;
+            padding: 24px 20px;
+            text-align: center;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-attribution {
+            font-size: 14px;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .footer-attribution strong {
+            color: #2c7ab8;
+            font-weight: 600;
+        }
+    </style>
 </body>
 </html>

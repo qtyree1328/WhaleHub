@@ -9,11 +9,20 @@ const MONTH_NAMES = [
 ];
 
 // Build SPECIES_CONFIG from WHALE_SPECIES (defined in whale-species.js)
+// Only includes species with hasMapData: true AND a valid mapConfig with url
 let SPECIES_CONFIG = [];
 
 if (typeof WHALE_SPECIES !== 'undefined' && Array.isArray(WHALE_SPECIES)) {
     SPECIES_CONFIG = WHALE_SPECIES
-        .filter(sp => sp.mapConfig && sp.hasMapData)
+        .filter(sp => {
+            // Must have hasMapData true
+            if (!sp.hasMapData) return false;
+            // Must have mapConfig object
+            if (!sp.mapConfig) return false;
+            // Must have a valid url (not empty, not a placeholder)
+            if (!sp.mapConfig.url || sp.mapConfig.url.includes('TILESET_ID')) return false;
+            return true;
+        })
         .map(sp => ({
             id: sp.mapConfig.id,
             name: sp.commonName,
@@ -22,10 +31,36 @@ if (typeof WHALE_SPECIES !== 'undefined' && Array.isArray(WHALE_SPECIES)) {
             url: sp.mapConfig.url,
             sourceLayer: sp.mapConfig.sourceLayer,
             color: sp.mapConfig.color,
-            dateRange: sp.mapConfig.dateRange
+            dateRange: parseDateRange(sp.mapConfig.dateRange)
         }));
+    
+    console.log('SPECIES_CONFIG built:', SPECIES_CONFIG.length, 'species');
+    SPECIES_CONFIG.forEach(sp => console.log(' -', sp.name, sp.id));
 } else {
     console.error('WHALE_SPECIES not found. Make sure whale-species.js is loaded before config.js');
+}
+
+// Parse dateRange - supports both string "2006-2025" and object { startYear, endYear }
+function parseDateRange(dateRange) {
+    if (!dateRange) {
+        return { startYear: 2005, endYear: 2025 };
+    }
+    
+    if (typeof dateRange === 'object' && dateRange.startYear && dateRange.endYear) {
+        return dateRange;
+    }
+    
+    if (typeof dateRange === 'string') {
+        const parts = dateRange.split('-');
+        if (parts.length === 2) {
+            return {
+                startYear: parseInt(parts[0], 10),
+                endYear: parseInt(parts[1], 10)
+            };
+        }
+    }
+    
+    return { startYear: 2005, endYear: 2025 };
 }
 
 // Shared base heatmap paint properties
@@ -56,6 +91,12 @@ function getSpeciesConfigByName(commonName) {
     return SPECIES_CONFIG.find(config => 
         config.name.toLowerCase() === normalizedName
     );
+}
+
+// Helper function to get species config by ID
+function getSpeciesConfigById(id) {
+    if (!id) return null;
+    return SPECIES_CONFIG.find(config => config.id === id);
 }
 
 // Helper function to get all species configs for a location's species list

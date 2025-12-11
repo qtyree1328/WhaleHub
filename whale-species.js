@@ -7,6 +7,17 @@
 //
 // Both formats are supported. Use heroImages array for multiple images per species.
 // If both are provided, heroImages takes precedence.
+//
+// MAP CONFIG:
+// To add a species to the map, set hasMapData: true and add a mapConfig object:
+// mapConfig: {
+//     id: 'unique_layer_id',           // Unique identifier for the map layer
+//     sourceId: 'unique_source_id',    // Unique identifier for the data source
+//     url: 'mapbox://username.tileset', // Mapbox tileset URL
+//     sourceLayer: 'layer-name',        // Source layer name from Mapbox
+//     color: { base: '#hex', heatmap: [...] }, // Color configuration
+//     dateRange: { startYear: 2005, endYear: 2025 } // Year range for data filtering
+// }
 
 const WHALE_SPECIES = [
     {
@@ -22,8 +33,8 @@ const WHALE_SPECIES = [
             'https://whalewatchersatlas.com/images/whales/Blue_whale2.jpg'
         ],
         color: '#0066ff',
-        shortDescription: 'WOW The largest animal ever known to exist on Earth.',
-        fullDescription: `WOW The blue whale is the largest animal known to have ever existed, reaching lengths of up to 100 feet (30 meters) and weights of up to 200 tons. Despite their enormous size, blue whales feed almost exclusively on tiny shrimp-like animals called krill.
+        shortDescription: 'The largest animal ever known to exist on Earth.',
+        fullDescription: `The blue whale is the largest animal known to have ever existed, reaching lengths of up to 100 feet (30 meters) and weights of up to 200 tons. Despite their enormous size, blue whales feed almost exclusively on tiny shrimp-like animals called krill.
 
 Blue whales are found in all oceans except the Arctic. They migrate seasonally between summer feeding grounds in polar waters and winter breeding grounds in tropical and subtropical waters.
 
@@ -45,21 +56,21 @@ Their distinctive mottled blue-gray coloring and small dorsal fin make them iden
             'They can consume up to 6 tons of krill daily'
         ],
         mapConfig: {
-            id: 'blue_2008_heat',
-            sourceId: 'blue_2008_src',
-            url: 'mapbox://qtyree.5dg1e85w',
-            sourceLayer: 'Blue_whale_merged_2008_2006_2-bhifyv',
+            id: 'blue_whale_heat',
+            sourceId: 'blue_whale_src',
+            url: 'mapbox://qtyree.d8ugc52g',
+            sourceLayer: 'Blue_whale_gbif_2005-2025_fin-9os5to',
             color: {
                 base: '#0066ff',
                 heatmap: [
                     'interpolate', ['linear'], ['heatmap-density'],
-                    0.0, 'rgba(0,0,0,0)',
+                    0.0, 'rgba(209, 211, 251, 0)',
                     0.3, 'rgba(150,200,255,0.6)',
                     0.6, 'rgba(70,130,255,0.8)',
                     1.0, 'rgba(0,60,200,0.95)'
                 ]
             },
-            dateRange: '2006-2025'
+            dateRange: { startYear: 2006, endYear: 2025 }
         }
     },
     {
@@ -76,7 +87,6 @@ Their distinctive mottled blue-gray coloring and small dorsal fin make them iden
             'https://whalewatchersatlas.com/images/whales/Humpback3.jpg',
             'https://whalewatchersatlas.com/images/whales/Humpback4.jpg',
             'https://whalewatchersatlas.com/images/whales/Humpback5.jpg'
-            
         ],
         color: '#00a65a',
         shortDescription: 'Famous for their spectacular breaching and complex songs.',
@@ -102,21 +112,21 @@ Humpbacks are found in all oceans and undertake one of the longest migrations of
             'Males compete by singing complex songs lasting up to 20 hours'
         ],
         mapConfig: {
-            id: 'humpback_2019_heat',
-            sourceId: 'humpback_2019_src',
-            url: 'mapbox://qtyree.3w2ef80k',
-            sourceLayer: 'Humpback_whale_merged_2019_Au-59si9c',
+            id: 'humpback_whale_heat',
+            sourceId: 'humpback_whale_src',
+            url: 'mapbox://qtyree.humpback_whale_2005_2025',
+            sourceLayer: 'humpback_whale_2005_2025',
             color: {
-                base: '#00a65a',
+                base: '#00dc30ff',
                 heatmap: [
                     'interpolate', ['linear'], ['heatmap-density'],
                     0.0, 'rgba(0,0,0,0)',
                     0.3, 'rgba(180,240,190,0.6)',
                     0.6, 'rgba(80,200,120,0.8)',
-                    1.0, 'rgba(0,140,60,0.95)'
+                    1.0, 'rgba(0, 180, 78, 0.95)'
                 ]
             },
-            dateRange: '2017-2025'
+            dateRange: { startYear: 2005, endYear: 2025 }
         }
     },
     {
@@ -132,7 +142,7 @@ Humpbacks are found in all oceans and undertake one of the longest migrations of
             'https://whalewatchersatlas.com/images/whales/Sperm2.jpg',
             'https://whalewatchersatlas.com/images/whales/Sperm3.jpg'
         ],
-        color: '#d7263d',
+        color: '#ed0322ff',
         shortDescription: 'The largest toothed predator and deepest diving mammal.',
         fullDescription: `The sperm whale is the largest of all toothed whales and the largest toothed predator on Earth. Made famous by Herman Melville's "Moby Dick," these magnificent creatures possess the largest brain of any animal and can dive deeper than any other mammal.
 
@@ -156,146 +166,29 @@ They are found throughout the world's oceans, from the equator to the edges of p
             'Their clicking sounds can reach 230 decibels'
         ],
         mapConfig: {
-            id: 'sperm_2019_heat',
-            sourceId: 'sperm_2019_src',
-            url: 'mapbox://qtyree.d1dgy295',
-            sourceLayer: 'Sperm_whale_gbif_2006_2025-09g1qn',
+            id: 'sperm_whale_heat',
+            sourceId: 'sperm_whale_src',
+            url: 'mapbox://qtyree.8kuncm9v',
+            sourceLayer: 'Sperm_whale_gbif_2005-2025_fi-9hwg0r',
             color: {
-                base: '#d7263d',
+                base: '#e90120ff',
                 heatmap: [
                     'interpolate', ['linear'], ['heatmap-density'],
                     0.0, 'rgba(0,0,0,0)',
-                    0.3, 'rgba(255,180,160,0.6)',
-                    0.6, 'rgba(230,80,60,0.8)',
-                    1.0, 'rgba(200,30,30,0.95)'
+                    0.3, 'rgba(235, 116, 116, 0.6)',
+                    0.6, 'rgba(234, 83, 63, 0.8)',
+                    1.0, 'rgba(246, 0, 0, 0.95)'
                 ]
             },
-            dateRange: '2006-2025'
+            dateRange: { startYear: 2005, endYear: 2025 }
         }
-    },
-    {
-        id: 'orca',
-        commonName: 'Orca (Killer Whale)',
-        scientificName: 'Orcinus orca',
-        category: 'Toothed Whale',
-        hasMapData: false,
-        image: 'https://whalewatchersatlas.com/images/whales/orca1.webp',
-        heroImage: 'https://whalewatchersatlas.com/images/whales/orca1.webp',
-        heroImages: [
-            'https://whalewatchersatlas.com/images/whales/orca1.webp',
-            'https://whalewatchersatlas.com/images/whales/Orca2.jpg',
-            'https://whalewatchersatlas.com/images/whales/Orca3.jpg',
-            'https://whalewatchersatlas.com/images/whales/Orca4.webp',
-            'https://whalewatchersatlas.com/images/whales/Orca5.jpg',
-            'https://whalewatchersatlas.com/images/whales/Orca6.webp',
-            'https://whalewatchersatlas.com/images/whales/Orca7.webp'
-        ],
-        color: '#1a1a2e',
-        shortDescription: 'Apex predators with complex social structures and cultures.',
-        fullDescription: `Orcas, also known as killer whales, are actually the largest members of the dolphin family. They are apex predators found in every ocean, from the Arctic to the Antarctic. Their distinctive black and white coloring and tall dorsal fin make them instantly recognizable.
-
-Orcas live in tight-knit family groups called pods, led by matriarchs. Different populations have developed unique hunting techniques, vocalizations, and diets—essentially different cultures passed down through generations.
-
-These highly intelligent creatures have been observed using sophisticated hunting strategies, including intentionally beaching themselves to catch seals and creating waves to knock prey off ice floes.`,
-        stats: {
-            length: 'Up to 32 ft (10 m)',
-            weight: 'Up to 6 tons',
-            lifespan: '50-90 years',
-            diet: 'Fish, seals, other whales',
-            population: '50,000+',
-            status: 'Data Deficient'
-        },
-        migrationPattern: 'Orcas don\'t have predictable migration routes. Some populations are resident, staying in the same area year-round, while others (transients) travel widely following prey.',
-        bestViewingMonths: [5, 6, 7, 8, 9],
-        funFacts: [
-            'Female orcas can live over 100 years',
-            'They are one of the few species with menopause',
-            'Different pods have distinct dialects',
-            'They have the second-largest brain of any ocean mammal'
-        ]
-    },
-    {
-        id: 'gray-whale',
-        commonName: 'Gray Whale',
-        scientificName: 'Eschrichtius robustus',
-        category: 'Baleen Whale',
-        hasMapData: false,
-        image: 'https://whalewatchersatlas.com/images/whales/Grey1.webp',
-        heroImage: 'https://whalewatchersatlas.com/images/whales/Grey1.webp',
-        heroImages: [
-            'https://whalewatchersatlas.com/images/whales/Grey1.webp',
-            'https://whalewatchersatlas.com/images/whales/Grey2.webp',
-            'https://whalewatchersatlas.com/images/whales/Grey3.webp',
-            'https://whalewatchersatlas.com/images/whales/Grey4.jpg'
-        ],
-        color: '#6c757d',
-        shortDescription: 'Champion migrators traveling 12,000 miles annually.',
-        fullDescription: `Gray whales are known for making one of the longest annual migrations of any mammal, traveling up to 12,000 miles round trip between their summer feeding grounds in the Arctic and their winter breeding lagoons in Baja California, Mexico.
-
-These whales are the only baleen whales that are primarily bottom feeders, scooping up sediment from the ocean floor and filtering out small crustaceans called amphipods. This unique feeding style often leaves them with patches of barnacles and whale lice.
-
-Gray whales in the breeding lagoons of Mexico are famous for being "friendly," often approaching boats and allowing people to touch them—a remarkable behavior that has made them favorites among whale watchers.`,
-        stats: {
-            length: 'Up to 49 ft (15 m)',
-            weight: 'Up to 40 tons',
-            lifespan: '55-70 years',
-            diet: 'Amphipods, worms',
-            population: '27,000',
-            status: 'Least Concern'
-        },
-        migrationPattern: 'Gray whales make one of the longest migrations of any mammal, traveling from Arctic feeding grounds to Baja California breeding lagoons and back—a 10,000-12,000 mile journey.',
-        bestViewingMonths: [1, 2, 3, 12],
-        funFacts: [
-            'They are called "friendly whales" for approaching boats',
-            'Calves gain 60-70 pounds per day on mother\'s milk',
-            'They were once called "devil fish" by whalers',
-            'They\'ve been making this migration for millions of years'
-        ]
-    },
-    {
-        id: 'fin-whale',
-        commonName: 'Fin Whale',
-        scientificName: 'Balaenoptera physalus',
-        category: 'Baleen Whale',
-        hasMapData: false,
-        image: 'https://whalewatchersatlas.com/images/whales/fin1.jpg',
-        heroImage: 'https://whalewatchersatlas.com/images/whales/fin1.jpg',
-        heroImages: [
-            'https://whalewatchersatlas.com/images/whales/fin1.jpg',
-            'https://whalewatchersatlas.com/images/whales/fin2.webp',
-            'https://whalewatchersatlas.com/images/whales/fin3.png',
-            'https://whalewatchersatlas.com/images/whales/fin4.webp'
-        ],
-        color: '#495057',
-        shortDescription: 'The "greyhound of the sea" and second-largest animal.',
-        fullDescription: `The fin whale is the second-largest animal on Earth after the blue whale, reaching lengths of up to 85 feet. Known as the "greyhound of the sea" for its sleek body and impressive speed, fin whales can swim at speeds up to 23 mph in short bursts.
-
-One of the most distinctive features of fin whales is their asymmetrical coloring—the right lower jaw is white, while the left is dark. Scientists believe this asymmetry may be used to confuse prey while feeding.
-
-Fin whales are found in all oceans and are often seen in social groups. Despite being heavily hunted in the 20th century, populations are slowly recovering, though they remain endangered.`,
-        stats: {
-            length: 'Up to 85 ft (26 m)',
-            weight: 'Up to 80 tons',
-            lifespan: '80-90 years',
-            diet: 'Krill, small fish, squid',
-            population: '100,000+',
-            status: 'Vulnerable'
-        },
-        migrationPattern: 'Fin whales migrate seasonally, moving to cooler waters to feed in summer and warmer waters in winter. However, their migration patterns are less predictable than some other species.',
-        bestViewingMonths: [6, 7, 8, 9, 10],
-        funFacts: [
-            'They can eat up to 2 tons of food per day',
-            'Their blow can reach 20 feet high',
-            'They have asymmetrical jaw coloring—unique among whales',
-            'A fin whale\'s heart weighs about 400 pounds'
-        ]
     },
     {
         id: 'beluga-whale',
         commonName: 'Beluga Whale',
         scientificName: 'Delphinapterus leucas',
         category: 'Toothed Whale',
-        hasMapData: false,
+        hasMapData: true,
         image: 'https://whalewatchersatlas.com/images/whales/beluga1.avif',
         heroImage: 'https://whalewatchersatlas.com/images/whales/beluga1.avif',
         heroImages: [
@@ -304,7 +197,7 @@ Fin whales are found in all oceans and are often seen in social groups. Despite 
             'https://whalewatchersatlas.com/images/whales/beluga2.webp',
             'https://whalewatchersatlas.com/images/whales/beluga3.jpg'
         ],
-        color: '#f8f9fa',
+        color: '#e6ff01ff',
         shortDescription: 'The "canary of the sea" with remarkable vocal abilities.',
         fullDescription: `Beluga whales are small, white whales known for their distinctive rounded forehead called a "melon" and their remarkable vocal abilities, which earned them the nickname "canary of the sea." They are highly social animals that live in groups and can produce a wide variety of sounds.
 
@@ -326,51 +219,87 @@ Belugas are found in Arctic and sub-Arctic waters, often congregating in estuari
             'Belugas can swim backwards',
             'Their white color provides camouflage in icy waters',
             'They shed and regrow their skin annually'
-        ]
+        ],
+        // Add mapConfig when Mapbox data is available:
+        mapConfig: {
+            id: 'beluga_heat',
+            sourceId: 'beluga_src',
+            url: 'mapbox://qtyree.7gaw6161',
+            sourceLayer: 'Beluga_whale_gbif_2005-2025-3o6w3m',
+            color: {
+                base: '#fffb00ff',
+                heatmap: [
+                    'interpolate', ['linear'], ['heatmap-density'],
+                    0.0, 'rgba(0,0,0,0)',
+                    0.3, 'rgba(244, 230, 125, 0.6)',
+                    0.6, 'rgba(223, 229, 55, 0.8)',
+                    1.0, 'rgba(255, 255, 0, 0.95)'
+                ]
+            },
+            dateRange: { startYear: 2005, endYear: 2025 }
+        }
     },
     {
-        id: 'right-whale',
-        commonName: 'Southern Right Whale',
-        scientificName: 'Eubalaena australis',
+        id: 'gray-whale',
+        commonName: 'Gray Whale',
+        scientificName: 'Eschrichtius robustus',
         category: 'Baleen Whale',
-        hasMapData: false,
-        image: 'https://whalewatchersatlas.com/images/whales/Southern_right3.jpg',
-        heroImage: 'https://whalewatchersatlas.com/images/whales/Southern_right3.jpg',
+        hasMapData: true,
+        image: 'https://whalewatchersatlas.com/images/whales/Grey1.webp',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/Grey1.webp',
         heroImages: [
-            'https://whalewatchersatlas.com/images/whales/Southern_right3.jpg',
-            'https://whalewatchersatlas.com/images/whales/Southern_right_whale2.jpg',
-            'https://whalewatchersatlas.com/images/whales/southern-right-whale-1.webp'
+            'https://whalewatchersatlas.com/images/whales/Grey1.webp',
+            'https://whalewatchersatlas.com/images/whales/Grey2.webp',
+            'https://whalewatchersatlas.com/images/whales/Grey3.webp',
+            'https://whalewatchersatlas.com/images/whales/Grey4.jpg'
         ],
-        color: '#343a40',
-        shortDescription: 'Gentle giants that come remarkably close to shore.',
-        fullDescription: `Southern right whales are large baleen whales named by early whalers who considered them the "right" whale to hunt—they were slow swimmers, floated when killed, and yielded large quantities of oil and baleen. This made them easy targets, and they were hunted nearly to extinction.
+        color: '#3cdef4ff',
+        shortDescription: 'Champion migrators traveling 12,000 miles annually.',
+        fullDescription: `Gray whales are known for making one of the longest annual migrations of any mammal, traveling up to 12,000 miles round trip between their summer feeding grounds in the Arctic and their winter breeding lagoons in Baja California, Mexico.
 
-These whales are easily recognized by their lack of a dorsal fin, their broad back, and the distinctive white callosities (rough patches of skin) on their heads. Each whale's callosity pattern is unique, like a fingerprint.
+These whales are the only baleen whales that are primarily bottom feeders, scooping up sediment from the ocean floor and filtering out small crustaceans called amphipods. This unique feeding style often leaves them with patches of barnacles and whale lice.
 
-Southern right whales are found in southern hemisphere waters and are known for coming remarkably close to shore, making places like Hermanus, South Africa one of the best land-based whale watching destinations in the world.`,
+Gray whales in the breeding lagoons of Mexico are famous for being "friendly," often approaching boats and allowing people to touch them—a remarkable behavior that has made them favorites among whale watchers.`,
         stats: {
-            length: 'Up to 56 ft (17 m)',
-            weight: 'Up to 80 tons',
-            lifespan: '50+ years',
-            diet: 'Copepods, krill',
-            population: '15,000+',
+            length: 'Up to 49 ft (15 m)',
+            weight: 'Up to 40 tons',
+            lifespan: '55-70 years',
+            diet: 'Amphipods, worms',
+            population: '27,000',
             status: 'Least Concern'
         },
-        migrationPattern: 'Southern right whales migrate between summer feeding grounds in Antarctic waters and winter breeding grounds along the coasts of South America, South Africa, and Australia.',
-        bestViewingMonths: [7, 8, 9, 10],
+        migrationPattern: 'Gray whales make one of the longest migrations of any mammal, traveling from Arctic feeding grounds to Baja California breeding lagoons and back—a 10,000-12,000 mile journey.',
+        bestViewingMonths: [1, 2, 3, 12],
         funFacts: [
-            'They were named the "right" whale to hunt by whalers',
-            'Their callosities are covered in whale lice',
-            'They can be identified by unique head patterns',
-            'Mothers and calves stay together for about a year'
-        ]
+            'They are called "friendly whales" for approaching boats',
+            'Calves gain 60-70 pounds per day on mother\'s milk',
+            'They were once called "devil fish" by whalers',
+            'They\'ve been making this migration for millions of years'
+        ],
+        mapConfig: {
+            id: 'gray_whale_heat',
+            sourceId: 'gray_whale_src',
+            url: 'mapbox://qtyree.cswaoaox',
+            sourceLayer: 'Grey_whale_gbif_2005-2025_fin-78xday',
+            color: {
+                base: '#3cdef4ff',
+                heatmap: [
+                    'interpolate', ['linear'], ['heatmap-density'],
+                    0.0, 'rgba(0,0,0,0)',
+                    0.3, 'rgba(179, 243, 246, 0.6)',
+                    0.6, 'rgba(101, 242, 255, 0.8)',
+                    1.0, 'rgba(62, 236, 252, 0.95)'
+                ]
+            },
+            dateRange: { startYear: 2005, endYear: 2025 }
+        }
     },
     {
         id: 'minke-whale',
         commonName: 'Minke Whale',
         scientificName: 'Balaenoptera acutorostrata',
         category: 'Baleen Whale',
-        hasMapData: false,
+        hasMapData: true,
         image: 'https://whalewatchersatlas.com/images/whales/minke1.webp',
         heroImage: 'https://whalewatchersatlas.com/images/whales/minke1.webp',
         heroImages: [
@@ -379,7 +308,7 @@ Southern right whales are found in southern hemisphere waters and are known for 
             'https://whalewatchersatlas.com/images/whales/minke3.jpg',
             'https://whalewatchersatlas.com/images/whales/minke4.jpg'
         ],
-        color: '#20c997',
+        color: '#f0b209ff',
         shortDescription: 'The smallest and most abundant of the rorqual whales.',
         fullDescription: `Minke whales are the smallest of the rorqual whales (the family that includes blue, fin, and humpback whales) and are found in oceans worldwide. They are curious animals that often approach boats, making them popular with whale watchers.
 
@@ -401,45 +330,296 @@ Despite being the most abundant of the large baleen whales, minke whales face th
             'Named after a Norwegian whaler who mistook them for blue whales',
             'They can swim at speeds up to 24 mph',
             'Each whale consumes about 1,000 lbs of food daily'
-        ]
+        ],
+        // Add mapConfig when Mapbox data is available:
+        mapConfig: {
+            id: 'minke_heat',
+            sourceId: 'minke_src',
+            url: 'mapbox://qtyree.minke_whale_2005_2025',
+            sourceLayer: 'minke_whale_2005_2025',
+            color: {
+                base: '#f0b209ff',
+                heatmap: [
+                    'interpolate', ['linear'], ['heatmap-density'],
+                    0.0, 'rgba(0,0,0,0)',
+                    0.3, 'rgba(230, 215, 150, 0.6)',
+                    0.6, 'rgba(246, 213, 65, 0.8)',
+                    1.0, 'rgba(255, 204, 2, 0.95)'
+                ]
+            },
+            dateRange: { startYear: 2005, endYear: 2025 }
+        }
     },
     {
-        id: 'brydes-whale',
-        commonName: 'Bryde\'s Whale',
-        scientificName: 'Balaenoptera brydei',
+        id: 'north-atlantic-right-whale',
+        commonName: 'North Atlantic Right Whale',
+        scientificName: 'Eubalaena glacialis',
         category: 'Baleen Whale',
-        hasMapData: false,
-        // still using Wikimedia until you add your own files for this species
-        image: 'https://whalewatchersatlas.com/images/whales/Bryde3.jpg',
-        heroImage: 'https://whalewatchersatlas.com/images/whales/Bryde3.jpg',
+        hasMapData: true,
+        image: 'https://whalewatchersatlas.com/images/whales/north_atlantic_right1.jpg',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/north_atlantic_right1.jpg',
         heroImages: [
-            'https://whalewatchersatlas.com/images/whales/Bryde2.jpeg',
-            'https://whalewatchersatlas.com/images/whales/Bryde3.jpg',
-            'https://whalewatchersatlas.com/images/whales/bryde1.avif'
+            'https://whalewatchersatlas.com/images/whales/north_atlantic_right1.jpg'
         ],
-        color: '#fd7e14',
-        shortDescription: 'Tropical residents with three distinctive head ridges.',
-        fullDescription: `Bryde's whales (pronounced "broo-dus") are medium-sized baleen whales that prefer warmer waters than most other baleen whale species. They are named after Johan Bryde, a Norwegian consul who helped establish the first whaling station in South Africa.
+        color: '#f842d9ff',
+        shortDescription: 'One of the most endangered large whales with fewer than 350 remaining.',
+        fullDescription: `The North Atlantic right whale is one of the world's most endangered large whale species, with fewer than 350 individuals remaining. They were named "right" whales by whalers who considered them the "right" whale to hunt because they swam slowly, floated when killed, and yielded large amounts of oil.
 
-Unlike most baleen whales that migrate to polar waters to feed, Bryde's whales remain in tropical and subtropical waters year-round, following schools of fish. They are distinguished by three parallel ridges on top of their head—other rorquals have only one.
+These whales are characterized by their lack of a dorsal fin, broad back, and distinctive white callosities (rough patches of skin) on their heads. Each whale's callosity pattern is unique and used by researchers for identification.
 
-Bryde's whales are known for their unpredictable behavior. They may surface erratically and change direction suddenly while feeding, making them challenging to observe but exciting for whale watchers.`,
+North Atlantic right whales face numerous threats including ship strikes, entanglement in fishing gear, climate change affecting their food supply, and noise pollution. Conservation efforts are ongoing to protect this critically endangered species.`,
         stats: {
-            length: 'Up to 55 ft (16.5 m)',
-            weight: 'Up to 45 tons',
+            length: 'Up to 52 ft (16 m)',
+            weight: 'Up to 70 tons',
+            lifespan: '70+ years',
+            diet: 'Copepods, krill',
+            population: '<350',
+            status: 'Critically Endangered'
+        },
+        migrationPattern: 'North Atlantic right whales migrate along the eastern coast of North America, from feeding grounds in New England and Canada to calving grounds off the southeastern United States.',
+        bestViewingMonths: [1, 2, 3, 4],
+        funFacts: [
+            'Fewer than 350 individuals remain',
+            'They can be identified by unique callosity patterns',
+            'Females give birth only every 6-10 years',
+            'Ship strikes are a leading cause of death'
+        ],
+        mapConfig: {
+            id: 'north_atlantic_right_whale_heat',
+            sourceId: 'north_atlantic_right_whale_src',
+            url: 'mapbox://qtyree.0gcvr6cu',
+            sourceLayer: 'NorthAtlanticRight_whale_gbif-3i6wg7',
+            color: {
+                base: '#f445d4ff',
+                heatmap: [
+                    'interpolate', ['linear'], ['heatmap-density'],
+                    0.0, 'rgba(0,0,0,0)',
+                    0.3, 'rgba(241, 144, 215, 0.6)',
+                    0.6, 'rgba(251, 70, 242, 0.8)',
+                    1.0, 'rgba(255, 35, 207, 0.95)'
+                ]
+            },
+            dateRange: { startYear: 2005, endYear: 2025 }
+        }
+    },
+    {
+        id: 'southern-right-whale',
+        commonName: 'Southern Right Whale',
+        scientificName: 'Eubalaena australis',
+        category: 'Baleen Whale',
+        hasMapData: true,
+        image: 'https://whalewatchersatlas.com/images/whales/Southern_right3.jpg',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/Southern_right3.jpg',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/Southern_right3.jpg',
+            'https://whalewatchersatlas.com/images/whales/Southern_right_whale2.jpg',
+            'https://whalewatchersatlas.com/images/whales/southern-right-whale-1.webp'
+        ],
+        color: '#d511f7ff',
+        shortDescription: 'Gentle giants that come remarkably close to shore.',
+        fullDescription: `Southern right whales are large baleen whales named by early whalers who considered them the "right" whale to hunt—they were slow swimmers, floated when killed, and yielded large quantities of oil and baleen. This made them easy targets, and they were hunted nearly to extinction.
+
+These whales are easily recognized by their lack of a dorsal fin, their broad back, and the distinctive white callosities (rough patches of skin) on their heads. Each whale's callosity pattern is unique, like a fingerprint.
+
+Southern right whales are found in southern hemisphere waters and are known for coming remarkably close to shore, making places like Hermanus, South Africa one of the best land-based whale watching destinations in the world.`,
+        stats: {
+            length: 'Up to 56 ft (17 m)',
+            weight: 'Up to 80 tons',
             lifespan: '50+ years',
-            diet: 'Schooling fish, krill',
-            population: '90,000-100,000',
+            diet: 'Copepods, krill',
+            population: '15,000+',
             status: 'Least Concern'
         },
-        migrationPattern: 'Bryde\'s whales are largely non-migratory, staying in warm tropical and subtropical waters year-round, though they may move locally following prey.',
-        bestViewingMonths: [1, 2, 3, 4, 5, 10, 11, 12],
+        migrationPattern: 'Southern right whales migrate between summer feeding grounds in Antarctic waters and winter breeding grounds along the coasts of South America, South Africa, and Australia.',
+        bestViewingMonths: [7, 8, 9, 10],
         funFacts: [
-            'They have three ridges on their head, unlike other rorquals',
-            'Bryde\'s whales rarely show their tail flukes when diving',
-            'They are unpredictable surface swimmers',
-            'They can eat 1,500 lbs of fish in a single feeding'
-        ]
+            'They were named the "right" whale to hunt by whalers',
+            'Their callosities are covered in whale lice',
+            'They can be identified by unique head patterns',
+            'Mothers and calves stay together for about a year'
+        ],
+        mapConfig: {
+            id: 'southern_right_whale_heat',
+            sourceId: 'southern_right_whale_src',
+            url: 'mapbox://qtyree.a55e1jkt',
+            sourceLayer: 'SouthernRight_whale_gbif_2005-a4f4pm',
+            color: {
+                base: '#d511f7ff',
+                heatmap: [
+                    'interpolate', ['linear'], ['heatmap-density'],
+                    0.0, 'rgba(0,0,0,0)',
+                    0.3, 'rgba(228, 148, 216, 0.6)',
+                    0.6, 'rgba(207, 103, 242, 0.8)',
+                    1.0, 'rgba(217, 31, 250, 0.95)'
+                ]
+            },
+            dateRange: { startYear: 2005, endYear: 2025 }
+        }
+    },
+    {
+        id: 'fin-whale',
+        commonName: 'Fin Whale',
+        scientificName: 'Balaenoptera physalus',
+        category: 'Baleen Whale',
+        hasMapData: true,
+        image: 'https://whalewatchersatlas.com/images/whales/fin1.jpg',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/fin1.jpg',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/fin1.jpg',
+            'https://whalewatchersatlas.com/images/whales/fin2.webp',
+            'https://whalewatchersatlas.com/images/whales/fin3.png',
+            'https://whalewatchersatlas.com/images/whales/fin4.webp'
+        ],
+        color: '#005f0aff',
+        shortDescription: 'The "greyhound of the sea" and second-largest animal.',
+        fullDescription: `The fin whale is the second-largest animal on Earth after the blue whale, reaching lengths of up to 85 feet. Known as the "greyhound of the sea" for its sleek body and impressive speed, fin whales can swim at speeds up to 23 mph in short bursts.
+
+One of the most distinctive features of fin whales is their asymmetrical coloring—the right lower jaw is white, while the left is dark. Scientists believe this asymmetry may be used to confuse prey while feeding.
+
+Fin whales are found in all oceans and are often seen in social groups. Despite being heavily hunted in the 20th century, populations are slowly recovering, though they remain endangered.`,
+        stats: {
+            length: 'Up to 85 ft (26 m)',
+            weight: 'Up to 80 tons',
+            lifespan: '80-90 years',
+            diet: 'Krill, small fish, squid',
+            population: '100,000+',
+            status: 'Vulnerable'
+        },
+        migrationPattern: 'Fin whales migrate seasonally, moving to cooler waters to feed in summer and warmer waters in winter. However, their migration patterns are less predictable than some other species.',
+        bestViewingMonths: [6, 7, 8, 9, 10],
+        funFacts: [
+            'They can eat up to 2 tons of food per day',
+            'Their blow can reach 20 feet high',
+            'They have asymmetrical jaw coloring—unique among whales',
+            'A fin whale\'s heart weighs about 400 pounds'
+        ],
+        mapConfig: {
+            id: 'fin_whale_heat',
+            sourceId: 'fin_whale_src',
+            url: 'mapbox://qtyree.fin_whale_2005_2025',
+            sourceLayer: 'Fin_whale_2005_2025',
+            color: {
+                base: '#03642aff',
+                heatmap: [
+                    'interpolate', ['linear'], ['heatmap-density'],
+                    0.0, 'rgba(0,0,0,0)',
+                    0.3, 'rgba(65, 89, 64, 0.6)',
+                    0.6, 'rgba(45, 106, 58, 0.8)',
+                    1.0, 'rgba(2, 93, 26, 0.95)'
+                ]
+            },
+            dateRange: { startYear: 2005, endYear: 2025 }
+        }
+    },
+    {
+        id: 'sei-whale',
+        commonName: 'Sei Whale',
+        scientificName: 'Balaenoptera borealis',
+        category: 'Baleen Whale',
+        hasMapData: true,
+        image: 'https://whalewatchersatlas.com/images/whales/sei1.jpg',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/sei1.jpg',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/sei1.jpg'
+        ],
+        color: '#20024fff',
+        shortDescription: 'One of the fastest whales, capable of bursts up to 35 mph.',
+        fullDescription: `The sei whale is the third-largest rorqual after the blue whale and fin whale, reaching lengths of up to 64 feet. Named after the Norwegian word "sei" (pollock), these whales often appeared off Norway at the same time as the pollock.
+
+Sei whales are among the fastest cetaceans, capable of short bursts of speed up to 35 mph. They have a distinctive tall, sickle-shaped dorsal fin and a sleek, streamlined body that makes them powerful swimmers.
+
+Unlike other rorquals that lunge-feed, sei whales are primarily skimmers, swimming through patches of prey with their mouths open. They prefer deep, offshore waters and are less commonly seen than other large whales.`,
+        stats: {
+            length: 'Up to 64 ft (19.5 m)',
+            weight: 'Up to 31 tons',
+            lifespan: '50-70 years',
+            diet: 'Copepods, krill, small fish',
+            population: '50,000-80,000',
+            status: 'Endangered'
+        },
+        migrationPattern: 'Sei whales have unpredictable migration patterns, generally moving to cooler waters in summer and warmer waters in winter, but they are known to appear suddenly in areas and then disappear.',
+        bestViewingMonths: [6, 7, 8],
+        funFacts: [
+            'One of the fastest whales at up to 35 mph',
+            'Named after the Norwegian word for pollock',
+            'They skim-feed rather than lunge-feed',
+            'Sei whales prefer deep, offshore waters'
+        ],
+        mapConfig: {
+            id: 'sei_whale_heat',
+            sourceId: 'sei_whale_src',
+            url: 'mapbox://qtyree.27hrhgdx',
+            sourceLayer: 'Sei_whale_gbif_2005-2025_fina-c4994m',
+            color: {
+                base: '#20024fff',
+                heatmap: [
+                    'interpolate', ['linear'], ['heatmap-density'],
+                    0.0, 'rgba(0,0,0,0)',
+                    0.3, 'rgba(82, 71, 99, 0.6)',
+                    0.6, 'rgba(55, 35, 80, 0.8)',
+                    1.0, 'rgba(58, 6, 123, 0.95)'
+                ]
+            },
+            dateRange: { startYear: 2005, endYear: 2025 }
+        }
+    },
+    {
+        id: 'orca',
+        commonName: 'Orca',
+        scientificName: 'Orcinus orca',
+        category: 'Toothed Whale',
+        hasMapData: true,
+        image: 'https://whalewatchersatlas.com/images/whales/orca1.webp',
+        heroImage: 'https://whalewatchersatlas.com/images/whales/orca1.webp',
+        heroImages: [
+            'https://whalewatchersatlas.com/images/whales/orca1.webp',
+            'https://whalewatchersatlas.com/images/whales/Orca2.jpg',
+            'https://whalewatchersatlas.com/images/whales/Orca3.jpg',
+            'https://whalewatchersatlas.com/images/whales/Orca4.webp',
+            'https://whalewatchersatlas.com/images/whales/Orca5.jpg',
+            'https://whalewatchersatlas.com/images/whales/Orca6.webp',
+            'https://whalewatchersatlas.com/images/whales/Orca7.webp'
+        ],
+        color: '#0e0e2bff',
+        shortDescription: 'Apex predators with complex social structures and cultures.',
+        fullDescription: `Orcas, also known as killer whales, are actually the largest members of the dolphin family. They are apex predators found in every ocean, from the Arctic to the Antarctic. Their distinctive black and white coloring and tall dorsal fin make them instantly recognizable.
+
+Orcas live in tight-knit family groups called pods, led by matriarchs. Different populations have developed unique hunting techniques, vocalizations, and diets—essentially different cultures passed down through generations.
+
+These highly intelligent creatures have been observed using sophisticated hunting strategies, including intentionally beaching themselves to catch seals and creating waves to knock prey off ice floes.`,
+        stats: {
+            length: 'Up to 32 ft (10 m)',
+            weight: 'Up to 6 tons',
+            lifespan: '50-90 years',
+            diet: 'Fish, seals, other whales',
+            population: '50,000+',
+            status: 'Data Deficient'
+        },
+        migrationPattern: 'Orcas don\'t have predictable migration routes. Some populations are resident, staying in the same area year-round, while others (transients) travel widely following prey.',
+        bestViewingMonths: [5, 6, 7, 8, 9],
+        funFacts: [
+            'Female orcas can live over 100 years',
+            'They are one of the few species with menopause',
+            'Different pods have distinct dialects',
+            'They have the second-largest brain of any ocean mammal'
+        ],
+        mapConfig: {
+            id: 'orca_whale_heat',
+            sourceId: 'orca_whale_src',
+            url: 'mapbox://qtyree.a7fg98a5',
+            sourceLayer: 'Orca_whale_gbif_2005-2025_fin-dnycm5',
+            color: {
+                base: '#0e0e2bff',
+                heatmap: [
+                    'interpolate', ['linear'], ['heatmap-density'],
+                    0.0, 'rgba(0,0,0,0)',
+                    0.3, 'rgba(97, 97, 129, 0.6)',
+                    0.6, 'rgba(47, 47, 74, 0.8)',
+                    1.0, 'rgba(26, 26, 39, 0.95)'
+                ]
+            },
+            dateRange: { startYear: 2005, endYear: 2025 }
+        }
     }
 ];
 

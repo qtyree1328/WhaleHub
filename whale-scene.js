@@ -21,32 +21,17 @@ class WhaleScene {
         this.config = {
             // Whale path control points (start, middle, end)
             // Keeping z more consistent so whale doesn't "zoom" toward camera
-            // startPos: { x: -9, y: -1.2, z: 0 },
-            // midPos: { x: 3, y: -7 ,z: 0 },
-            // endPos: { x: 14, y: -4.5, z: 0 },
-            
-            // // Whale rotation (in radians)
-            // startRotation: { x: 0, y: Math.PI * 0.3, z: 0.05 },
-            // endRotation: { x: 0, y: -Math.PI * 0.3, z: -0.05 },
-            
-            // // Whale scale - keep more consistent
-            // startScale: 0.2,
-            // endScale: 0.6,
-            
-            // // Camera - move back for wider view
-            // cameraZ: 15,
-            // fov: 45,
-            startPos: { x: 0, y: 0, z: 0 },
-            midPos: { x: 0, y: 0 ,z: 0 },
-            endPos: { x: 0, y: 0, z: 0 },
+            startPos: { x: -9, y: -1.2, z: 0 },
+            midPos: { x: 3, y: -7 ,z: 0 },
+            endPos: { x: 14, y: -4.5, z: 0 },
             
             // Whale rotation (in radians)
-            // startRotation: { x: 0, y: Math.PI * 0.3, z: 0.05 },
-            // endRotation: { x: 0, y: -Math.PI * 0.3, z: -0.05 },
+            startRotation: { x: 0, y: Math.PI * 0.3, z: 0.05 },
+            endRotation: { x: 0, y: -Math.PI * 0.3, z: -0.05 },
             
             // Whale scale - keep more consistent
-            startScale:1,
-            endScale: 1,
+            startScale: 0.2,
+            endScale: 0.6,
             
             // Camera - move back for wider view
             cameraZ: 15,
@@ -227,15 +212,29 @@ class WhaleScene {
             (gltf) => {
                 this.whale = gltf.scene;
                 
-                // Center the model
+                // Get model size BEFORE centering
                 const box = new THREE.Box3().setFromObject(this.whale);
+                const size = box.getSize(new THREE.Vector3());
                 const center = box.getCenter(new THREE.Vector3());
+                
+                console.log('=== WHALE MODEL DEBUG ===');
+                console.log('Model size:', size.x.toFixed(2), 'x', size.y.toFixed(2), 'x', size.z.toFixed(2));
+                console.log('Model center:', center.x.toFixed(2), center.y.toFixed(2), center.z.toFixed(2));
+                console.log('Camera Z:', this.config.cameraZ);
+                console.log('Scale:', this.config.startScale, '->', this.config.endScale);
+                
+                // Center the model
                 this.whale.position.sub(center);
                 
                 // Create a parent group for easier transforms
                 this.whaleGroup = new THREE.Group();
                 this.whaleGroup.add(this.whale);
                 this.scene.add(this.whaleGroup);
+                
+                // Log final bounding box
+                const finalBox = new THREE.Box3().setFromObject(this.whaleGroup);
+                const finalSize = finalBox.getSize(new THREE.Vector3());
+                console.log('Final size after centering:', finalSize.x.toFixed(2), 'x', finalSize.y.toFixed(2), 'x', finalSize.z.toFixed(2));
                 
                 // Setup animation
                 if (gltf.animations && gltf.animations.length > 0) {
@@ -267,6 +266,7 @@ class WhaleScene {
                 // Initial position
                 this.updateWhaleTransform(0);
                 this.isLoaded = true;
+                console.log('=== MODEL LOADED SUCCESSFULLY ===');
             },
             (progress) => {
                 const percent = (progress.loaded / progress.total * 100).toFixed(0);

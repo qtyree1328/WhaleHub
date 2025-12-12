@@ -396,4 +396,3 @@ class WhaleScene {
 
 // Export for use
 window.WhaleScene = WhaleScene;
-

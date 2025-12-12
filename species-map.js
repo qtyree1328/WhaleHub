@@ -1,5 +1,6 @@
 // Individual species tracking map with animated monthly transitions
 // Uses config.js for species data configuration
+// Uses circular-controls.js for the month selector UI
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -23,6 +24,9 @@ let morphDuration = 1000;
 let intensityMultiplier = 1.0;
 let radiusMultiplier = 1.0;
 
+// Circular controls instance
+let circularControls = null;
+
 // ============================================================
 // INITIALIZE MAP
 // ============================================================
@@ -43,21 +47,14 @@ function updateLabels() {
     const label = MONTH_NAMES[monthA - 1];
     const monthLabel = document.getElementById('monthLabel');
     const monthBottom = document.getElementById('monthBottom');
-    const centerMonth = document.getElementById('centerMonth');
-    const monthSlider = document.getElementById('monthSlider');
     
     if (monthLabel) monthLabel.textContent = label;
     if (monthBottom) monthBottom.textContent = label;
-    if (centerMonth) centerMonth.textContent = label;
-    if (monthSlider) monthSlider.value = String(monthA);
     
-    // Update month markers
-    document.querySelectorAll('.month-marker').forEach((marker, idx) => {
-        marker.classList.toggle('active', idx + 1 === monthA);
-    });
-    
-    // Update rotation indicator
-    updateRotationIndicator(monthA);
+    // Update circular controls if initialized
+    if (circularControls) {
+        circularControls.externalSetMonth(monthA);
+    }
 }
 
 // ============================================================
@@ -154,17 +151,9 @@ function startAnimation() {
     if (isPlaying) return;
     isPlaying = true;
     
-    // Update center button
-    const centerPlayBtn = document.getElementById('centerPlayBtn');
-    const centerPlayIcon = document.getElementById('centerPlayIcon');
-    if (centerPlayBtn) centerPlayBtn.classList.add('playing');
-    if (centerPlayIcon) centerPlayIcon.textContent = '⏸';
-    
-    // Update hidden button for compatibility
-    const playPauseBtn = document.getElementById('playPause');
-    if (playPauseBtn) {
-        playPauseBtn.textContent = '⏸ Pause';
-        playPauseBtn.classList.add('playing');
+    // Update circular controls
+    if (circularControls) {
+        circularControls.setPlaying(true);
     }
     
     monthB = (monthA % 12) + 1;
@@ -177,17 +166,9 @@ function startAnimation() {
 function stopAnimation() {
     isPlaying = false;
     
-    // Update center button
-    const centerPlayBtn = document.getElementById('centerPlayBtn');
-    const centerPlayIcon = document.getElementById('centerPlayIcon');
-    if (centerPlayBtn) centerPlayBtn.classList.remove('playing');
-    if (centerPlayIcon) centerPlayIcon.textContent = '▶';
-    
-    // Update hidden button for compatibility
-    const playPauseBtn = document.getElementById('playPause');
-    if (playPauseBtn) {
-        playPauseBtn.textContent = '▶ Play';
-        playPauseBtn.classList.remove('playing');
+    // Update circular controls
+    if (circularControls) {
+        circularControls.setPlaying(false);
     }
     
     if (animFrame) {
@@ -195,6 +176,15 @@ function stopAnimation() {
         animFrame = null;
     }
     startTime = null;
+}
+
+function setMonth(month) {
+    stopAnimation();
+    monthA = month;
+    monthB = (monthA % 12) + 1;
+    
+    updateLabels();
+    snapToCurrentMonth();
 }
 
 // ============================================================
@@ -251,181 +241,26 @@ function generateLegendWithToggles() {
 }
 
 // ============================================================
-// CIRCULAR SELECTOR
+// INITIALIZE CIRCULAR CONTROLS
 // ============================================================
-const circularSelector = document.querySelector('.circular-selector');
-const rotationIndicator = document.getElementById('rotationIndicator');
-const centerMonth = document.getElementById('centerMonth');
-const dragRing = document.getElementById('dragRing');
-
-let currentRotationAngle = -90;
-
-function createMonthMarkers() {
-    if (!circularSelector) return;
-    
-    // Clear existing markers
-    const existingMarkers = circularSelector.querySelectorAll('.month-marker');
-    existingMarkers.forEach(m => m.remove());
-    
-    // Get actual size of the circular selector
-    const selectorRect = circularSelector.getBoundingClientRect();
-    const selectorSize = selectorRect.width;
-    
-    // Calculate dimensions based on actual size
-    const centerX = selectorSize / 2;
-    const centerY = selectorSize / 2;
-    const radius = selectorSize * 0.4;
-    const markerSize = Math.max(16, selectorSize * 0.2);
-    const markerOffset = markerSize / 2;
-    
-    MONTH_ABBREV.forEach((month, index) => {
-        const angle = (index * 30 - 90) * (Math.PI / 180);
-        const x = centerX + radius * Math.cos(angle) - markerOffset;
-        const y = centerY + radius * Math.sin(angle) - markerOffset;
-        
-        const marker = document.createElement('div');
-        marker.className = 'month-marker';
-        marker.textContent = month;
-        marker.dataset.month = index + 1;
-        marker.style.left = `${x}px`;
-        marker.style.top = `${y}px`;
-        
-        if (index + 1 === monthA) {
-            marker.classList.add('active');
-        }
-        
-        marker.addEventListener('click', () => {
-            setMonth(index + 1);
-        });
-        
-        circularSelector.appendChild(marker);
-    });
-}
-
-function updateRotationIndicator(monthIndex) {
-    if (!rotationIndicator) return;
-    
-    const targetAngle = (monthIndex - 1) * 30 - 90;
-    
-    const normalizedCurrent = ((currentRotationAngle % 360) + 360) % 360;
-    const normalizedTarget = ((targetAngle % 360) + 360) % 360;
-    
-    let diff = normalizedTarget - normalizedCurrent;
-    
-    if (diff > 180) diff -= 360;
-    if (diff < -180) diff += 360;
-    
-    currentRotationAngle += diff;
-    rotationIndicator.style.transform = `rotate(${currentRotationAngle}deg)`;
-}
-
-function setMonth(month) {
-    stopAnimation();
-    monthA = month;
-    monthB = (monthA % 12) + 1;
-    
-    updateLabels();
-    snapToCurrentMonth();
-}
-
-// Drag functionality
-let isDragging = false;
-
-function getAngleFromEvent(e) {
-    if (!circularSelector) return 0;
-    const rect = circularSelector.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
-    return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
-}
-
-function getMonthFromAngle(angle) {
-    let normalizedAngle = (angle + 90 + 360) % 360;
-    return Math.floor(normalizedAngle / 30) + 1;
-}
-
-if (dragRing) {
-    dragRing.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        e.preventDefault();
-    });
-    
-    dragRing.addEventListener('touchstart', (e) => {
-        isDragging = true;
-    }, { passive: true });
-}
-
-document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const currentAngle = getAngleFromEvent(e);
-    const month = getMonthFromAngle(currentAngle);
-    if (month !== monthA) {
-        setMonth(month);
+function initCircularControls() {
+    if (typeof CircularControls === 'undefined') {
+        console.warn('CircularControls not loaded, falling back to basic controls');
+        return;
     }
-});
-
-document.addEventListener('touchmove', (e) => {
-    if (!isDragging) return;
-    const currentAngle = getAngleFromEvent(e);
-    const month = getMonthFromAngle(currentAngle);
-    if (month !== monthA) {
-        setMonth(month);
-    }
-}, { passive: true });
-
-document.addEventListener('mouseup', () => { isDragging = false; });
-document.addEventListener('touchend', () => { isDragging = false; });
-
-// Arrow navigation (hidden buttons for compatibility)
-const prevMonthBtn = document.getElementById('prevMonth');
-const nextMonthBtn = document.getElementById('nextMonth');
-
-if (prevMonthBtn) {
-    prevMonthBtn.addEventListener('click', () => {
-        const newMonth = monthA === 1 ? 12 : monthA - 1;
-        setMonth(newMonth);
+    
+    circularControls = new CircularControls({
+        container: '#controls',
+        onMonthChange: (month) => {
+            setMonth(month);
+        },
+        onPlayToggle: () => {
+            isPlaying ? stopAnimation() : startAnimation();
+        },
+        getIsPlaying: () => isPlaying,
+        getCurrentMonth: () => monthA
     });
 }
-
-if (nextMonthBtn) {
-    nextMonthBtn.addEventListener('click', () => {
-        const newMonth = monthA === 12 ? 1 : monthA + 1;
-        setMonth(newMonth);
-    });
-}
-
-// Nav ring halves (visible left/right buttons)
-const navRingLeft = document.getElementById('navRingLeft');
-const navRingRight = document.getElementById('navRingRight');
-
-if (navRingLeft) {
-    navRingLeft.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const newMonth = monthA === 1 ? 12 : monthA - 1;
-        setMonth(newMonth);
-    });
-}
-
-if (navRingRight) {
-    navRingRight.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const newMonth = monthA === 12 ? 1 : monthA + 1;
-        setMonth(newMonth);
-    });
-}
-
-// Resize handler
-let resizeTimeout;
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        createMonthMarkers();
-    }, 150);
-});
 
 // ============================================================
 // ANIMATION SETTINGS PANEL
@@ -581,7 +416,7 @@ map.on('load', () => {
     // Generate dynamic UI elements
     generateLegendWithToggles();
     updateDescriptionText();
-    createMonthMarkers();
+    initCircularControls();
     
     // Initialize slider fills
     updateSliderFill(speedSlider);
@@ -623,31 +458,3 @@ map.on('load', () => {
     setWeightAll(0);
     updateLabels();
 });
-
-// ============================================================
-// PLAY/PAUSE BUTTON (center and hidden)
-// ============================================================
-const centerPlayBtn = document.getElementById('centerPlayBtn');
-if (centerPlayBtn) {
-    centerPlayBtn.addEventListener('click', (e) => {
-        // Prevent drag from triggering play
-        if (e.target.closest('.drag-ring')) return;
-        isPlaying ? stopAnimation() : startAnimation();
-    });
-}
-
-const playPauseBtn = document.getElementById('playPause');
-if (playPauseBtn) {
-    playPauseBtn.addEventListener('click', () => {
-        isPlaying ? stopAnimation() : startAnimation();
-    });
-}
-
-// Hidden month slider (for compatibility)
-const monthSlider = document.getElementById('monthSlider');
-if (monthSlider) {
-    monthSlider.addEventListener('input', (e) => {
-        const month = parseInt(e.target.value, 10);
-        setMonth(month);
-    });
-}

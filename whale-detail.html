@@ -14,141 +14,133 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Enhanced map styles for expandable functionality */
-        .species-map-card {
-            position: relative;
-            transition: all 0.3s ease;
+        :root {
+            --primary: #0a4a7c;
+            --primary-light: #1a6db0;
+            --accent: #00c9a7;
+            --text: #1a2b3c;
+            --text-muted: #5a6d7e;
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --border: #e2e8f0;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        .species-map-card.expanded {
-            position: fixed;
-            top: 64px;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 100;
-            border-radius: 0;
-            margin: 0;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f1f5f9;
+            color: var(--text);
+            line-height: 1.6;
         }
-        
-        .species-map-card.expanded .species-map-container {
-            height: calc(100vh - 64px - 56px) !important;
+
+        /* ============================================================
+           HERO SECTION - Similar to location-detail
+           ============================================================ */
+        .species-detail {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px 48px;
         }
-        
-        .species-map-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-        }
-        
-        .species-map-header h3 {
-            margin: 0;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        
-        .map-controls {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .map-view-toggle {
-            display: flex;
-            background: rgba(255,255,255,0.2);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        
-        .map-view-btn {
-            padding: 6px 12px;
-            border: none;
-            background: transparent;
-            color: rgba(255,255,255,0.8);
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .map-view-btn.active {
-            background: rgba(255,255,255,0.3);
-            color: white;
-        }
-        
-        .map-view-btn:hover:not(.active) {
-            background: rgba(255,255,255,0.15);
-        }
-        
-        .year-select {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            appearance: none;
-            padding-right: 24px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-        }
-        
-        .year-select option {
-            background: #0a4a7c;
-            color: white;
-        }
-        
-        .year-select.hidden {
-            display: none;
-        }
-        
-        .expand-btn {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
-        }
-        
-        .expand-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .species-map-container {
-            height: 300px;
-            position: relative;
-            transition: height 0.3s ease;
-        }
-        
-        /* Hero image carousel */
+
         .species-hero {
             position: relative;
+            height: 450px;
+            margin: 0 -24px 32px;
+            overflow: hidden;
+            background: #1a2b3c;
         }
-        
+
+        .species-hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        .species-hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 40%, transparent 100%);
+        }
+
+        .species-hero-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 40px;
+            color: white;
+        }
+
+        .species-hero-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        .species-hero-title {
+            font-size: 52px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            letter-spacing: -0.03em;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .species-hero-scientific {
+            font-size: 20px;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .species-back-link {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-md);
+            transition: all 0.25s ease;
+        }
+
+        .species-back-link:hover {
+            background: rgba(0,0,0,0.5);
+            transform: translateX(-4px);
+        }
+
+        /* Hero image navigation */
         .hero-image-nav {
             position: absolute;
-            bottom: 140px;
+            bottom: 150px;
             right: 40px;
             display: none;
             gap: 8px;
             z-index: 10;
         }
-        
+
         .hero-image-nav.visible {
             display: flex;
         }
-        
+
         .hero-nav-btn {
             width: 44px;
             height: 44px;
@@ -163,19 +155,19 @@
             backdrop-filter: blur(8px);
             transition: all 0.15s ease;
         }
-        
+
         .hero-nav-btn:hover {
             background: rgba(255,255,255,0.4);
         }
-        
+
         .hero-nav-btn:disabled {
             opacity: 0.3;
             cursor: not-allowed;
         }
-        
+
         .hero-image-counter {
             position: absolute;
-            bottom: 150px;
+            bottom: 160px;
             right: 140px;
             background: rgba(0,0,0,0.5);
             color: white;
@@ -186,13 +178,354 @@
             backdrop-filter: blur(8px);
             display: none;
         }
-        
+
         .hero-image-counter.visible {
             display: block;
         }
-        
-        .species-hero-image {
-            transition: opacity 0.3s ease;
+
+        /* Status badge in hero */
+        .hero-status-badge {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 18px;
+            border-radius: var(--radius-md);
+            backdrop-filter: blur(12px);
+            text-align: center;
+        }
+
+        .hero-status-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 4px;
+        }
+
+        .hero-status-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .hero-status-value.status-endangered { color: #ef4444; }
+        .hero-status-value.status-vulnerable { color: #f59e0b; }
+        .hero-status-value.status-least-concern { color: #22c55e; }
+        .hero-status-value.status-data-deficient { color: #94a3b8; }
+
+        /* ============================================================
+           CONTENT LAYOUT
+           ============================================================ */
+        .species-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 960px) {
+            .species-content { grid-template-columns: 1fr; }
+        }
+
+        .species-main {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .species-section {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .species-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 20px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .species-description {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text);
+            white-space: pre-line;
+        }
+
+        .fun-facts-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .fun-facts-list li {
+            padding: 12px 0;
+            padding-left: 28px;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .fun-facts-list li:last-child {
+            border-bottom: none;
+        }
+
+        .fun-facts-list li::before {
+            content: '🐋';
+            position: absolute;
+            left: 0;
+            top: 12px;
+        }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .species-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .species-stats-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .species-stats-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 16px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .species-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .species-stat:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .species-stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .species-stat-value {
+            font-size: 14px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .species-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-endangered { background: #fef2f2; color: #ef4444; }
+        .status-vulnerable { background: #fefce8; color: #ca8a04; }
+        .status-least-concern { background: #f0fdf4; color: #16a34a; }
+        .status-data-deficient { background: #f1f5f9; color: #64748b; }
+
+        /* ============================================================
+           MAP CARD - Enhanced with better controls
+           ============================================================ */
+        .species-map-card {
+            background: var(--primary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .species-map-card.expanded {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            border-radius: 0;
+            margin: 0;
+        }
+
+        .species-map-card.expanded .species-map-container {
+            height: calc(100vh - 64px - 60px) !important;
+        }
+
+        .species-map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .species-map-header h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .map-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .map-view-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .map-view-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-view-btn.active {
+            background: rgba(255,255,255,0.25);
+            color: white;
+        }
+
+        .map-view-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .year-select {
+            padding: 6px 28px 6px 10px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+        }
+
+        .year-select option {
+            background: var(--primary);
+            color: white;
+        }
+
+        .year-select.hidden {
+            display: none;
+        }
+
+        .map-month-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .map-month-label {
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .map-month-slider {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .map-month-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .expand-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .expand-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .species-map-container {
+            height: 350px;
+            position: relative;
+            transition: height 0.3s ease;
+        }
+
+        .species-map-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e7ee 0%, #f1f5f9 100%);
+            color: var(--text-muted);
+            text-align: center;
+            padding: 24px;
+        }
+
+        .species-map-placeholder-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .species-map-placeholder-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .species-map-placeholder p {
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         /* Map overlay for expanded state */
@@ -203,18 +536,175 @@
             background: rgba(0,0,0,0.5);
             z-index: 99;
         }
-        
+
         .map-overlay-bg.visible {
             display: block;
         }
-        .map-month-control { display: flex; align-items: center; gap: 8px; }
-        .map-month-label { font-size: 11px; font-weight: 600; min-width: 28px; text-align: center; }
-        .map-month-slider { width: 80px; height: 4px; -webkit-appearance: none; background: rgba(255,255,255,0.3); border-radius: 2px; cursor: pointer; }
-        .map-month-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: white; border-radius: 50%; cursor: pointer; }
-        .mapboxgl-popup-content { padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .popup-title { font-weight: 600; font-size: 14px; color: #1a2b3c; margin-bottom: 6px; }
-        .popup-row { font-size: 12px; color: #5a6d7e; margin-bottom: 2px; }
-        
+
+        /* Popup styles */
+        .mapboxgl-popup-content {
+            padding: 14px 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .popup-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--primary);
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .popup-row {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .popup-row strong {
+            color: var(--text);
+        }
+
+        /* ============================================================
+           PHOTO GALLERY SECTION
+           ============================================================ */
+        .photo-gallery-section {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .photo-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .gallery-thumb {
+            aspect-ratio: 4/3;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .gallery-thumb:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .gallery-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .lightbox-prev { left: 20px; }
+        .lightbox-next { right: 20px; }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 768px) {
+            .species-hero {
+                height: 350px;
+            }
+
+            .species-hero-title {
+                font-size: 32px;
+            }
+
+            .species-hero-content {
+                padding: 24px;
+            }
+
+            .hero-image-nav {
+                bottom: 120px;
+                right: 24px;
+            }
+
+            .hero-image-counter {
+                bottom: 130px;
+                right: 120px;
+            }
+
+            .map-controls {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
     </style>
 </head>
 <body class="page-enter">
@@ -225,7 +715,7 @@
                 <span class="whale-icon">
                     <img src="favicon.ico" alt="Whale Icon" class="whale-icon-img">
                 </span>
-                <span class="brand-text">Whale Migration Guide</span>
+                <span class="brand-text">Whale Watchers Atlas</span>
             </a>
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Density Map</a>
@@ -240,6 +730,16 @@
     <!-- Map overlay background -->
     <div class="map-overlay-bg" id="mapOverlay"></div>
 
+    <!-- Lightbox for gallery -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev">‹</button>
+        <div class="lightbox-content">
+            <img id="lightboxImage" src="" alt="">
+        </div>
+        <button class="lightbox-nav lightbox-next" id="lightboxNext">›</button>
+    </div>
+
     <!-- Detail Page Content -->
     <main class="species-detail">
         <!-- Hero Section -->
@@ -252,6 +752,10 @@
                 </svg>
                 Back to Species
             </a>
+            <div class="hero-status-badge" id="heroStatusBadge">
+                <div class="hero-status-label">Conservation Status</div>
+                <div class="hero-status-value" id="heroStatus"></div>
+            </div>
             <div class="hero-image-counter" id="imageCounter">1 / 1</div>
             <div class="hero-image-nav" id="heroNav">
                 <button class="hero-nav-btn" id="prevImage" disabled>
@@ -280,6 +784,12 @@
                 <section class="species-section">
                     <h2 class="species-section-title">Migration Pattern</h2>
                     <p class="species-description" id="migrationPattern"></p>
+                </section>
+
+                <!-- Photo Gallery -->
+                <section class="photo-gallery-section" id="photoGallerySection" style="display: none;">
+                    <h2 class="species-section-title">Photo Gallery</h2>
+                    <div class="photo-gallery-grid" id="photoGalleryGrid"></div>
                 </section>
 
                 <section class="species-section">
@@ -331,21 +841,30 @@
     <script src="whale-species.js"></script>
     <script src="config.js"></script>
     <script>
-        // ============== STATE ==============
-        let currentMonth = 1;
-        let currentPopup = null;
+        // ============================================================
+        // CONSTANTS
+        // ============================================================
+        // const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 
+        //                     'July', 'August', 'September', 'October', 'November', 'December'];
         const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+        // ============================================================
+        // STATE
+        // ============================================================
         let speciesMap = null;
-        let speciesConfig = null;
-        let currentView = 'heatmap';
+        let speciesData = null;
+        let currentMonth = 1;
         let currentYear = 'all';
+        let currentView = 'heatmap';
         let isMapExpanded = false;
-        let availableYears = [];
+        let currentPopup = null;
         let currentImageIndex = 0;
         let speciesImages = [];
+        let lightboxIndex = 0;
 
-        // ============== UTILITY FUNCTIONS ==============
+        // ============================================================
+        // UTILITY FUNCTIONS
+        // ============================================================
         function getSpeciesId() {
             const params = new URLSearchParams(window.location.search);
             return params.get('id');
@@ -369,20 +888,12 @@
             if (species.heroImages && Array.isArray(species.heroImages) && species.heroImages.length > 0) {
                 return species.heroImages;
             }
-            return [species.heroImage];
+            return [species.heroImage || species.image];
         }
 
-        // Get species config from config.js if available
-        function getSpeciesConfigForId(speciesId) {
-            const configMap = {
-                'blue-whale': SPECIES_CONFIG.find(s => s.id === 'blue_2008_heat'),
-                'humpback-whale': SPECIES_CONFIG.find(s => s.id === 'humpback_2019_heat'),
-                'sperm-whale': SPECIES_CONFIG.find(s => s.id === 'sperm_2019_heat')
-            };
-            return configMap[speciesId];
-        }
-
-        // ============== RENDER FUNCTIONS ==============
+        // ============================================================
+        // RENDER FUNCTIONS
+        // ============================================================
         function renderStats(stats) {
             const container = document.getElementById('statsContainer');
             const statsHTML = Object.entries(stats).map(([key, value]) => {
@@ -413,7 +924,87 @@
             list.innerHTML = facts.map(fact => `<li>${fact}</li>`).join('');
         }
 
-        // ============== IMAGE CAROUSEL ==============
+        function renderPhotoGallery(species) {
+            const images = getSpeciesImages(species);
+            if (images.length <= 1) return;
+
+            const section = document.getElementById('photoGallerySection');
+            const grid = document.getElementById('photoGalleryGrid');
+            
+            section.style.display = 'block';
+            grid.innerHTML = images.map((img, idx) => `
+                <div class="gallery-thumb" data-index="${idx}">
+                    <img src="${img}" alt="${species.commonName} photo ${idx + 1}">
+                </div>
+            `).join('');
+
+            // Add click handlers
+            grid.querySelectorAll('.gallery-thumb').forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    lightboxIndex = parseInt(thumb.dataset.index);
+                    openLightbox();
+                });
+            });
+        }
+
+        // ============================================================
+        // LIGHTBOX
+        // ============================================================
+        function openLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImage');
+            img.src = speciesImages[lightboxIndex];
+            lightbox.classList.add('active');
+            updateLightboxNav();
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        function updateLightboxNav() {
+            document.getElementById('lightboxPrev').style.display = lightboxIndex > 0 ? 'flex' : 'none';
+            document.getElementById('lightboxNext').style.display = lightboxIndex < speciesImages.length - 1 ? 'flex' : 'none';
+        }
+
+        function setupLightbox() {
+            document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+            document.getElementById('lightboxPrev').addEventListener('click', () => {
+                if (lightboxIndex > 0) {
+                    lightboxIndex--;
+                    document.getElementById('lightboxImage').src = speciesImages[lightboxIndex];
+                    updateLightboxNav();
+                }
+            });
+            document.getElementById('lightboxNext').addEventListener('click', () => {
+                if (lightboxIndex < speciesImages.length - 1) {
+                    lightboxIndex++;
+                    document.getElementById('lightboxImage').src = speciesImages[lightboxIndex];
+                    updateLightboxNav();
+                }
+            });
+            document.getElementById('lightbox').addEventListener('click', (e) => {
+                if (e.target.id === 'lightbox') closeLightbox();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (!document.getElementById('lightbox').classList.contains('active')) return;
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft' && lightboxIndex > 0) {
+                    lightboxIndex--;
+                    document.getElementById('lightboxImage').src = speciesImages[lightboxIndex];
+                    updateLightboxNav();
+                }
+                if (e.key === 'ArrowRight' && lightboxIndex < speciesImages.length - 1) {
+                    lightboxIndex++;
+                    document.getElementById('lightboxImage').src = speciesImages[lightboxIndex];
+                    updateLightboxNav();
+                }
+            });
+        }
+
+        // ============================================================
+        // HERO IMAGE CAROUSEL
+        // ============================================================
         function updateHeroImage() {
             const img = document.getElementById('heroImage');
             img.style.opacity = '0';
@@ -452,16 +1043,18 @@
             }
         }
 
-        // ============== MAP FUNCTIONS ==============
+        // ============================================================
+        // MAP FUNCTIONS
+        // ============================================================
         function initMap(species) {
             const container = document.getElementById('mapContainer');
-            speciesConfig = getSpeciesConfigForId(species.id);
             
-            if (!species.hasMapData || !speciesConfig) {
+            // Check if species has map data AND mapConfig
+            if (!species.hasMapData || !species.mapConfig) {
                 container.innerHTML = `
                     <div class="species-map-placeholder">
                         <div class="species-map-placeholder-icon">
-                            <img src="favicon-192.png" alt="Whale Icon" class="whale-icon-img">
+                            <img src="favicon-192.png" alt="Whale Icon">
                         </div>
                         <p>Migration map data coming soon.<br>Check back later for updates!</p>
                     </div>
@@ -469,15 +1062,29 @@
                 return;
             }
 
+            const mapConfig = species.mapConfig;
+            speciesData = species;
+
             // Show map controls
             document.getElementById('mapControls').style.display = 'flex';
+
+            // Populate year dropdown based on dateRange
+            const yearSelect = document.getElementById('yearSelect');
+            const startYear = mapConfig.dateRange?.startYear || 2005;
+            const endYear = mapConfig.dateRange?.endYear || 2025;
+            
+            let yearOptions = '<option value="all">All Years</option>';
+            for (let y = endYear; y >= startYear; y--) {
+                yearOptions += `<option value="${y}">${y}</option>`;
+            }
+            yearSelect.innerHTML = yearOptions;
 
             // Create map
             mapboxgl.accessToken = MAPBOX_TOKEN;
             speciesMap = new mapboxgl.Map({
                 container: container,
                 style: 'mapbox://styles/mapbox/light-v11',
-                center: [-130, 35],
+                center: [-100, 35],
                 zoom: 2,
                 interactive: true
             });
@@ -488,15 +1095,15 @@
                 // Add source
                 speciesMap.addSource('species-data', {
                     type: 'vector',
-                    url: speciesConfig.url
+                    url: mapConfig.url
                 });
 
-                // Add heatmap layer
+                // Add heatmap layer (shows all data by default - no month filter for heatmap)
                 speciesMap.addLayer({
                     id: 'species-heatmap',
                     type: 'heatmap',
                     source: 'species-data',
-                    'source-layer': speciesConfig.sourceLayer,
+                    'source-layer': mapConfig.sourceLayer,
                     maxzoom: 9,
                     paint: {
                         'heatmap-weight': 1,
@@ -504,7 +1111,7 @@
                             'interpolate', ['linear'], ['zoom'],
                             0, 0.5, 5, 1.0, 8, 1.5
                         ],
-                        'heatmap-color': speciesConfig.color.heatmap,
+                        'heatmap-color': mapConfig.color.heatmap,
                         'heatmap-radius': [
                             'interpolate', ['linear'], ['zoom'],
                             0, 2, 4, 12, 8, 24
@@ -518,14 +1125,14 @@
                     id: 'species-points',
                     type: 'circle',
                     source: 'species-data',
-                    'source-layer': speciesConfig.sourceLayer,
+                    'source-layer': mapConfig.sourceLayer,
                     paint: {
                         'circle-radius': [
                             'interpolate', ['linear'], ['zoom'],
-                            0, 1, 4, 3, 8, 6
+                            0, 2, 4, 4, 8, 8
                         ],
-                        'circle-color': speciesConfig.color.base,
-                        'circle-opacity': 0.7,
+                        'circle-color': mapConfig.color.base,
+                        'circle-opacity': 0.8,
                         'circle-stroke-width': 1,
                         'circle-stroke-color': 'white'
                     },
@@ -533,58 +1140,18 @@
                         'visibility': 'none'
                     }
                 }, 'waterway-label');
-                // Extract unique years from the data
+
+                // Setup point interactions
                 setupPointClicks();
-                extractYears();
+                
+                // Apply initial view
+                updateMapView();
             });
 
             // Setup controls
             setupMapControls();
         }
 
-        function extractYears() {
-            // Query the source for unique years
-            const features = speciesMap.querySourceFeatures('species-data', {
-                sourceLayer: speciesConfig.sourceLayer
-            });
-
-            const yearsSet = new Set();
-            features.forEach(f => {
-                if (f.properties && f.properties.year) {
-                    yearsSet.add(f.properties.year);
-                }
-            });
-
-            availableYears = Array.from(yearsSet).sort((a, b) => b - a);
-            
-            // If we found years, populate the dropdown
-            if (availableYears.length > 0) {
-                const yearSelect = document.getElementById('yearSelect');
-                yearSelect.innerHTML = '<option value="all">All Years</option>' + 
-                    availableYears.map(y => `<option value="${y}">${y}</option>`).join('');
-            }
-            
-            // Try again after tiles load more data
-            speciesMap.once('idle', () => {
-                const moreFeatures = speciesMap.querySourceFeatures('species-data', {
-                    sourceLayer: speciesConfig.sourceLayer
-                });
-                
-                moreFeatures.forEach(f => {
-                    if (f.properties && f.properties.year) {
-                        yearsSet.add(f.properties.year);
-                    }
-                });
-                
-                availableYears = Array.from(yearsSet).sort((a, b) => b - a);
-                
-                if (availableYears.length > 0) {
-                    const yearSelect = document.getElementById('yearSelect');
-                    yearSelect.innerHTML = '<option value="all">All Years</option>' + 
-                        availableYears.map(y => `<option value="${y}">${y}</option>`).join('');
-                }
-            });
-        }
         function setupPointClicks() {
             // Change cursor on hover
             speciesMap.on('mouseenter', 'species-points', () => {
@@ -604,10 +1171,11 @@
                 
                 if (currentPopup) currentPopup.remove();
                 
-                let popupHTML = `<div class="popup-title">${speciesConfig.name}</div>`;
+                let popupHTML = `<div class="popup-title">${speciesData.commonName}</div>`;
                 if (props.year) popupHTML += `<div class="popup-row"><strong>Year:</strong> ${props.year}</div>`;
                 if (props.month) popupHTML += `<div class="popup-row"><strong>Month:</strong> ${MONTH_NAMES[props.month - 1]}</div>`;
                 if (props.count) popupHTML += `<div class="popup-row"><strong>Count:</strong> ${props.count}</div>`;
+                if (props.source) popupHTML += `<div class="popup-row"><strong>Source:</strong> ${props.source}</div>`;
                 popupHTML += `<div class="popup-row"><strong>Location:</strong> ${coords.lat.toFixed(4)}°, ${coords.lng.toFixed(4)}°</div>`;
                 
                 currentPopup = new mapboxgl.Popup({ closeOnClick: true, maxWidth: '280px' })
@@ -615,28 +1183,6 @@
                     .setHTML(popupHTML)
                     .addTo(speciesMap);
             });
-        }
-
-        function updateMapFilter() {
-            if (!speciesMap) return;
-            
-            let filter;
-            if (currentYear === 'all') {
-                filter = ['==', ['get', 'month'], currentMonth];
-            } else {
-                filter = ['all',
-                    ['==', ['get', 'month'], currentMonth],
-                    ['==', ['get', 'year'], parseInt(currentYear)]
-                ];
-            }
-            
-            // Apply filter to BOTH layers
-            if (speciesMap.getLayer('species-heatmap')) {
-                speciesMap.setFilter('species-heatmap', filter);
-            }
-            if (speciesMap.getLayer('species-points')) {
-                speciesMap.setFilter('species-points', filter);
-            }
         }
 
         function updateMapView() {
@@ -652,6 +1198,30 @@
             
             updateMapFilter();
         }
+
+        function updateMapFilter() {
+            if (!speciesMap) return;
+            
+            // Build filter based on current month and year
+            let filter;
+            if (currentYear === 'all') {
+                filter = ['==', ['get', 'month'], currentMonth];
+            } else {
+                filter = ['all',
+                    ['==', ['get', 'month'], currentMonth],
+                    ['==', ['get', 'year'], parseInt(currentYear)]
+                ];
+            }
+            
+            // Apply filter to both layers
+            if (speciesMap.getLayer('species-heatmap')) {
+                speciesMap.setFilter('species-heatmap', filter);
+            }
+            if (speciesMap.getLayer('species-points')) {
+                speciesMap.setFilter('species-points', filter);
+            }
+        }
+
         function setupMapControls() {
             // View toggle buttons
             document.querySelectorAll('.map-view-btn').forEach(btn => {
@@ -663,7 +1233,7 @@
                     document.querySelectorAll('.map-view-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     
-                    // Toggle year selector visibility
+                    // Toggle year selector visibility (only show for points view)
                     const yearSelect = document.getElementById('yearSelect');
                     if (view === 'points') {
                         yearSelect.classList.remove('hidden');
@@ -674,11 +1244,14 @@
                     updateMapView();
                 });
             });
+
+            // Month slider
             document.getElementById('mapMonthSlider').addEventListener('input', (e) => {
                 currentMonth = parseInt(e.target.value);
                 document.getElementById('mapMonthLabel').textContent = MONTH_ABBR[currentMonth - 1];
                 updateMapFilter();
             });
+
             // Year selector
             document.getElementById('yearSelect').addEventListener('change', (e) => {
                 currentYear = e.target.value;
@@ -700,9 +1273,6 @@
                 }
             });
         }
-
-
-
 
         function toggleMapExpand() {
             const mapCard = document.getElementById('mapCard');
@@ -737,7 +1307,9 @@
             }, 350);
         }
 
-        // ============== INITIALIZATION ==============
+        // ============================================================
+        // INITIALIZATION
+        // ============================================================
         function initPage() {
             const speciesId = getSpeciesId();
             const species = findSpecies(speciesId);
@@ -748,7 +1320,7 @@
             }
 
             // Update page title
-            document.title = `${species.commonName} - Whale Migration Guide`;
+            document.title = `${species.commonName} - Whale Watchers Atlas`;
 
             // Setup images
             speciesImages = getSpeciesImages(species);
@@ -760,14 +1332,22 @@
             document.getElementById('heroCategory').textContent = species.category;
             document.getElementById('heroTitle').textContent = species.commonName;
             document.getElementById('heroScientific').textContent = species.scientificName;
+            
+            // Update status badge
+            const statusValue = species.stats?.status || 'Unknown';
+            const heroStatus = document.getElementById('heroStatus');
+            heroStatus.textContent = statusValue;
+            heroStatus.className = 'hero-status-value ' + getStatusClass(statusValue);
 
             // Update content
             document.getElementById('speciesDescription').textContent = species.fullDescription;
             document.getElementById('migrationPattern').textContent = species.migrationPattern;
 
-            // Render stats and facts
+            // Render stats, facts, and gallery
             renderStats(species.stats);
             renderFunFacts(species.funFacts);
+            renderPhotoGallery(species);
+            setupLightbox();
 
             // Initialize map
             initMap(species);

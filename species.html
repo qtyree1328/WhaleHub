@@ -11,10 +11,397 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Three.js for whale animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="sperm-whale-scene.js"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ============================================================
+           SPECIES PAGE HERO SECTION
+           ============================================================ */
+        #species-hero {
+            position: relative;
+            min-height: 220vh; /* Longer scroll */
+            background: linear-gradient(180deg, 
+                #0a1628 0%, 
+                #0d2440 20%,
+                #134e7a 45%,
+                #1a6eb0 65%,
+                #2d8fd4 80%,
+                #7ec8e3 92%,
+                #f8f9fa 100%
+            );
+            overflow: hidden;
+        }
+
+        #species-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 2px, transparent 2px),
+                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 100px 100px, 150px 150px, 80px 80px;
+            animation: float-particles 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-particles {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
+        }
+
+        .species-hero-scene {
+            position: relative;
+            min-height: 70vh; /* Shorter initial scene so highlights don't overlap */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            z-index: 10;
+        }
+
+        .species-hero-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .species-hero-title {
+            font-size: clamp(42px, 8vw, 80px);
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 4px 40px rgba(0,0,0,0.4);
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin: 0 0 16px 0;
+            text-align: center;
+        }
+
+        .species-hero-title span {
+            display: block;
+            background: linear-gradient(135deg, #7ec8e3 0%, #a8e6cf 50%, #7ec8e3 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .species-hero-tagline {
+            font-size: clamp(16px, 2.5vw, 22px);
+            color: rgba(255,255,255,0.85);
+            margin: 0 0 30px 0;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .species-hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            flex-wrap: wrap;
+        }
+
+        .species-stat {
+            text-align: center;
+        }
+
+        .species-stat-value {
+            font-size: clamp(36px, 6vw, 56px);
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .species-stat-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 8px;
+        }
+
+        /* Floating highlight - positioned further down */
+        .species-highlight {
+            position: absolute;
+            z-index: 10;
+            max-width: 450px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .species-highlight-text {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.2;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.4);
+        }
+
+        .species-highlight-sub {
+            font-size: clamp(14px, 1.8vw, 17px);
+            color: rgba(255,255,255,0.8);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .highlight-left {
+            top: 45%; /* Moved down */
+            left: 6%;
+            text-align: left;
+        }
+
+        .highlight-right {
+            top: 65%; /* Moved down */
+            right: 6%;
+            text-align: right;
+        }
+
+        /* Scroll indicator */
+        .species-scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            font-weight: 500;
+            animation: bounce 2s ease-in-out infinite;
+            z-index: 20;
+            transition: opacity 0.3s ease;
+        }
+
+        .species-scroll-indicator.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .species-scroll-indicator svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* Whale Scene */
+        #spermWhaleScene {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 11;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #spermWhaleScene canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            #species-hero {
+                min-height: 200vh;
+            }
+
+            .species-hero-stats {
+                gap: 30px;
+            }
+
+            .species-highlight {
+                left: 5% !important;
+                right: 5% !important;
+                text-align: center !important;
+                max-width: none;
+            }
+            
+            .highlight-left {
+                top: 40%;
+            }
+            
+            .highlight-right {
+                top: 58%;
+            }
+        }
+
+        /* ============================================================
+           EXISTING STYLES BELOW
+           ============================================================ */
+        
+        /* Map Introduction Section */
+        .species-map-intro {
+            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 60px 24px 50px;
+        }
+        
+        .map-intro-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .map-intro-title {
+            font-size: clamp(28px, 5vw, 38px);
+            font-weight: 700;
+            color: #0a4a7c;
+            text-align: center;
+            margin: 0 0 16px 0;
+        }
+        
+        .map-intro-description {
+            font-size: 17px;
+            line-height: 1.7;
+            color: #4a5568;
+            text-align: center;
+            margin: 0 0 24px 0;
+        }
+        
+        .map-intro-tips {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: linear-gradient(135deg, #e6f4ff 0%, #f0f9ff 100%);
+            border: 1px solid #bde0fe;
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 36px;
+        }
+        
+        .tip-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .tip-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #1e5a8a;
+        }
+        
+        .tip-text strong {
+            color: #0a4a7c;
+        }
+        
+        .preset-section {
+            width: min(1200px, 100%);
+            margin: 0 auto; 
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+        
+        .preset-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a2b3c;
+            margin: 0 0 8px 0;
+        }
+        
+        .preset-description {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0 0 20px 0;
+        }
+        
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        
+        .preset-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 16px 18px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        
+        .preset-btn:hover {
+            background: #f0f7ff;
+            border-color: #2c7ab8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 122, 184, 0.15);
+        }
+        
+        .preset-btn:active {
+            transform: translateY(0);
+        }
+        
+        .preset-btn.active {
+            background: #e6f4ff;
+            border-color: #2c7ab8;
+        }
+        
+        .preset-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .preset-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a2b3c;
+        }
+        
+        .preset-species {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        @media (max-width: 768px) {
+            .species-map-intro {
+                padding: 40px 16px 36px;
+            }
+            
+            .map-intro-tips {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .preset-section {
+                padding: 20px 16px;
+            }
+            
+            .preset-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         /* Ensure map can host absolutely positioned children */
         #map {
             position: relative;
@@ -106,546 +493,9 @@
         }
 
         /* ============================================================
-           ANIMATION SETTINGS DROPDOWN - TOP RIGHT (Compact)
-           ============================================================ */
-        .settings-panel {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            z-index: 10;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        
-        .settings-toggle {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-            font-size: 12px;
-            font-weight: 600;
-            color: #333;
-            transition: all 0.2s ease;
-        }
-        
-        .settings-toggle:hover {
-            background: #fff;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-        }
-        
-        .settings-toggle svg {
-            width: 16px;
-            height: 16px;
-            transition: transform 0.3s ease;
-        }
-        
-        .settings-panel.open .settings-toggle svg {
-            transform: rotate(90deg);
-        }
-        
-        .settings-toggle .chevron {
-            width: 12px;
-            height: 12px;
-            margin-left: auto;
-            transition: transform 0.3s ease;
-        }
-        
-        .settings-panel.open .settings-toggle .chevron {
-            transform: rotate(180deg);
-        }
-        
-        .settings-dropdown {
-            position: absolute;
-            top: calc(100% + 6px);
-            right: 0;
-            width: 220px;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(12px);
-            border-radius: 12px;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-8px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .settings-panel.open .settings-dropdown {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        
-        .settings-header {
-            padding: 10px 14px;
-            border-bottom: 1px solid #eee;
-            font-size: 10px;
-            font-weight: 700;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .settings-content {
-            padding: 12px 14px;
-        }
-        
-        .setting-group {
-            margin-bottom: 14px;
-        }
-        
-        .setting-group:last-child {
-            margin-bottom: 0;
-        }
-        
-        .setting-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        
-        .setting-label span {
-            font-size: 11px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .setting-value {
-            font-size: 10px;
-            font-weight: 600;
-            color: #2c7ab8;
-            background: #e3f2fd;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-        
-        .setting-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 5px;
-            border-radius: 3px;
-            background: linear-gradient(to right, #2c7ab8 0%, #e0e0e0 0%);
-            outline: none;
-            cursor: pointer;
-        }
-        
-        .setting-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #fff;
-            border: 2px solid #2c7ab8;
-            cursor: pointer;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-        
-        .setting-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(44, 122, 184, 0.3);
-        }
-        
-        .setting-slider::-moz-range-thumb {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #fff;
-            border: 2px solid #2c7ab8;
-            cursor: pointer;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-        }
-        
-        .setting-description {
-            font-size: 9px;
-            color: #888;
-            margin-top: 4px;
-            line-height: 1.3;
-        }
-        
-        .setting-presets {
-            display: flex;
-            gap: 4px;
-            margin-top: 6px;
-        }
-        
-        .preset-btn {
-            flex: 1;
-            padding: 5px 6px;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            background: #fff;
-            font-size: 9px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .preset-btn:hover {
-            border-color: #2c7ab8;
-            color: #2c7ab8;
-            background: #f0f7ff;
-        }
-        
-        .preset-btn.active {
-            border-color: #2c7ab8;
-            background: #2c7ab8;
-            color: #fff;
-        }
-        
-        .settings-divider {
-            height: 1px;
-            background: #eee;
-            margin: 12px 0;
-        }
-        
-        .reset-btn {
-            width: 100%;
-            padding: 8px;
-            border: none;
-            border-radius: 8px;
-            background: #f5f5f5;
-            font-size: 10px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .reset-btn:hover {
-            background: #e74c3c;
-            color: #fff;
-        }
-
-        /* ============================================================
-           CIRCULAR MONTH SELECTOR - BOTTOM RIGHT (Donut style)
-           ============================================================ */
-        #controls {
-            position: absolute !important;
-            bottom: 20px !important;
-            right: 20px !important;
-            top: auto !important;
-            left: auto !important;
-            z-index: 10 !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(10px);
-            border-radius: 50%;
-            padding: 8px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            width: auto !important;
-        }
-        
-        .control-header {
-            display: none;
-        }
-        
-        .circular-selector {
-            position: relative;
-            width: 180px;
-            height: 180px;
-            margin: 0 auto;
-        }
-        
-        .month-wheel {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .month-marker {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            user-select: none;
-            z-index: 2;
-        }
-        
-        .month-marker:hover {
-            background: rgba(44, 122, 184, 0.15);
-            color: #2c7ab8;
-            transform: scale(1.1);
-        }
-        
-        .month-marker.active {
-            background: #2c7ab8;
-            color: white;
-            box-shadow: 0 2px 8px rgba(44, 122, 184, 0.4);
-            transform: scale(1.15);
-        }
-        
-        /* Navigation ring - split into left and right halves */
-        .nav-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            z-index: 3;
-            overflow: hidden;
-        }
-        
-        .nav-ring-half {
-            position: absolute;
-            width: 50%;
-            height: 100%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            background: rgba(240, 240, 240, 0.8);
-        }
-        
-        .nav-ring-half:hover {
-            background: rgba(44, 122, 184, 0.15);
-        }
-        
-        .nav-ring-half:active {
-            background: rgba(44, 122, 184, 0.25);
-        }
-        
-        .nav-ring-left {
-            left: 0;
-            border-radius: 50px 0 0 50px;
-            border-right: 1px solid rgba(0, 0, 0, 0.08);
-        }
-        
-        .nav-ring-right {
-            right: 0;
-            border-radius: 0 50px 50px 0;
-            border-left: 1px solid rgba(0, 0, 0, 0.08);
-        }
-        
-        .nav-ring-half svg {
-            width: 20px;
-            height: 20px;
-            color: #666;
-            transition: all 0.2s ease;
-        }
-        
-        .nav-ring-half:hover svg {
-            color: #2c7ab8;
-            transform: scale(1.1);
-        }
-        
-        /* Center play button */
-        .center-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: white;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 5;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 2px solid #e0e0e0;
-        }
-        
-        .center-display:hover {
-            transform: translate(-50%, -50%) scale(1.05);
-            box-shadow: 0 4px 16px rgba(44, 122, 184, 0.25);
-            border-color: #2c7ab8;
-        }
-        
-        .center-display.playing {
-            border-color: #27ae60;
-            background: #f0fff4;
-        }
-        
-        .center-display.playing:hover {
-            box-shadow: 0 4px 16px rgba(39, 174, 96, 0.25);
-        }
-        
-        .center-month {
-            font-size: 10px;
-            font-weight: 700;
-            color: #2c7ab8;
-            margin-bottom: 2px;
-            line-height: 1;
-        }
-        
-        .center-play-icon {
-            font-size: 16px;
-            color: #2c7ab8;
-            transition: all 0.2s ease;
-        }
-        
-        .center-display.playing .center-play-icon {
-            color: #27ae60;
-        }
-        
-        .center-hint {
-            display: none;
-        }
-        
-        .rotation-indicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 50%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent 0%, transparent 55%, #2c7ab8 70%, #2c7ab8 100%);
-            transform-origin: left center;
-            z-index: 1;
-            pointer-events: none;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .rotation-indicator::after {
-            content: '';
-            position: absolute;
-            right: -4px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
-            background: #2c7ab8;
-            border-radius: 50%;
-            box-shadow: 0 0 6px rgba(44, 122, 184, 0.5);
-        }
-        
-        /* Drag handle - the grabbable ball at the end of the indicator */
-        .drag-handle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #2c7ab8;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            cursor: grab;
-            z-index: 10;
-            transform: translate(-50%, -50%);
-            transition: transform 0.1s ease, box-shadow 0.2s ease;
-        }
-        
-        .drag-handle:hover {
-            transform: translate(-50%, -50%) scale(1.15);
-            box-shadow: 0 4px 12px rgba(44, 122, 184, 0.5);
-        }
-        
-        .drag-handle:active,
-        .drag-handle.dragging {
-            cursor: grabbing;
-            transform: translate(-50%, -50%) scale(1.2);
-            box-shadow: 0 6px 16px rgba(44, 122, 184, 0.6);
-        }
-        
-        /* Hidden - we're using the drag handle instead */
-        .drag-ring {
-            display: none;
-        }
-        
-        /* Hide old nav arrows and play controls */
-        .nav-arrows {
-            display: none;
-        }
-        
-        .play-controls {
-            display: none;
-        }
-        
-        .control-button {
-            display: none;
-        }
-        
-        /* Hide the old slider */
-        #monthSlider {
-            display: none;
-        }
-        
-        .month-display {
-            display: none;
-        }
-        
-        /* Month bottom display */
-        #monthBottom {
-            display: none;
-        }
-
-        /* ============================================================
-           RESPONSIVE STYLES
+           RESPONSIVE STYLES FOR LEGEND
            ============================================================ */
         @media (max-width: 768px) {
-            #controls {
-                bottom: 15px !important;
-                right: 15px !important;
-                padding: 6px;
-            }
-            
-            .circular-selector {
-                width: 150px;
-                height: 150px;
-            }
-            
-            .month-marker {
-                width: 26px;
-                height: 26px;
-                font-size: 8px;
-            }
-            
-            .nav-ring {
-                width: 82px;
-                height: 82px;
-            }
-            
-            .center-display {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .center-month {
-                font-size: 8px;
-            }
-            
-            .center-play-icon {
-                font-size: 12px;
-            }
-            
-            .nav-ring-half svg {
-                width: 16px;
-                height: 16px;
-            }
-            
-            .drag-handle {
-                width: 20px;
-                height: 20px;
-            }
-            
             #legend {
                 max-width: 180px;
                 padding: 12px;
@@ -654,69 +504,12 @@
             .legend-name {
                 font-size: 11px;
             }
-            
-            .settings-toggle span {
-                display: none;
-            }
-            
-            .settings-dropdown {
-                width: 200px;
-            }
         }
         
         @media (max-width: 480px) {
-            #controls {
-                bottom: 10px !important;
-                right: 10px !important;
-                padding: 5px;
-            }
-            
-            .circular-selector {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .month-marker {
-                width: 22px;
-                height: 22px;
-                font-size: 7px;
-            }
-            
-            .nav-ring {
-                width: 65px;
-                height: 65px;
-            }
-            
-            .center-display {
-                width: 40px;
-                height: 40px;
-            }
-            
-            .center-month {
-                font-size: 7px;
-            }
-            
-            .center-play-icon {
-                font-size: 10px;
-            }
-            
-            .nav-ring-half svg {
-                width: 12px;
-                height: 12px;
-            }
-            
-            .drag-handle {
-                width: 18px;
-                height: 18px;
-            }
-            
             #legend {
                 max-width: 150px;
                 padding: 10px;
-            }
-            
-            .settings-dropdown {
-                width: 180px;
             }
         }
     </style>
@@ -741,18 +534,119 @@
         </div>
     </nav>
 
-    <!-- Description Section -->
-    <div id="description">
-        <h1>Individual Species Migration Tracking</h1>
-        <p>
-            This animated map shows individual heatmaps of whale observations for multiple species plotted simultaneously. 
-            <span id="speciesDescription">Loading species data...</span>
-        </p>
-        <p>
-            <strong>How to use:</strong> Drag the blue ball to rotate through months, click month labels, or use the arrows.
-            Toggle species visibility using the checkboxes in the legend.
-        </p>
-    </div>
+    <!-- Hero Section with Sperm Whale Animation -->
+    <section id="species-hero">
+        <!-- Title Scene -->
+        <div class="species-hero-scene">
+            <div class="species-hero-content">
+                <h1 class="species-hero-title">
+                    Species
+                    <span>Tracking</span>
+                </h1>
+                <p class="species-hero-tagline">
+                    Explore the global distribution of 11 whale species through interactive heatmaps built from over 500,000 verified observations
+                </p>
+                <div class="species-hero-stats">
+                    <div class="species-stat">
+                        <div class="species-stat-value">11</div>
+                        <div class="species-stat-label">Species Tracked</div>
+                    </div>
+                    <div class="species-stat">
+                        <div class="species-stat-value">500K+</div>
+                        <div class="species-stat-label">Observations</div>
+                    </div>
+                    <div class="species-stat">
+                        <div class="species-stat-value">Global</div>
+                        <div class="species-stat-label">Coverage</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating highlights -->
+        <div class="species-highlight highlight-left" id="highlight1">
+            <div class="species-highlight-text">Layer Multiple Species</div>
+            <div class="species-highlight-sub">Toggle individual species on and off to compare migration patterns and discover overlap zones</div>
+        </div>
+
+        <div class="species-highlight highlight-right" id="highlight2">
+            <div class="species-highlight-text">Animated Monthly Data</div>
+            <div class="species-highlight-sub">Watch how species distributions shift throughout the year with smooth monthly transitions</div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="species-scroll-indicator" id="speciesScrollIndicator">
+            <span>Scroll to explore</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+        </div>
+
+        <!-- 3D Whale Scene -->
+        <div id="spermWhaleScene" aria-hidden="true"></div>
+    </section>
+
+    <!-- Map Introduction Section -->
+    <section class="species-map-intro">
+        <div class="map-intro-container">
+            <h2 class="map-intro-title">Explore Migration Patterns</h2>
+            <p class="map-intro-description">
+                Use the interactive map below to visualize how different whale species share ocean habitats throughout the year. 
+                Toggle multiple species simultaneously to discover fascinating migration overlaps and seasonal patterns.
+            </p>
+            
+            <div class="map-intro-tips">
+                <div class="tip-icon">💡</div>
+                <div class="tip-text">
+                    <strong>Pro tip:</strong> Try enabling 2-3 species at once to see how their migrations intersect. 
+                    Use the monthly animation to watch patterns shift through the seasons.
+                </div>
+            </div>
+            
+            <div class="preset-section">
+                <h3 class="preset-title">Quick Presets</h3>
+                <p class="preset-description">Select a preset to automatically configure species for common migration patterns:</p>
+                
+                <div class="preset-buttons">
+                    <button class="preset-btn" data-preset="pacific">
+                        <span class="preset-icon">🌊</span>
+                        <span class="preset-name">Eastern Pacific Migration</span>
+                        <span class="preset-species">Gray, Humpback, Blue Whales</span>
+                    </button>
+                    
+                    <button class="preset-btn" data-preset="arctic">
+                        <span class="preset-icon">❄️</span>
+                        <span class="preset-name">Arctic & North Atlantic</span>
+                        <span class="preset-species">Bowhead, Beluga, Narwhal</span>
+                    </button>
+                    
+                    <button class="preset-btn" data-preset="tropical">
+                        <span class="preset-icon">🏝️</span>
+                        <span class="preset-name">Tropical Breeding Grounds</span>
+                        <span class="preset-species">Humpback, Sperm, Pilot Whales</span>
+                    </button>
+                    
+                    <button class="preset-btn" data-preset="deepsea">
+                        <span class="preset-icon">🦑</span>
+                        <span class="preset-name">Deep Sea Giants</span>
+                        <span class="preset-species">Sperm, Beaked, Blue Whales</span>
+                    </button>
+                    
+                    <button class="preset-btn" data-preset="all">
+                        <span class="preset-icon">🐋</span>
+                        <span class="preset-name">All Species</span>
+                        <span class="preset-species">View complete dataset</span>
+                    </button>
+                    
+                    <button class="preset-btn" data-preset="clear">
+                        <span class="preset-icon">✨</span>
+                        <span class="preset-name">Clear All</span>
+                        <span class="preset-species">Start fresh</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Map Container -->
     <div id="map">
@@ -829,47 +723,9 @@
             </div>
         </div>
 
-        <!-- Circular Month Controls - BOTTOM LEFT -->
+        <!-- Circular Month Controls - BOTTOM RIGHT -->
         <div id="controls">
-            <div class="control-header">Month Selector</div>
-            <div class="circular-selector">
-                <div class="month-wheel"></div>
-                <div class="rotation-indicator" id="rotationIndicator"></div>
-                <!-- Month markers will be generated by JS -->
-                <div class="drag-ring" id="dragRing"></div>
-                
-                <!-- Draggable handle ball -->
-                <div class="drag-handle" id="dragHandle"></div>
-                
-                <!-- Navigation ring with left/right halves -->
-                <div class="nav-ring">
-                    <div class="nav-ring-half nav-ring-left" id="navRingLeft">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <path d="M15 18l-6-6 6-6"/>
-                        </svg>
-                    </div>
-                    <div class="nav-ring-half nav-ring-right" id="navRingRight">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <path d="M9 18l6-6-6-6"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <!-- Center play button -->
-                <div class="center-display" id="centerPlayBtn">
-                    <div class="center-month" id="centerMonth">January</div>
-                    <div class="center-play-icon" id="centerPlayIcon">▶</div>
-                </div>
-            </div>
-            <!-- Hidden elements for compatibility -->
-            <div class="nav-arrows">
-                <button class="nav-arrow" id="prevMonth" aria-label="Previous month"></button>
-                <button class="nav-arrow" id="nextMonth" aria-label="Next month"></button>
-            </div>
-            <div class="play-controls">
-                <button id="playPause" class="control-button">▶ Play</button>
-            </div>
-            <input id="monthSlider" type="range" min="1" max="12" step="1" value="1">
+            <!-- Content will be generated by CircularControls component -->
         </div>
 
         <!-- Hidden month display for compatibility -->
@@ -879,156 +735,8 @@
 
     <script src="whale-species.js"></script>
     <script src="config.js"></script>
+    <script src="circular-controls.js"></script>
     <script src="species-map.js"></script>
-    
-    <!-- Drag Handle Controller Script -->
-    <script>
-    (function() {
-        // Wait for DOM to be ready
-        document.addEventListener('DOMContentLoaded', function() {
-            const dragHandle = document.getElementById('dragHandle');
-            const circularSelector = document.querySelector('.circular-selector');
-            const rotationIndicator = document.getElementById('rotationIndicator');
-            
-            if (!dragHandle || !circularSelector) return;
-            
-            let isDragging = false;
-            let currentMonth = 1;
-            
-            // Position the drag handle based on current month
-            function updateDragHandlePosition(month) {
-                const angle = ((month - 1) / 12) * 360 - 90; // -90 to start at top
-                const radius = 75; // Distance from center (adjust based on your design)
-                const centerX = 90; // Half of 180px width
-                const centerY = 90; // Half of 180px height
-                
-                const radians = angle * (Math.PI / 180);
-                const x = centerX + radius * Math.cos(radians);
-                const y = centerY + radius * Math.sin(radians);
-                
-                dragHandle.style.left = x + 'px';
-                dragHandle.style.top = y + 'px';
-            }
-            
-            // Get angle from mouse/touch position relative to center
-            function getAngleFromEvent(e) {
-                const rect = circularSelector.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                
-                const deltaX = clientX - centerX;
-                const deltaY = clientY - centerY;
-                
-                let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-                angle = (angle + 90 + 360) % 360; // Normalize to start from top
-                
-                return angle;
-            }
-            
-            // Convert angle to month (1-12)
-            function angleToMonth(angle) {
-                const month = Math.round((angle / 360) * 12) + 1;
-                return month > 12 ? 1 : month;
-            }
-            
-            // Update the month (trigger existing slider change)
-            function setMonth(month) {
-                if (month === currentMonth) return;
-                currentMonth = month;
-                
-                // Update the hidden slider to trigger existing functionality
-                const slider = document.getElementById('monthSlider');
-                if (slider) {
-                    slider.value = month;
-                    slider.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-                
-                updateDragHandlePosition(month);
-            }
-            
-            // Mouse/Touch event handlers
-            function startDrag(e) {
-                e.preventDefault();
-                isDragging = true;
-                dragHandle.classList.add('dragging');
-                document.body.style.cursor = 'grabbing';
-            }
-            
-            function doDrag(e) {
-                if (!isDragging) return;
-                e.preventDefault();
-                
-                const angle = getAngleFromEvent(e);
-                const month = angleToMonth(angle);
-                setMonth(month);
-            }
-            
-            function endDrag(e) {
-                if (!isDragging) return;
-                isDragging = false;
-                dragHandle.classList.remove('dragging');
-                document.body.style.cursor = '';
-            }
-            
-            // Attach event listeners
-            dragHandle.addEventListener('mousedown', startDrag);
-            dragHandle.addEventListener('touchstart', startDrag, { passive: false });
-            
-            document.addEventListener('mousemove', doDrag);
-            document.addEventListener('touchmove', doDrag, { passive: false });
-            
-            document.addEventListener('mouseup', endDrag);
-            document.addEventListener('touchend', endDrag);
-            
-            // Watch for external changes to the slider (from month markers, arrows, etc.)
-            const slider = document.getElementById('monthSlider');
-            if (slider) {
-                const originalOnInput = slider.oninput;
-                
-                // Create a MutationObserver to watch for value changes
-                const observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
-                            const newMonth = parseInt(slider.value);
-                            if (newMonth !== currentMonth) {
-                                currentMonth = newMonth;
-                                updateDragHandlePosition(newMonth);
-                            }
-                        }
-                    });
-                });
-                
-                observer.observe(slider, { attributes: true });
-                
-                // Also listen to input events
-                slider.addEventListener('input', function() {
-                    const newMonth = parseInt(this.value);
-                    if (newMonth !== currentMonth && !isDragging) {
-                        currentMonth = newMonth;
-                        updateDragHandlePosition(newMonth);
-                    }
-                });
-            }
-            
-            // Initialize position
-            updateDragHandlePosition(1);
-            
-            // Periodically sync with slider (backup sync)
-            setInterval(function() {
-                if (!isDragging && slider) {
-                    const sliderMonth = parseInt(slider.value);
-                    if (sliderMonth !== currentMonth) {
-                        currentMonth = sliderMonth;
-                        updateDragHandlePosition(sliderMonth);
-                    }
-                }
-            }, 100);
-        });
-    })();
-    </script>
     
     <!-- Footer -->
     <footer class="site-footer">
@@ -1062,5 +770,216 @@
             font-weight: 600;
         }
     </style>
+    
+    <!-- Three.js Sperm Whale Scene Controller -->
+    <script>
+    (function() {
+        const hero = document.getElementById('species-hero');
+        const whaleContainer = document.getElementById('spermWhaleScene');
+        const scrollIndicator = document.getElementById('speciesScrollIndicator');
+        const highlight1 = document.getElementById('highlight1');
+        const highlight2 = document.getElementById('highlight2');
+        
+        if (!hero || !whaleContainer) return;
+        
+        // Wait for Three.js and GLTFLoader to be available
+        function initWhaleScene() {
+            if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined' || typeof SpermWhaleScene === 'undefined') {
+                setTimeout(initWhaleScene, 100);
+                return;
+            }
+            
+            // Initialize the sperm whale scene
+            const whaleScene = new SpermWhaleScene(whaleContainer, 'models/Sperm_whale.glb');
+            
+            // ============================================
+            // CUSTOMIZE SPERM WHALE HERE
+            // ============================================
+            
+            // Animation options: 'Swim1_Anim', 'Swim2_Anim', 'Idle_Anim', 'Jump_Anim', etc.
+            whaleScene.config.animationName = 'Swim1_Anim';
+            whaleScene.config.animationSpeed = 0.5;
+            
+            // Path: left to right
+            // whaleScene.config.startPos = { x: -14, y: 1, z: 6 };
+            // whaleScene.config.midPos = { x: 0, y: -0.5, z: -2 };
+            // whaleScene.config.endPos = { x: 14, y: 0, z: 4 };
+            
+            // Rotation
+            // whaleScene.config.startRotation = { x: 0.05, y: -Math.PI * 0.2, z: 0.03 };
+            // whaleScene.config.endRotation = { x: -0.05, y: Math.PI * 0.3, z: -0.03 };
+            
+            // Size
+            // whaleScene.config.startScale = 0.45;
+            // whaleScene.config.endScale = 0.65;
+            
+            // ============================================
+            
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            
+            function updateScroll() {
+                const rect = hero.getBoundingClientRect();
+                const heroHeight = rect.height;
+                const viewportHeight = window.innerHeight;
+                
+                const scrollDistance = heroHeight - viewportHeight;
+                const progress = clamp(-rect.top / scrollDistance, 0, 1);
+                
+                // Update whale scene with scroll progress
+                whaleScene.setScrollProgress(progress);
+                
+                // Fade container in/out
+                let opacity = 1;
+                if (progress < 0.05) {
+                    opacity = progress / 0.05;
+                } else if (progress > 0.9) {
+                    opacity = (1 - progress) / 0.1;
+                }
+                whaleContainer.style.opacity = opacity;
+                
+                // Hide scroll indicator after scrolling starts
+                if (scrollIndicator) {
+                    if (progress > 0.05) {
+                        scrollIndicator.classList.add('hidden');
+                    } else {
+                        scrollIndicator.classList.remove('hidden');
+                    }
+                }
+                
+                // Show highlights progressively - spread out more
+                if (highlight1) {
+                    const show1 = 0.12, peak1 = 0.22, fade1 = 0.38, hide1 = 0.48;
+                    let op1 = 0;
+                    if (progress >= show1 && progress < peak1) {
+                        op1 = (progress - show1) / (peak1 - show1);
+                    } else if (progress >= peak1 && progress < fade1) {
+                        op1 = 1;
+                    } else if (progress >= fade1 && progress < hide1) {
+                        op1 = 1 - (progress - fade1) / (hide1 - fade1);
+                    }
+                    highlight1.style.opacity = op1;
+                    highlight1.style.transform = `translateY(${(1 - op1) * 30}px)`;
+                }
+                
+                if (highlight2) {
+                    const show2 = 0.35, peak2 = 0.45, fade2 = 0.62, hide2 = 0.75;
+                    let op2 = 0;
+                    if (progress >= show2 && progress < peak2) {
+                        op2 = (progress - show2) / (peak2 - show2);
+                    } else if (progress >= peak2 && progress < fade2) {
+                        op2 = 1;
+                    } else if (progress >= fade2 && progress < hide2) {
+                        op2 = 1 - (progress - fade2) / (hide2 - fade2);
+                    }
+                    highlight2.style.opacity = op2;
+                    highlight2.style.transform = `translateY(${(1 - op2) * 30}px)`;
+                }
+            }
+            
+            let ticking = false;
+            function onScroll() {
+                if (!ticking) {
+                    requestAnimationFrame(() => {
+                        updateScroll();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }
+            
+            window.addEventListener('scroll', onScroll, { passive: true });
+            window.addEventListener('resize', updateScroll, { passive: true });
+            
+            // Initial update
+            updateScroll();
+        }
+        
+        initWhaleScene();
+    })();
+    </script>
+    
+    <!-- Preset Button Handler -->
+    <script>
+    (function() {
+        // Define presets - species names should match what's in your whale-species.js
+        const presets = {
+            pacific: ['Gray Whale', 'Humpback Whale', 'Blue Whale'],
+            arctic: ['Bowhead Whale', 'Beluga', 'Narwhal'],
+            tropical: ['Humpback Whale', 'Sperm Whale', 'Pilot Whale'],
+            deepsea: ['Sperm Whale', 'Beaked Whale', 'Blue Whale'],
+            all: 'all',
+            clear: 'clear'
+        };
+        
+        // Wait for map to be ready, then attach preset handlers
+        function initPresets() {
+            const presetBtns = document.querySelectorAll('.preset-btn[data-preset]');
+            
+            presetBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const presetName = btn.dataset.preset;
+                    const preset = presets[presetName];
+                    
+                    // Update active state
+                    presetBtns.forEach(b => b.classList.remove('active'));
+                    if (presetName !== 'clear') {
+                        btn.classList.add('active');
+                    }
+                    
+                    // Get all checkboxes in the legend
+                    const checkboxes = document.querySelectorAll('#legendSpecies input[type="checkbox"]');
+                    
+                    if (preset === 'all') {
+                        // Enable all species
+                        checkboxes.forEach(cb => {
+                            if (!cb.checked) {
+                                cb.checked = true;
+                                cb.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        });
+                    } else if (preset === 'clear') {
+                        // Disable all species
+                        checkboxes.forEach(cb => {
+                            if (cb.checked) {
+                                cb.checked = false;
+                                cb.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        });
+                    } else if (Array.isArray(preset)) {
+                        // First disable all, then enable selected
+                        checkboxes.forEach(cb => {
+                            const label = cb.closest('.legend-row')?.querySelector('.legend-name')?.textContent?.trim();
+                            const shouldBeChecked = preset.some(species => 
+                                label?.toLowerCase().includes(species.toLowerCase()) ||
+                                species.toLowerCase().includes(label?.toLowerCase() || '')
+                            );
+                            
+                            if (cb.checked !== shouldBeChecked) {
+                                cb.checked = shouldBeChecked;
+                                cb.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        });
+                    }
+                    
+                    // Scroll to map smoothly
+                    const mapElement = document.getElementById('map');
+                    if (mapElement) {
+                        mapElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        }
+        
+        // Initialize when DOM is ready and map has loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                // Delay to ensure map legend is populated
+                setTimeout(initPresets, 1500);
+            });
+        } else {
+            setTimeout(initPresets, 1500);
+        }
+    })();
+    </script>
 </body>
 </html>

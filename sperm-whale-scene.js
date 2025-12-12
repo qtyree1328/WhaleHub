@@ -69,7 +69,18 @@ class SpermWhaleScene {
             turnDuration: 0.3, // Turn takes 30% of scroll (45% to 75%)
         };
         
+        // Setup DRACO loader for compressed models
+        this.setupDracoLoader();
+        
         this.init();
+    }
+    
+    setupDracoLoader() {
+        // Create DRACO loader instance for compressed GLB files
+        this.dracoLoader = new THREE.DRACOLoader();
+        // Use Google's hosted DRACO decoder files
+        this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+        this.dracoLoader.setDecoderConfig({ type: 'js' });
     }
     
     init() {
@@ -256,6 +267,9 @@ class SpermWhaleScene {
     
     loadModel() {
         const loader = new THREE.GLTFLoader();
+        
+        // Set DRACO loader for compressed models
+        loader.setDRACOLoader(this.dracoLoader);
         
         loader.load(
             this.modelPath,

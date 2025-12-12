@@ -21,17 +21,32 @@ class WhaleScene {
         this.config = {
             // Whale path control points (start, middle, end)
             // Keeping z more consistent so whale doesn't "zoom" toward camera
-            startPos: { x: -9, y: -1.2, z: 0 },
-            midPos: { x: 3, y: -7 ,z: 0 },
-            endPos: { x: 14, y: -4.5, z: 0 },
+            // startPos: { x: -9, y: -1.2, z: 0 },
+            // midPos: { x: 3, y: -7 ,z: 0 },
+            // endPos: { x: 14, y: -4.5, z: 0 },
+            
+            // // Whale rotation (in radians)
+            // startRotation: { x: 0, y: Math.PI * 0.3, z: 0.05 },
+            // endRotation: { x: 0, y: -Math.PI * 0.3, z: -0.05 },
+            
+            // // Whale scale - keep more consistent
+            // startScale: 0.2,
+            // endScale: 0.6,
+            
+            // // Camera - move back for wider view
+            // cameraZ: 15,
+            // fov: 45,
+            startPos: { x: 0, y: 0, z: 0 },
+            midPos: { x: 0, y: 0 ,z: 0 },
+            endPos: { x: 0, y: 0, z: 0 },
             
             // Whale rotation (in radians)
-            startRotation: { x: 0, y: Math.PI * 0.3, z: 0.05 },
-            endRotation: { x: 0, y: -Math.PI * 0.3, z: -0.05 },
+            // startRotation: { x: 0, y: Math.PI * 0.3, z: 0.05 },
+            // endRotation: { x: 0, y: -Math.PI * 0.3, z: -0.05 },
             
             // Whale scale - keep more consistent
-            startScale: 0.2,
-            endScale: 0.6,
+            startScale:1,
+            endScale: 1,
             
             // Camera - move back for wider view
             cameraZ: 15,
@@ -55,7 +70,18 @@ class WhaleScene {
             animationSpeed: .6, // 0.5 = animation plays at half speed relative to scroll (use less of the animation)
         };
         
+        // Setup DRACO loader for compressed models
+        this.setupDracoLoader();
+        
         this.init();
+    }
+    
+    setupDracoLoader() {
+        // Create DRACO loader instance for compressed GLB files
+        this.dracoLoader = new THREE.DRACOLoader();
+        // Use Google's hosted DRACO decoder files
+        this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+        this.dracoLoader.setDecoderConfig({ type: 'js' });
     }
     
     init() {
@@ -192,6 +218,9 @@ class WhaleScene {
     
     loadModel() {
         const loader = new THREE.GLTFLoader();
+        
+        // Set DRACO loader for compressed models
+        loader.setDRACOLoader(this.dracoLoader);
         
         loader.load(
             this.modelPath,

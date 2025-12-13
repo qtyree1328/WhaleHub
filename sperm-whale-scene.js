@@ -18,33 +18,21 @@ class SpermWhaleScene {
         
         // Configuration optimized for Sperm Whale
         this.config = {
-            // Whale path control points (start, middle, end)
-            // Phase 1: Swim LEFT to RIGHT across screen
-            // Phase 2: Turn RIGHT and swim TOWARD camera
-            startPos: { x: -14, y: 0, z: 0 },     // Start far LEFT
-            midPos: { x: 3, y: 0, z: 0 },         // Right of center (where turn happens)
-            endPos: { x: 3, y: -1, z: 18 },       // Swim TOWARD camera (positive Z)
+            // Whale path - simple swim from left to right with subtle curve at end
+            startPos: { x: -10, y: -1, z: -2 },    // Start far LEFT, slightly back
+            endPos: { x: 10, y: -2, z: 2 },     // End RIGHT, slightly forward and down
             
             // Whale rotation (in radians)
-            // In Three.js with default setup:
-            //   y = 0: facing +Z (toward camera)
-            //   y = PI/2 (90°): facing +X (right side of screen)
-            //   y = -PI/2 (-90°): facing -X (left side of screen)  
-            //   y = PI (180°): facing -Z (away from camera)
-            //
-            // To swim LEFT→RIGHT: whale nose points RIGHT = y: Math.PI/2
-            // After turning RIGHT by 90°: nose points TOWARD camera = y: 0
-            startRotation: { x: 0, y: Math.PI / 2, z: 0 },     // Facing RIGHT (swimming left to right)
-            midRotation: { x: 0, y: Math.PI / 2, z: 0 },       // Still facing right at turn point  
-            endRotation: { x: 0.15, y: 0, z: 0 },              // Facing CAMERA (after turning right 90°)
+            // Swim left to right with subtle turn toward camera at end
+            startRotation: { x: 0, y: Math.PI / 2, z: 0 },      // Facing RIGHT
+            endRotation: { x: 0.08, y: Math.PI / 2.5, z: 0 },   // Slight turn toward camera
             
-            // Whale scale - gets bigger as it approaches
-            startScale: 0.4,
-            midScale: 0.7,
-            endScale: 1.6,  // Much bigger when close to camera
+            // Whale scale - subtle growth as it passes
+            startScale: 1,
+            endScale: 1.3,
             
             // Camera
-            cameraZ: 16,
+            cameraZ: 10,
             fov: 50,
             
             // Underwater effects
@@ -60,13 +48,8 @@ class SpermWhaleScene {
             ambientColor: 0x88aacc,
             directionalColor: 0xffffff,
             
-            // Animation settings
+            // Animation settings - just swim, no turn
             swimAnimation: 'Swim1_Anim',
-            turnAnimation: 'TurnRight_Start_Anim',
-            
-            // Turn timing
-            turnPoint: 0.45,   // Turn starts at 45% scroll
-            turnDuration: 0.3, // Turn takes 30% of scroll (45% to 75%)
         };
         
         // Setup DRACO loader for compressed models
@@ -289,7 +272,7 @@ class SpermWhaleScene {
                 this.whaleGroup.add(this.whale);
                 this.scene.add(this.whaleGroup);
                 
-                // Setup animations - load both swim and turn
+                // Setup animations - just swim animation
                 if (gltf.animations && gltf.animations.length > 0) {
                     this.mixer = new THREE.AnimationMixer(this.whale);
                     this.animations = {};
@@ -300,23 +283,9 @@ class SpermWhaleScene {
                         this.animations.swim = this.mixer.clipAction(swimClip);
                         this.animations.swim.setLoop(THREE.LoopRepeat);
                         this.animations.swimDuration = swimClip.duration;
-                        console.log('Loaded swim animation:', swimClip.name, 'Duration:', swimClip.duration);
-                    }
-                    
-                    // Find turn animation
-                    const turnClip = gltf.animations.find(a => a.name === this.config.turnAnimation);
-                    if (turnClip) {
-                        this.animations.turn = this.mixer.clipAction(turnClip);
-                        this.animations.turn.setLoop(THREE.LoopOnce);
-                        this.animations.turn.clampWhenFinished = true;
-                        this.animations.turnDuration = turnClip.duration;
-                        console.log('Loaded turn animation:', turnClip.name, 'Duration:', turnClip.duration);
-                    }
-                    
-                    // Start with swim animation
-                    if (this.animations.swim) {
                         this.animations.swim.play();
                         this.currentAnimation = 'swim';
+                        console.log('Loaded swim animation:', swimClip.name, 'Duration:', swimClip.duration);
                     }
                     
                     console.log('Available animations:', gltf.animations.map(a => a.name));
@@ -367,87 +336,47 @@ class SpermWhaleScene {
         // Clamp progress
         progress = Math.max(0, Math.min(1, progress));
         
-        const turnPoint = this.config.turnPoint || 0.45;
-        const turnDuration = this.config.turnDuration || 0.2;
-        const turnEnd = turnPoint + turnDuration;
+        // Smooth easing for the whole journey
+        const eased = this.smoothstep(progress);
         
-        let pos, rotX, rotY, rotZ, scale;
+        // Simple interpolation from start to end
+        const pos = {
+            x: this.lerp(this.config.startPos.x, this.config.endPos.x, eased),
+            y: this.lerp(this.config.startPos.y, this.config.endPos.y, eased),
+            z: this.lerp(this.config.startPos.z, this.config.endPos.z, eased)
+        };
         
-        // Determine which phase we're in
-        if (progress < turnPoint) {
-            // ===== PHASE 1: Swimming across (left to right) =====
-            const phaseProgress = progress / turnPoint;
-            const eased = this.smoothstep(phaseProgress);
-            
-            // Linear path from start to mid
-            pos = {
-                x: this.lerp(this.config.startPos.x, this.config.midPos.x, eased),
-                y: this.lerp(this.config.startPos.y, this.config.midPos.y, eased),
-                z: this.lerp(this.config.startPos.z, this.config.midPos.z, eased)
-            };
-            
-            // Rotation: facing right during swim across
+        // Rotation - subtle turn happens in last 30% of journey
+        let rotX, rotY, rotZ;
+        if (progress < 0.7) {
+            // First 70%: maintain starting rotation
             rotX = this.config.startRotation.x;
             rotY = this.config.startRotation.y;
             rotZ = this.config.startRotation.z;
-            
-            // Scale: gradual increase
-            scale = this.lerp(this.config.startScale, this.config.midScale, eased);
-            
-            // Animation: Swimming
-            this.setAnimationPhase('swim', phaseProgress);
-            
-        } else if (progress < turnEnd) {
-            // ===== PHASE 2: Turning right =====
-            const phaseProgress = (progress - turnPoint) / turnDuration;
-            const eased = this.smoothstep(phaseProgress);
-            
-            // Stay roughly in place during turn, slight movement toward camera
-            pos = {
-                x: this.config.midPos.x,
-                y: this.config.midPos.y,
-                z: this.lerp(this.config.midPos.z, this.config.midPos.z + 2, eased)
-            };
-            
-            // Rotation: turn from facing right to facing camera
-            rotX = this.lerp(this.config.midRotation.x, this.config.endRotation.x, eased);
-            rotY = this.lerp(this.config.midRotation.y, this.config.endRotation.y, eased);
-            rotZ = this.lerp(this.config.midRotation.z, this.config.endRotation.z, eased);
-            
-            // Scale: slight increase during turn
-            scale = this.lerp(this.config.midScale, this.config.midScale * 1.15, eased);
-            
-            // Animation: Turning
-            this.setAnimationPhase('turn', phaseProgress);
-            
         } else {
-            // ===== PHASE 3: Swimming toward camera =====
-            const phaseProgress = (progress - turnEnd) / (1 - turnEnd);
-            const eased = this.easeOutCubic(phaseProgress);
-            
-            // Path from turn end position to final position (toward camera = positive Z)
-            const phase3Start = {
-                x: this.config.midPos.x,
-                y: this.config.midPos.y,
-                z: this.config.midPos.z + 2
-            };
-            
-            pos = {
-                x: this.lerp(phase3Start.x, this.config.endPos.x, eased),
-                y: this.lerp(phase3Start.y, this.config.endPos.y, eased),
-                z: this.lerp(phase3Start.z, this.config.endPos.z, eased)
-            };
-            
-            // Rotation: hold facing camera
-            rotX = this.config.endRotation.x;
-            rotY = this.config.endRotation.y;
-            rotZ = this.config.endRotation.z;
-            
-            // Scale: get much bigger as approaching camera
-            scale = this.lerp(this.config.midScale * 1.15, this.config.endScale, eased);
-            
-            // Animation: Back to swimming
-            this.setAnimationPhase('swim', phaseProgress);
+            // Last 30%: subtle turn toward camera
+            const turnProgress = (progress - 0.7) / 0.3;
+            const turnEased = this.smoothstep(turnProgress);
+            rotX = this.lerp(this.config.startRotation.x, this.config.endRotation.x, turnEased);
+            rotY = this.lerp(this.config.startRotation.y, this.config.endRotation.y, turnEased);
+            rotZ = this.lerp(this.config.startRotation.z, this.config.endRotation.z, turnEased);
+        }
+        
+        // Scale: gradual increase throughout
+        const scale = this.lerp(this.config.startScale, this.config.endScale, eased);
+        
+        // Keep swim animation playing throughout
+        if (this.animations && this.animations.swim) {
+            if (this.currentAnimation !== 'swim') {
+                this.animations.swim.reset();
+                this.animations.swim.fadeIn(0.3);
+                this.animations.swim.play();
+                this.currentAnimation = 'swim';
+            }
+            this.animations.swim.timeScale = 1;
+            if (this.mixer) {
+                this.mixer.update(0.016);
+            }
         }
         
         // Add gentle swimming motion (subtle bobbing)
@@ -463,46 +392,6 @@ class SpermWhaleScene {
         
         // Scale
         this.whaleGroup.scale.setScalar(scale);
-    }
-    
-    setAnimationPhase(phase, phaseProgress) {
-        if (!this.mixer || !this.animations) return;
-        
-        if (phase === 'swim' && this.animations.swim) {
-            // Continuous swimming - loop based on progress
-            if (this.currentAnimation !== 'swim') {
-                // Transition to swim
-                if (this.animations.turn) {
-                    this.animations.turn.fadeOut(0.3);
-                }
-                this.animations.swim.reset();
-                this.animations.swim.fadeIn(0.3);
-                this.animations.swim.play();
-                this.currentAnimation = 'swim';
-            }
-            // Let swim animation play continuously
-            this.animations.swim.timeScale = 1;
-            
-        } else if (phase === 'turn' && this.animations.turn) {
-            // Turn animation - scrub based on progress
-            if (this.currentAnimation !== 'turn') {
-                // Transition to turn
-                if (this.animations.swim) {
-                    this.animations.swim.fadeOut(0.2);
-                }
-                this.animations.turn.reset();
-                this.animations.turn.fadeIn(0.2);
-                this.animations.turn.play();
-                this.currentAnimation = 'turn';
-            }
-            // Scrub turn animation based on phase progress
-            this.animations.turn.timeScale = 0;
-            const turnTime = phaseProgress * (this.animations.turnDuration || 1);
-            this.animations.turn.time = turnTime;
-        }
-        
-        // Update mixer
-        this.mixer.update(0.016); // ~60fps
     }
     
     setScrollProgress(progress) {

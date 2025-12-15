@@ -19,24 +19,35 @@ class SpermWhaleScene {
         // Configuration - ALL CONTROLS HERE
         this.config = {
             // Swim controls
-            swimStartX: -12,
+            swimStartX: -32,
             swimEndX: 12,
-            swimY: -1,
-            swimZ: 0,
-            swimSpeed: 0.5,
-            swimDuration: 4200,
-            scale: 1.2,
+            swimStartY: -10,
+            swimEndY: 2,
+            swimStartZ: -32,
+            swimEndZ: 8,
+            swimSpeed: 2,
+            swimDuration: 13000,
+            swimScaleStart: 0.65,
+            swimScaleEnd: 1.25,
+            swimRotationX: 0,
+            swimRotationY: Math.PI * 0.35,
+            swimRotationZ: 0,
+            swimProgressLead: 0.08,
+            swimAutoStart: true,
+            swimStartMargin:8,
+            swimAutoEndMargin: null,
             
             // Camera
             cameraZ: 10,
             fov: 50,
             
             // Effects
-            enableParticles: true,
+            enableParticles: false,
             particleCount: 150,
             enableFog: true,
             fogNear: 25,
             fogFar: 100,
+            enableLightRays: false,
             
             // Colors
             backgroundColor: 0x0a1628,
@@ -44,7 +55,16 @@ class SpermWhaleScene {
             ambientColor: 0x88aacc,
             directionalColor: 0xffffff,
             
-            swimAnimation: 'Swim1_Anim',
+            swimAnimation: 'FastBreather_Anim',
+            swimAnimationTrimStart: 0.2,
+            swimAnimationTrimEnd: null,
+            
+            // Animation cleanup
+            removePositionTracks: ['Bone', 'MasterBone.006'],
+        };
+        this.dynamicPath = {
+            startX: this.config.swimStartX,
+            endX: this.config.swimEndX
         };
         
         // Setup DRACO loader for compressed models
@@ -78,6 +98,7 @@ class SpermWhaleScene {
         const aspect = this.container.clientWidth / this.container.clientHeight;
         this.camera = new THREE.PerspectiveCamera(this.config.fov, aspect, 0.1, 1000);
         this.camera.position.z = this.config.cameraZ;
+        this.updateSwimBounds();
         
         // Renderer
         this.renderer = new THREE.WebGLRenderer({ 
@@ -97,7 +118,9 @@ class SpermWhaleScene {
         if (this.config.enableParticles) {
             this.setupParticles();
         }
-        this.setupLightRays();
+        if (this.config.enableLightRays) {
+            this.setupLightRays();
+        }
         
         // Load whale model
         this.loadModel();
@@ -268,19 +291,27 @@ class SpermWhaleScene {
                 this.scene.add(this.whaleGroup);
                 
                 // Set initial position, rotation, scale from config
-                this.whaleGroup.position.set(this.config.swimStartX, this.config.swimY, this.config.swimZ);
-                this.whaleGroup.rotation.set(0, Math.PI / 2, 0); // Face right
-                this.whaleGroup.scale.setScalar(this.config.scale);
+                const startX = this.getSwimStartX();
+                const startY = this.config.swimStartY ?? this.config.swimY ?? 0;
+                this.whaleGroup.position.set(startX, startY, this.config.swimStartZ);
+                const rotationX = this.config.swimRotationX ?? 0;
+                const rotationY = this.config.swimRotationY ?? Math.PI / 2;
+                const rotationZ = this.config.swimRotationZ ?? 0;
+                this.whaleGroup.rotation.set(rotationX, rotationY, rotationZ);
+                const initialScale = this.config.swimScaleStart || this.config.scale || 1;
+                this.whaleGroup.scale.setScalar(initialScale);
                 
                 // Setup swim animation
                 if (gltf.animations && gltf.animations.length > 0) {
                     this.mixer = new THREE.AnimationMixer(this.whale);
                     
-                    const swimClip = gltf.animations.find(a => a.name === this.config.swimAnimation);
+                    let swimClip = gltf.animations.find(a => a.name === this.config.swimAnimation);
                     if (swimClip) {
+                        swimClip = this.prepareAnimationClip(swimClip);
                         const action = this.mixer.clipAction(swimClip);
                         action.setLoop(THREE.LoopRepeat);
                         action.timeScale = this.config.swimSpeed;
+                        action.clampWhenFinished = false;
                         action.play();
                     }
                 }
@@ -297,15 +328,152 @@ class SpermWhaleScene {
         );
     }
     
+    prepareAnimationClip(clip) {
+        if (!clip) return null;
+        
+        const prepared = clip.clone();
+        
+        if (Array.isArray(this.config.removePositionTracks) && this.config.removePositionTracks.length > 0) {
+            const blockedNames = new Set(
+                this.config.removePositionTracks.map(name => `${name}.position`)
+            );
+            prepared.tracks = prepared.tracks.filter(track => !blockedNames.has(track.name));
+        }
+        
+        this.trimClipToWindow(
+            prepared,
+            this.config.swimAnimationTrimStart,
+            this.config.swimAnimationTrimEnd
+        );
+        
+        this.makeLoopSeamless(prepared);
+        prepared.resetDuration();
+        prepared.optimize();
+        return prepared;
+    }
+    
+    makeLoopSeamless(clip) {
+        clip.tracks.forEach(track => {
+            if (!track || track.times.length < 2) return;
+            
+            const valueSize = track.getValueSize();
+            const firstValues = track.values.slice(0, valueSize);
+            const lastOffset = track.values.length - valueSize;
+            
+            for (let i = 0; i < valueSize; i++) {
+                track.values[lastOffset + i] = firstValues[i];
+            }
+        });
+    }
+    
+    trimClipToWindow(clip, startTime, endTime) {
+        if (!clip) return;
+        const duration = clip.duration;
+        const hasStart = typeof startTime === 'number' && startTime > 0;
+        const hasEnd = typeof endTime === 'number' && endTime > 0 && endTime < duration;
+        if (!hasStart && !hasEnd) return;
+        
+        const safeStart = hasStart ? Math.min(Math.max(startTime, 0), duration) : 0;
+        const safeEnd = hasEnd ? Math.min(Math.max(endTime, safeStart), duration) : duration;
+        
+        clip.tracks = clip.tracks
+            .map(track => this.trimTrack(track, safeStart, safeEnd))
+            .filter(track => !!track);
+    }
+    
+    trimTrack(track, startTime, endTime) {
+        if (!track || !track.times || track.times.length === 0) return track;
+        
+        const times = track.times;
+        const values = track.values;
+        const valueSize = track.getValueSize();
+        const newTimes = [];
+        const newValues = [];
+        
+        for (let i = 0; i < times.length; i++) {
+            const time = times[i];
+            if (time < startTime) continue;
+            if (time > endTime) break;
+            
+            newTimes.push(time - startTime);
+            const valueOffset = i * valueSize;
+            for (let j = 0; j < valueSize; j++) {
+                newValues.push(values[valueOffset + j]);
+            }
+        }
+        
+        if (newTimes.length === 0) {
+            return null;
+        }
+        
+        track.times = new track.times.constructor(newTimes);
+        track.values = new track.values.constructor(newValues);
+        return track;
+    }
+    
+    getSwimStartX() {
+        if (this.dynamicPath && typeof this.dynamicPath.startX === 'number') {
+            return this.dynamicPath.startX;
+        }
+        return this.config.swimStartX;
+    }
+    
+    getSwimEndX() {
+        if (this.dynamicPath && typeof this.dynamicPath.endX === 'number') {
+            return this.dynamicPath.endX;
+        }
+        return this.config.swimEndX;
+    }
+    
+    updateSwimBounds() {
+        if (!this.camera || !this.config.swimAutoStart) return;
+        
+        const startZ = this.config.swimStartZ ?? 0;
+        const cameraZ = this.camera.position.z;
+        const distance = Math.abs(cameraZ - startZ);
+        if (distance === 0) return;
+        
+        const halfFov = THREE.MathUtils.degToRad(this.camera.fov) / 2;
+        const fullHeight = 2 * Math.tan(halfFov) * distance;
+        const halfWidth = (fullHeight * this.camera.aspect) / 2;
+        const margin = this.config.swimStartMargin ?? 0;
+        
+        this.dynamicPath.startX = -(halfWidth + margin);
+        if (typeof this.config.swimAutoEndMargin === 'number') {
+            this.dynamicPath.endX = halfWidth + this.config.swimAutoEndMargin;
+        }
+        
+        if (this.whaleGroup) {
+            this.updateWhaleTransform(this.scrollProgress);
+        }
+    }
+    
     updateWhaleTransform(progress) {
         if (!this.whaleGroup) return;
         
         progress = Math.max(0, Math.min(1, progress));
         
-        // Move left to right
-        const x = this.config.swimStartX + (this.config.swimEndX - this.config.swimStartX) * progress;
+        const lead = Math.max(0, this.config.swimProgressLead || 0);
+        const adjusted = Math.max(0, Math.min(1, progress + lead));
         
-        this.whaleGroup.position.x = x;
+        // easeOutCubic so the whale slows as it nears the viewer
+        const eased = 1 - Math.pow(1 - adjusted, 3);
+        
+        const startX = this.getSwimStartX();
+        const endX = this.getSwimEndX();
+        const startZ = this.config.swimStartZ ?? this.whaleGroup.position.z;
+        const endZ = this.config.swimEndZ ?? startZ;
+        const x = startX + (endX - startX) * eased;
+        const z = startZ + (endZ - startZ) * eased;
+        const startY = this.config.swimStartY ?? this.whaleGroup.position.y;
+        const endY = this.config.swimEndY ?? startY;
+        const y = startY + (endY - startY) * eased;
+        const startScale = this.config.swimScaleStart ?? this.whaleGroup.scale.x;
+        const endScale = this.config.swimScaleEnd ?? startScale;
+        const scale = startScale + (endScale - startScale) * eased;
+
+        this.whaleGroup.position.set(x, y, z);
+        this.whaleGroup.scale.setScalar(scale);
     }
     
     setScrollProgress(progress) {
@@ -342,6 +510,9 @@ class SpermWhaleScene {
         this.camera.updateProjectionMatrix();
         
         this.renderer.setSize(width, height);
+        
+        this.updateSwimBounds();
+        this.updateWhaleTransform(this.scrollProgress);
     }
     
     animate() {

@@ -114,8 +114,8 @@ Humpbacks are found in all oceans and undertake one of the longest migrations of
         mapConfig: {
             id: 'humpback_whale_heat',
             sourceId: 'humpback_whale_src',
-            url: 'mapbox://qtyree.humpback_whale_2005_2025',
-            sourceLayer: 'humpback_whale_2005_2025',
+            url: 'mapbox://qtyree.humpback_whale_2005_2025_ocean',
+            sourceLayer: 'humpback_whale_2005_2025_oceans',
             color: {
                 base: '#00dc30ff',
                 heatmap: [
@@ -606,8 +606,8 @@ These highly intelligent creatures have been observed using sophisticated huntin
         mapConfig: {
             id: 'orca_whale_heat',
             sourceId: 'orca_whale_src',
-            url: 'mapbox://qtyree.a7fg98a5',
-            sourceLayer: 'Orca_whale_gbif_2005-2025_fin-dnycm5',
+            url: 'mapbox://qtyree.orca_whale_2005_2025_ocean',
+            sourceLayer: 'orca_whale_2005_2025_oceans',
             color: {
                 base: '#0e0e2bff',
                 heatmap: [

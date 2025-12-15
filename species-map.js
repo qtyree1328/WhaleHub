@@ -72,17 +72,52 @@ function setFilterAll() {
 }
 
 function setWeightAll(phaseVal) {
-    const weightExpr = [
-        'case',
-        ['==', ['get', 'month'], monthA], 1 - phaseVal,
-        ['==', ['get', 'month'], monthB], phaseVal,
-        0
-    ];
-    
+    // Get active preset filters if available
+    const presetFilters = typeof window.getActivePresetFilters === 'function'
+        ? window.getActivePresetFilters()
+        : null;
+
     SPECIES_CONFIG.forEach(species => {
-        if (map.getLayer(species.id)) {
-            map.setPaintProperty(species.id, 'heatmap-weight', weightExpr);
+        if (!map.getLayer(species.id)) return;
+
+        let weightExpr;
+
+        // Check if this layer needs ocean filtering from active preset
+        let oceanList = null;
+        if (presetFilters) {
+            const layerId = species.id.toLowerCase();
+            for (const [key, oceans] of Object.entries(presetFilters)) {
+                if (layerId.includes(key.toLowerCase())) {
+                    oceanList = oceans;
+                    break;
+                }
+            }
         }
+
+        if (oceanList) {
+            // Combine month-based weight with ocean filter
+            weightExpr = [
+                'case',
+                ['in', ['get', 'ocean'], ['literal', oceanList]],
+                [
+                    'case',
+                    ['==', ['get', 'month'], monthA], 1 - phaseVal,
+                    ['==', ['get', 'month'], monthB], phaseVal,
+                    0
+                ],
+                0  // Not in allowed oceans = 0 weight
+            ];
+        } else {
+            // Just month-based weight
+            weightExpr = [
+                'case',
+                ['==', ['get', 'month'], monthA], 1 - phaseVal,
+                ['==', ['get', 'month'], monthB], phaseVal,
+                0
+            ];
+        }
+
+        map.setPaintProperty(species.id, 'heatmap-weight', weightExpr);
     });
 }
 

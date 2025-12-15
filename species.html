@@ -22,20 +22,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ============================================================
-           SPECIES PAGE HERO SECTION
-           ============================================================ */
+        /* Hero Section */
         #species-hero {
             position: relative;
-            min-height: 220vh; /* Longer scroll */
+            min-height: 120vh;
             background: linear-gradient(180deg, 
-                #0a1628 0%, 
-                #0d2440 20%,
-                #134e7a 45%,
-                #1a6eb0 65%,
-                #2d8fd4 80%,
-                #7ec8e3 92%,
-                #f8f9fa 100%
+                #0a1628 0%, #0d2440 20%, #134e7a 45%,
+                #1a6eb0 65%, #2d8fd4 80%, #7ec8e3 92%, #f8f9fa 100%
             );
             overflow: hidden;
         }
@@ -43,10 +36,7 @@
         #species-hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background-image: 
                 radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 1px, transparent 1px),
                 radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 2px, transparent 2px),
@@ -63,7 +53,7 @@
 
         .species-hero-scene {
             position: relative;
-            min-height: 70vh; /* Shorter initial scene so highlights don't overlap */
+            min-height: 70vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -71,21 +61,16 @@
             z-index: 10;
         }
 
-        .species-hero-content {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .species-hero-content { text-align: center; max-width: 800px; margin: 0 auto; }
 
         .species-hero-title {
             font-size: clamp(42px, 8vw, 80px);
             font-weight: 800;
-            color: #ffffff;
+            color: #fff;
             text-shadow: 0 4px 40px rgba(0,0,0,0.4);
             line-height: 1.1;
             letter-spacing: -0.03em;
             margin: 0 0 16px 0;
-            text-align: center;
         }
 
         .species-hero-title span {
@@ -108,28 +93,17 @@
             color: rgba(255,255,255,0.85);
             margin: 0 0 30px 0;
             line-height: 1.6;
-            text-align: center;
         }
 
-        .species-hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 50px;
-            flex-wrap: wrap;
-        }
-
-        .species-stat {
-            text-align: center;
-        }
-
+        .species-hero-stats { display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; }
+        .species-stat { text-align: center; }
         .species-stat-value {
             font-size: clamp(36px, 6vw, 56px);
             font-weight: 800;
-            color: #ffffff;
+            color: #fff;
             line-height: 1;
             text-shadow: 0 2px 20px rgba(0,0,0,0.3);
         }
-
         .species-stat-label {
             font-size: 13px;
             color: rgba(255,255,255,0.7);
@@ -138,44 +112,6 @@
             margin-top: 8px;
         }
 
-        /* Floating highlight - positioned further down */
-        .species-highlight {
-            position: absolute;
-            z-index: 10;
-            max-width: 450px;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .species-highlight-text {
-            font-size: clamp(28px, 4vw, 42px);
-            font-weight: 700;
-            color: #ffffff;
-            line-height: 1.2;
-            text-shadow: 0 4px 30px rgba(0,0,0,0.4);
-        }
-
-        .species-highlight-sub {
-            font-size: clamp(14px, 1.8vw, 17px);
-            color: rgba(255,255,255,0.8);
-            margin-top: 10px;
-            line-height: 1.5;
-        }
-
-        .highlight-left {
-            top: 45%; /* Moved down */
-            left: 6%;
-            text-align: left;
-        }
-
-        .highlight-right {
-            top: 65%; /* Moved down */
-            right: 6%;
-            text-align: right;
-        }
-
-        /* Scroll indicator */
         .species-scroll-indicator {
             position: fixed;
             bottom: 30px;
@@ -192,229 +128,227 @@
             z-index: 20;
             transition: opacity 0.3s ease;
         }
-
-        .species-scroll-indicator.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .species-scroll-indicator svg {
-            width: 24px;
-            height: 24px;
-        }
+        .species-scroll-indicator.hidden { opacity: 0; pointer-events: none; }
+        .species-scroll-indicator svg { width: 24px; height: 24px; }
 
         @keyframes bounce {
             0%, 100% { transform: translateX(-50%) translateY(0); }
             50% { transform: translateX(-50%) translateY(10px); }
         }
 
-        /* Whale Scene */
         #spermWhaleScene {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             pointer-events: none;
             z-index: 11;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
+        #spermWhaleScene canvas { width: 100% !important; height: 100% !important; }
 
-        #spermWhaleScene canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        /* Mobile adjustments */
         @media (max-width: 768px) {
-            #species-hero {
-                min-height: 200vh;
-            }
-
-            .species-hero-stats {
-                gap: 30px;
-            }
-
-            .species-highlight {
-                left: 5% !important;
-                right: 5% !important;
-                text-align: center !important;
-                max-width: none;
-            }
-            
-            .highlight-left {
-                top: 40%;
-            }
-            
-            .highlight-right {
-                top: 58%;
-            }
+            #species-hero { min-height: 110vh; }
+            .species-hero-stats { gap: 30px; }
+            .species-highlight { left: 5% !important; right: 5% !important; text-align: center !important; max-width: none; }
+            .highlight-left { top: 40%; }
+            .highlight-right { top: 58%; }
         }
 
         /* ============================================================
-           EXISTING STYLES BELOW
+           MAP DESCRIPTION SECTION
            ============================================================ */
-        
-        /* Map Introduction Section */
-        .species-map-intro {
-            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
-            padding: 60px 24px 50px;
+        .map-intro {
+            background: linear-gradient(180deg, #f8f9fa 0%, #fff 100%);
+            padding: 48px 24px 32px;
+            text-align: center;
         }
-        
-        .map-intro-container {
-            max-width: 900px;
+
+        .map-intro-inner {
+            max-width: 720px;
             margin: 0 auto;
         }
-        
+
         .map-intro-title {
-            font-size: clamp(28px, 5vw, 38px);
+            font-size: clamp(28px, 4vw, 36px);
             font-weight: 700;
-            color: #0a4a7c;
-            text-align: center;
+            color: #1e293b;
             margin: 0 0 16px 0;
+            line-height: 1.2;
         }
-        
-        .map-intro-description {
-            font-size: 17px;
+
+        .map-intro-text {
+            font-size: 16px;
             line-height: 1.7;
-            color: #4a5568;
-            text-align: center;
+            color: #475569;
             margin: 0 0 24px 0;
         }
-        
-        .map-intro-tips {
-            display: flex;
+
+        .map-intro-tip {
+            display: inline-flex;
             align-items: flex-start;
-            gap: 14px;
-            background: linear-gradient(135deg, #e6f4ff 0%, #f0f9ff 100%);
-            border: 1px solid #bde0fe;
-            border-radius: 12px;
-            padding: 18px 22px;
-            margin-bottom: 36px;
-        }
-        
-        .tip-icon {
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-        
-        .tip-text {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #1e5a8a;
-        }
-        
-        .tip-text strong {
-            color: #0a4a7c;
-        }
-        
-        .preset-section {
-            width: min(1200px, 100%);
-            margin: 0 auto; 
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-        }
-        
-        .preset-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1a2b3c;
-            margin: 0 0 8px 0;
-        }
-        
-        .preset-description {
-            font-size: 14px;
-            color: #64748b;
-            margin: 0 0 20px 0;
-        }
-        
-        .preset-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 12px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: left;
+            max-width: 600px;
         }
-        
-        .preset-btn {
+
+        .map-intro-tip-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .map-intro-tip-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #0369a1;
+        }
+
+        .map-intro-tip-text strong {
+            color: #0c4a6e;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .map-intro { padding: 32px 16px 24px; }
+            .map-intro-tip { flex-direction: column; gap: 8px; text-align: center; align-items: center; }
+        }
+
+        /* ============================================================
+           PRESET BAR - Improved styling
+           ============================================================ */
+        .preset-bar {
+            background: linear-gradient(to bottom, #f8fafc, #fff);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 24px;
+        }
+
+        .preset-bar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .preset-bar-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .preset-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .preset-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .preset-chip:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+
+        .preset-chip.active {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            border-color: #0284c7;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+        }
+
+        .preset-chip .chip-icon {
+            font-size: 18px;
+        }
+
+        .preset-chip .chip-text {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 4px;
-            padding: 16px 18px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
+            gap: 1px;
         }
-        
-        .preset-btn:hover {
-            background: #f0f7ff;
-            border-color: #2c7ab8;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(44, 122, 184, 0.15);
-        }
-        
-        .preset-btn:active {
-            transform: translateY(0);
-        }
-        
-        .preset-btn.active {
-            background: #e6f4ff;
-            border-color: #2c7ab8;
-        }
-        
-        .preset-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-        
-        .preset-name {
-            font-size: 15px;
+
+        .preset-chip .chip-title {
             font-weight: 600;
-            color: #1a2b3c;
+            line-height: 1.2;
         }
-        
-        .preset-species {
-            font-size: 12px;
-            color: #64748b;
+
+        .preset-chip .chip-desc {
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.7;
+            line-height: 1.2;
         }
-        
-        @media (max-width: 768px) {
-            .species-map-intro {
-                padding: 40px 16px 36px;
-            }
-            
-            .map-intro-tips {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .preset-section {
-                padding: 20px 16px;
-            }
-            
-            .preset-buttons {
-                grid-template-columns: 1fr;
-            }
+
+        .preset-chip.active .chip-desc {
+            opacity: 0.85;
         }
-        
-        /* Ensure map can host absolutely positioned children */
-        #map {
-            position: relative;
+
+        /* Utility buttons (All / Clear) */
+        .preset-chip.utility {
+            padding: 10px 14px;
+            background: #f1f5f9;
+        }
+
+        .preset-chip.utility .chip-text {
+            flex-direction: row;
+            gap: 0;
+        }
+
+        .preset-chip.utility .chip-desc {
+            display: none;
+        }
+
+        .preset-chip.utility:hover {
+            background: #e2e8f0;
+        }
+
+        .preset-chip.utility.active {
+            background: #64748b;
+            border-color: #64748b;
+        }
+
+        @media (max-width: 900px) {
+            .preset-bar { padding: 12px 16px; }
+            .preset-bar-label { width: 100%; margin-bottom: 4px; }
+            .preset-chip { padding: 8px 12px; }
+            .preset-chip .chip-icon { font-size: 16px; }
+            .preset-chip .chip-title { font-size: 13px; }
+            .preset-chip .chip-desc { display: none; }
         }
 
         /* ============================================================
-           LEGEND WITH TOGGLES - TOP LEFT
+           MAP & LEGEND
            ============================================================ */
+        #map { position: relative; }
+
         #legend {
             position: absolute;
-            top: 16px;
-            left: 16px;
+            top: 16px; left: 16px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 16px;
@@ -425,7 +359,6 @@
             z-index: 10;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         }
-        
         .legend-title {
             font-weight: 700;
             font-size: 13px;
@@ -436,7 +369,6 @@
             padding-bottom: 8px;
             border-bottom: 1px solid #eee;
         }
-        
         .legend-row {
             display: flex;
             align-items: center;
@@ -446,37 +378,16 @@
             transition: opacity 0.2s;
             border-bottom: 1px solid #f5f5f5;
         }
-        
-        .legend-row:last-of-type {
-            border-bottom: none;
-        }
-        
-        .legend-row:hover {
-            opacity: 0.8;
-        }
-        
+        .legend-row:last-of-type { border-bottom: none; }
+        .legend-row:hover { opacity: 0.8; }
         .legend-row input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
+            width: 16px; height: 16px;
             cursor: pointer;
             accent-color: #2c7ab8;
             flex-shrink: 0;
         }
-        
-        .legend-color {
-            width: 28px;
-            height: 12px;
-            border-radius: 3px;
-            flex-shrink: 0;
-        }
-        
-        .legend-name {
-            font-size: 13px;
-            color: #333;
-            flex: 1;
-            font-weight: 500;
-        }
-        
+        .legend-color { width: 28px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+        .legend-name { font-size: 13px; color: #333; flex: 1; font-weight: 500; }
         .legend-note {
             font-size: 11px;
             color: #888;
@@ -485,38 +396,150 @@
             border-top: 1px solid #eee;
             line-height: 1.4;
         }
-        
-        .legend-no-data {
-            font-size: 12px;
-            color: #888;
-            font-style: italic;
-            padding: 8px 0;
-        }
 
-        /* ============================================================
-           RESPONSIVE STYLES FOR LEGEND
-           ============================================================ */
         @media (max-width: 768px) {
             #legend {
-                max-width: 180px;
-                padding: 12px;
-            }
-            
-            .legend-name {
-                font-size: 11px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            #legend {
-                max-width: 150px;
-                padding: 10px;
+                top: auto; bottom: 100px;
+                left: 10px; right: 10px;
+                max-width: none;
+                max-height: 200px;
+                overflow-y: auto;
             }
         }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: absolute;
+            top: 16px; right: 16px;
+            z-index: 10;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .settings-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.2s;
+        }
+        .settings-toggle:hover { background: #fff; box-shadow: 0 4px 28px rgba(0, 0, 0, 0.2); }
+        .settings-toggle svg { width: 18px; height: 18px; }
+        .settings-toggle .chevron { width: 14px; height: 14px; transition: transform 0.2s; }
+        .settings-panel.open .settings-toggle .chevron { transform: rotate(180deg); }
+
+        .settings-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+        }
+        .settings-panel.open .settings-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+        .settings-header {
+            padding: 14px 16px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+        }
+        .settings-content { padding: 16px; }
+        .setting-group { margin-bottom: 16px; }
+        .setting-group:last-child { margin-bottom: 0; }
+        .setting-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #333;
+        }
+        .setting-value { color: #2c7ab8; font-weight: 600; }
+        .setting-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        .setting-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: #2c7ab8;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(44, 122, 184, 0.3);
+        }
+        .setting-description { font-size: 11px; color: #888; margin-top: 6px; }
+        .setting-presets { display: flex; gap: 6px; margin-top: 10px; }
+        .setting-presets .preset-btn {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 11px;
+            text-align: center;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .setting-presets .preset-btn:hover { background: #e2e8f0; }
+        .setting-presets .preset-btn.active { background: #2c7ab8; color: white; border-color: #2c7ab8; }
+        .settings-divider { height: 1px; background: #eee; margin: 16px 0; }
+        .reset-btn {
+            width: 100%;
+            padding: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover { background: #f1f5f9; color: #475569; }
+
+        #monthBottom, .month-display { display: none; }
+        #controls { position: absolute; bottom: 24px; right: 24px; z-index: 10; }
+
+        @media (max-width: 768px) {
+            .settings-panel { top: 10px; right: 10px; }
+            .settings-dropdown { width: 260px; }
+            #controls { bottom: 16px; right: 16px; }
+        }
+
+        /* Footer */
+        .site-footer {
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            border-top: 1px solid #dee2e6;
+            padding: 24px 20px;
+            text-align: center;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .footer-content { max-width: 1200px; margin: 0 auto; }
+        .footer-attribution { font-size: 14px; color: #495057; margin: 0; }
+        .footer-attribution strong { color: #2c7ab8; font-weight: 600; }
     </style>
 </head>
-<body class="page-enter">
-    <!-- Navigation Bar -->
+<body>
     <nav id="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-brand">
@@ -535,17 +558,16 @@
         </div>
     </nav>
 
-    <!-- Hero Section with Sperm Whale Animation -->
     <section id="species-hero">
-        <!-- Title Scene -->
         <div class="species-hero-scene">
             <div class="species-hero-content">
                 <h1 class="species-hero-title">
-                    Species
-                    <span>Tracking</span>
+                    Track Every
+                    <span>Migration</span>
                 </h1>
                 <p class="species-hero-tagline">
-                    Explore the global distribution of 11 whale species through interactive heatmaps built from over 500,000 verified observations
+                    Explore species-specific movement patterns as whales travel 
+                    between feeding grounds and breeding waters
                 </p>
                 <div class="species-hero-stats">
                     <div class="species-stat">
@@ -553,29 +575,17 @@
                         <div class="species-stat-label">Species Tracked</div>
                     </div>
                     <div class="species-stat">
-                        <div class="species-stat-value">500K+</div>
-                        <div class="species-stat-label">Observations</div>
+                        <div class="species-stat-value">12</div>
+                        <div class="species-stat-label">Months of Data</div>
                     </div>
                     <div class="species-stat">
-                        <div class="species-stat-value">Global</div>
-                        <div class="species-stat-label">Coverage</div>
+                        <div class="species-stat-value">∞</div>
+                        <div class="species-stat-label">Stories to Discover</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Floating highlights -->
-        <div class="species-highlight highlight-left" id="highlight1">
-            <div class="species-highlight-text">Layer Multiple Species</div>
-            <div class="species-highlight-sub">Toggle individual species on and off to compare migration patterns and discover overlap zones</div>
-        </div>
-
-        <div class="species-highlight highlight-right" id="highlight2">
-            <div class="species-highlight-text">Animated Monthly Data</div>
-            <div class="species-highlight-sub">Watch how species distributions shift throughout the year with smooth monthly transitions</div>
-        </div>
-
-        <!-- Scroll Indicator -->
         <div class="species-scroll-indicator" id="speciesScrollIndicator">
             <span>Scroll to explore</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -583,87 +593,81 @@
             </svg>
         </div>
 
-        <!-- 3D Whale Scene -->
-        <div id="spermWhaleScene" aria-hidden="true"></div>
+        <div id="spermWhaleScene"></div>
     </section>
 
     <!-- Map Introduction Section -->
-    <section class="species-map-intro">
-        <div class="map-intro-container">
+    <section class="map-intro">
+        <div class="map-intro-inner">
             <h2 class="map-intro-title">Explore Migration Patterns</h2>
-            <p class="map-intro-description">
-                Use the interactive map below to visualize how different whale species share ocean habitats throughout the year. 
-                Toggle multiple species simultaneously to discover fascinating migration overlaps and seasonal patterns.
+            <p class="map-intro-text">
+                Use the interactive map below to visualize how different whale species share ocean habitats throughout the year. Toggle multiple species simultaneously to discover fascinating migration overlaps and seasonal patterns.
             </p>
-            
-            <div class="map-intro-tips">
-                <div class="tip-icon">💡</div>
-                <div class="tip-text">
-                    <strong>Pro tip:</strong> Try enabling 2-3 species at once to see how their migrations intersect. 
-                    Use the monthly animation to watch patterns shift through the seasons.
-                </div>
-            </div>
-            
-            <div class="preset-section">
-                <h3 class="preset-title">Quick Presets</h3>
-                <p class="preset-description">Select a preset to automatically configure species for common migration patterns:</p>
-                
-                <div class="preset-buttons">
-                    <button class="preset-btn" data-preset="pacific">
-                        <span class="preset-icon">🌊</span>
-                        <span class="preset-name">Eastern Pacific Migration</span>
-                        <span class="preset-species">Gray, Humpback, Blue Whales</span>
-                    </button>
-                    
-                    <button class="preset-btn" data-preset="arctic">
-                        <span class="preset-icon">❄️</span>
-                        <span class="preset-name">Arctic & North Atlantic</span>
-                        <span class="preset-species">Bowhead, Beluga, Narwhal</span>
-                    </button>
-                    
-                    <button class="preset-btn" data-preset="tropical">
-                        <span class="preset-icon">🏝️</span>
-                        <span class="preset-name">Tropical Breeding Grounds</span>
-                        <span class="preset-species">Humpback, Sperm, Pilot Whales</span>
-                    </button>
-                    
-                    <button class="preset-btn" data-preset="deepsea">
-                        <span class="preset-icon">🦑</span>
-                        <span class="preset-name">Deep Sea Giants</span>
-                        <span class="preset-species">Sperm, Beaked, Blue Whales</span>
-                    </button>
-                    
-                    <button class="preset-btn" data-preset="all">
-                        <span class="preset-icon">🐋</span>
-                        <span class="preset-name">All Species</span>
-                        <span class="preset-species">View complete dataset</span>
-                    </button>
-                    
-                    <button class="preset-btn" data-preset="clear">
-                        <span class="preset-icon">✨</span>
-                        <span class="preset-name">Clear All</span>
-                        <span class="preset-species">Start fresh</span>
-                    </button>
-                </div>
+            <div class="map-intro-tip">
+                <span class="map-intro-tip-icon">💡</span>
+                <p class="map-intro-tip-text">
+                    <strong>Pro tip:</strong> Try enabling 2-3 species at once to see how their migrations intersect. Use the monthly animation to watch patterns shift through the seasons.
+                </p>
             </div>
         </div>
     </section>
 
+    <!-- Preset Bar -->
+    <div class="preset-bar">
+        <div class="preset-bar-inner">
+            <span class="preset-bar-label">Migration Regions</span>
+            <div class="preset-chips">
+                <button class="preset-chip" data-preset="north_pacific">
+                    <span class="chip-text">
+                        <span class="chip-title">North Pacific Migration</span>
+                        <span class="chip-desc">Blue, Humpback, Gray</span>
+                    </span>
+                </button>
+                <button class="preset-chip" data-preset="north_atlantic">
+                    <span class="chip-text">
+                        <span class="chip-title">North Atlantic</span>
+                        <span class="chip-desc">Humpback, Fin, Right Whale</span>
+                    </span>
+                </button>
+                <button class="preset-chip" data-preset="arctic">
+                    <span class="chip-text">
+                        <span class="chip-title">North Arctic</span>
+                        <span class="chip-desc">Beluga, Orca (Northern)</span>
+                    </span>
+                </button>
+                <button class="preset-chip" data-preset="southern_ocean">
+                    <span class="chip-text">
+                        <span class="chip-title">Southern Ocean</span>
+                        <span class="chip-desc">Blue, Humpback, Orca</span>
+                    </span>
+                </button>
+                <button class="preset-chip utility" data-preset="all">
+                    <span class="chip-text">
+                        <span class="chip-title">All Species</span>
+                        <span class="chip-desc"></span>
+                    </span>
+                </button>
+                <button class="preset-chip utility" data-preset="clear">
+                    <span class="chip-text">
+                        <span class="chip-title">Clear</span>
+                        <span class="chip-desc"></span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Map Container -->
     <div id="map">
-        <!-- Legend with Species Toggles - TOP LEFT -->
         <div id="legend">
             <div class="legend-title">Species Layers</div>
-            <div id="legendSpecies">
-                <!-- Legend entries with toggles will be generated by JavaScript -->
-            </div>
+            <div id="legendSpecies"></div>
             <div class="legend-note">
                 Click checkboxes to show/hide species.<br>
                 Brighter color = higher observation density.
             </div>
         </div>
 
-        <!-- Animation Settings Panel - TOP RIGHT -->
         <div class="settings-panel" id="settingsPanel">
             <button class="settings-toggle" id="settingsToggle">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -678,7 +682,6 @@
             <div class="settings-dropdown">
                 <div class="settings-header">Animation Settings</div>
                 <div class="settings-content">
-                    <!-- Transition Speed -->
                     <div class="setting-group">
                         <div class="setting-label">
                             <span>Transition Speed</span>
@@ -692,10 +695,7 @@
                             <button class="preset-btn" data-speed="2000">Slow</button>
                         </div>
                     </div>
-                    
                     <div class="settings-divider"></div>
-                    
-                    <!-- Heatmap Intensity -->
                     <div class="setting-group">
                         <div class="setting-label">
                             <span>Heatmap Intensity</span>
@@ -704,10 +704,7 @@
                         <input type="range" class="setting-slider" id="intensitySlider" min="20" max="200" value="100" step="10">
                         <div class="setting-description">Brightness of species density overlay</div>
                     </div>
-                    
                     <div class="settings-divider"></div>
-                    
-                    <!-- Heatmap Radius -->
                     <div class="setting-group">
                         <div class="setting-label">
                             <span>Heatmap Radius</span>
@@ -716,20 +713,13 @@
                         <input type="range" class="setting-slider" id="radiusSlider" min="50" max="200" value="100" step="10">
                         <div class="setting-description">Spread of each data point</div>
                     </div>
-                    
                     <div class="settings-divider"></div>
-                    
                     <button class="reset-btn" id="resetSettings">Reset to Defaults</button>
                 </div>
             </div>
         </div>
 
-        <!-- Circular Month Controls - BOTTOM RIGHT -->
-        <div id="controls">
-            <!-- Content will be generated by CircularControls component -->
-        </div>
-
-        <!-- Hidden month display for compatibility -->
+        <div id="controls"></div>
         <div id="monthBottom">January</div>
         <div class="month-display"><span id="monthLabel">January</span></div>
     </div>
@@ -739,246 +729,394 @@
     <script src="circular-controls.js"></script>
     <script src="species-map.js"></script>
     
-    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-content">
             <p class="footer-attribution">Data collected and processed by <strong>Quintin Tyree</strong></p>
         </div>
     </footer>
     
-    <style>
-        .site-footer {
-            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-            border-top: 1px solid #dee2e6;
-            padding: 24px 20px;
-            text-align: center;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .footer-attribution {
-            font-size: 14px;
-            color: #495057;
-            margin: 0;
-        }
-        
-        .footer-attribution strong {
-            color: #2c7ab8;
-            font-weight: 600;
-        }
-    </style>
-    
-    <!-- Three.js Sperm Whale Scene Controller -->
+    <!-- Three.js Sperm Whale Scene (intro animation, then hide) -->
     <script>
     (function() {
         const hero = document.getElementById('species-hero');
         const whaleContainer = document.getElementById('spermWhaleScene');
         const scrollIndicator = document.getElementById('speciesScrollIndicator');
-        const highlight1 = document.getElementById('highlight1');
-        const highlight2 = document.getElementById('highlight2');
-        
+
         if (!hero || !whaleContainer) return;
-        
-        // Wait for Three.js and GLTFLoader to be available
+
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+        function waitForLoaded(scene) {
+            return new Promise((resolve) => {
+                const tick = () => {
+                    if (scene && scene.isLoaded) resolve();
+                    else requestAnimationFrame(tick);
+                };
+                tick();
+            });
+        }
+
+        async function playIntroOnly(scene) {
+            // Use configurable duration from scene
+            const INTRO_MS = scene.config.swimDuration || 4200;
+
+            // Start at top
+            window.scrollTo(0, 0);
+
+            // Hide scroll indicator during intro
+            if (scrollIndicator) scrollIndicator.classList.add('hidden');
+
+            await waitForLoaded(scene);
+
+            // Show whale for intro
+            whaleContainer.style.display = '';
+            whaleContainer.style.transition = 'opacity 0.8s ease';
+            whaleContainer.style.opacity = 1;
+
+            const t0 = performance.now();
+
+            return new Promise((resolve) => {
+                const step = (now) => {
+                    const t = clamp((now - t0) / INTRO_MS, 0, 1);
+
+                    // easeInOutCubic
+                    const eased = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+
+                    // Update whale position
+                    scene.setScrollProgress(eased);
+
+                    if (t < 1) requestAnimationFrame(step);
+                    else resolve();
+                };
+                requestAnimationFrame(step);
+            });
+        }
+
         function initWhaleScene() {
             if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined' || typeof SpermWhaleScene === 'undefined') {
                 setTimeout(initWhaleScene, 100);
                 return;
             }
-            
-            // Initialize the sperm whale scene
+
             const whaleScene = new SpermWhaleScene(whaleContainer, 'models/Sperm_whale.glb');
-            
-            // ============================================
-            // CUSTOMIZE SPERM WHALE HERE
-            // ============================================
-            
-            // Animation options: 'Swim1_Anim', 'Swim2_Anim', 'Idle_Anim', 'Jump_Anim', etc.
-            whaleScene.config.animationName = 'Swim1_Anim';
-            whaleScene.config.animationSpeed = 0.5;
-            
-            // Path: left to right
-            // whaleScene.config.startPos = { x: -14, y: 1, z: 6 };
-            // whaleScene.config.midPos = { x: 0, y: -0.5, z: -2 };
-            // whaleScene.config.endPos = { x: 14, y: 0, z: 4 };
-            
-            // Rotation
-            // whaleScene.config.startRotation = { x: 0.05, y: -Math.PI * 0.2, z: 0.03 };
-            // whaleScene.config.endRotation = { x: -0.05, y: Math.PI * 0.3, z: -0.03 };
-            
-            // Size
-            // whaleScene.config.startScale = 0.45;
-            // whaleScene.config.endScale = 0.65;
-            
-            // ============================================
-            
-            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-            
-            function updateScroll() {
-                const rect = hero.getBoundingClientRect();
-                const heroHeight = rect.height;
-                const viewportHeight = window.innerHeight;
-                
-                const scrollDistance = heroHeight - viewportHeight;
-                const progress = clamp(-rect.top / scrollDistance, 0, 1);
-                
-                // Update whale scene with scroll progress
-                whaleScene.setScrollProgress(progress);
-                
-                // Fade container in/out
-                let opacity = 1;
-                if (progress < 0.05) {
-                    opacity = progress / 0.05;
-                } else if (progress > 0.9) {
-                    opacity = (1 - progress) / 0.1;
-                }
-                whaleContainer.style.opacity = opacity;
-                
-                // Hide scroll indicator after scrolling starts
-                if (scrollIndicator) {
-                    if (progress > 0.05) {
-                        scrollIndicator.classList.add('hidden');
-                    } else {
-                        scrollIndicator.classList.remove('hidden');
-                    }
-                }
-                
-                // Show highlights progressively - spread out more
-                if (highlight1) {
-                    const show1 = 0.12, peak1 = 0.22, fade1 = 0.38, hide1 = 0.48;
-                    let op1 = 0;
-                    if (progress >= show1 && progress < peak1) {
-                        op1 = (progress - show1) / (peak1 - show1);
-                    } else if (progress >= peak1 && progress < fade1) {
-                        op1 = 1;
-                    } else if (progress >= fade1 && progress < hide1) {
-                        op1 = 1 - (progress - fade1) / (hide1 - fade1);
-                    }
-                    highlight1.style.opacity = op1;
-                    highlight1.style.transform = `translateY(${(1 - op1) * 30}px)`;
-                }
-                
-                if (highlight2) {
-                    const show2 = 0.35, peak2 = 0.45, fade2 = 0.62, hide2 = 0.75;
-                    let op2 = 0;
-                    if (progress >= show2 && progress < peak2) {
-                        op2 = (progress - show2) / (peak2 - show2);
-                    } else if (progress >= peak2 && progress < fade2) {
-                        op2 = 1;
-                    } else if (progress >= fade2 && progress < hide2) {
-                        op2 = 1 - (progress - fade2) / (hide2 - fade2);
-                    }
-                    highlight2.style.opacity = op2;
-                    highlight2.style.transform = `translateY(${(1 - op2) * 30}px)`;
-                }
-            }
-            
-            let ticking = false;
-            function onScroll() {
-                if (!ticking) {
-                    requestAnimationFrame(() => {
-                        updateScroll();
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            }
-            
-            window.addEventListener('scroll', onScroll, { passive: true });
-            window.addEventListener('resize', updateScroll, { passive: true });
-            
-            // Initial update
-            updateScroll();
+
+            // Play intro then fade out
+            playIntroOnly(whaleScene).then(() => {
+                // Fade out whale
+                whaleContainer.style.opacity = 0;
+                setTimeout(() => {
+                    whaleContainer.style.display = 'none';
+                    if (whaleScene.dispose) whaleScene.dispose();
+                }, 800);
+
+                // Show scroll indicator after animation
+                if (scrollIndicator) scrollIndicator.classList.remove('hidden');
+            });
         }
-        
+
         initWhaleScene();
     })();
     </script>
-    
-    <!-- Preset Button Handler -->
+    <!-- Preset Handler with setFilter Ocean Filtering -->
     <script>
     (function() {
-        // Define presets - species names should match what's in your whale-species.js
+        /*
+         * OCEAN FILTER LISTS
+         * Used to filter humpback and orca by region using map.setFilter()
+         */
+        const NORTH_PACIFIC_OCEANS = [
+            'North Pacific Ocean', 'Bering Sea', 'Gulf of Alaska', 'Sea of Okhotsk',
+            'Sea of Japan', 'Philippine Sea', 'East China Sea', 'Golfo de California',
+            'Monterey Bay', 'Prince William Sound', 'Cook Inlet', 'Bristol Bay',
+            'Salish Sea', 'Hecate Strait', 'Queen Charlotte Strait', 'Queen Charlotte Sound',
+            'San Francisco Bay', 'Coral Sea', 'Tasman Sea', 'Great Barrier Reef',
+            'Norton Sound', "Gulf of Anadyr'", 'Karaginskiy Gulf', 'Kronotskiy Gulf',
+            'Cordova Bay', 'Dixon Entrance', 'Columbia River', 'Korea Strait',
+            'La Pérouse Strait', 'Uchiura Bay', 'Golfo de Tehuantepec'
+        ];
+        
+        const NORTH_ATLANTIC_OCEANS = [
+            'North Atlantic Ocean', 'Gulf of Maine', 'Gulf of Saint Lawrence',
+            'Bay of Fundy', 'Labrador Sea', 'Davis Strait', 'Baffin Bay',
+            'Caribbean Sea', 'Gulf of Mexico', 'Sargasso Sea', 'Norwegian Sea',
+            'North Sea', 'Irish Sea', 'English Channel', 'Bay of Biscay',
+            'Mediterranean Sea', 'Baltic Sea', 'Greenland Sea', 'Denmark Strait',
+            'Barents Sea', 'Strait of Belle Isle', 'Strait of Gibraltar',
+            'Bristol Channel', 'Kattegat', 'Skagerrak', 'Gulf of Guinea',
+            'Ligurian Sea', 'Tyrrhenian Sea', 'Alboran Sea', 'Red Sea'
+        ];
+        
+        const NORTH_ARCTIC_OCEANS = [
+            'Arctic Ocean', 'Chukchi Sea', 'Bering Sea', 'Beaufort Sea',
+            'Baffin Bay', 'Davis Strait', 'Greenland Sea', 'Norwegian Sea',
+            'Barents Sea', 'Labrador Sea', 'Kangertittivaq', 'Eclipse Sound',
+            'Smith Sound', 'The North Western Passages', 'Vestfjorden',
+            'Trondheimsfjorden', 'Sognefjorden', 'Boknafjorden',
+            'North Pacific Ocean', 'Gulf of Alaska', 'Sea of Okhotsk',
+            'North Atlantic Ocean', 'Gulf of Maine', 'Gulf of Saint Lawrence',
+            'Bay of Fundy', 'North Sea', 'Irish Sea', 'Iceland Sea',
+            'Kara Sea', 'Laptev Sea', 'East Siberian Sea', 'Lincoln Sea',
+            'Prince William Sound', 'Cook Inlet', 'Bristol Bay',
+            'Salish Sea', 'Hecate Strait', 'Queen Charlotte Strait', 'Queen Charlotte Sound',
+            'Norton Sound', "Gulf of Anadyr'", 'Karaginskiy Gulf', 'Kronotskiy Gulf',
+            'Denmark Strait', 'Fram Strait'
+        ];
+        
+        const SOUTHERN_OCEANS = [
+            'Southern Ocean', 'South Atlantic Ocean', 'South Pacific Ocean',
+            'Drake Passage', 'Scotia Sea', 'Weddell Sea', 'Ross Sea',
+            'Bellingshausen Sea', 'Davis Sea', 'Amundsen Sea', 'Tasman Sea',
+            'Great Australian Bight', 'Indian Ocean', 'Mozambique Channel',
+            'Coral Sea', 'Arafura Sea', 'Bransfield Strait', 'Marguerite Bay',
+            'McMurdo Sound', 'Prydz Bay', 'Sulzberger Bay', 'Bass Strait',
+            'Gulf St. Vincent', 'Geographe Bay', 'Timor Sea', 'Gulf of Carpentaria',
+            'Solomon Sea', 'Celebes Sea', 'Ceram Sea', 'Bali Sea', 'Andaman Sea',
+            'Bay of Bengal', 'Golfo San Jorge', 'Golfo San Matías', 'Golfo Corcovado',
+            'Estrecho de Magellanes', 'Bay Inútil', 'Seno de Skyring'
+        ];
+        
+        /*
+         * PRESETS CONFIGURATION
+         * - species: names to match in legend checkboxes
+         * - filterLayers: which layer IDs need ocean filtering, with their ocean list
+         * - center/zoom: map view
+         */
         const presets = {
-            pacific: ['Gray Whale', 'Humpback Whale', 'Blue Whale'],
-            arctic: ['Bowhead Whale', 'Beluga', 'Narwhal'],
-            tropical: ['Humpback Whale', 'Sperm Whale', 'Pilot Whale'],
-            deepsea: ['Sperm Whale', 'Beaked Whale', 'Blue Whale'],
+            north_pacific: {
+                species: ['Blue', 'Humpback', 'Gray'],
+                filterLayers: {
+                    'humpback': NORTH_PACIFIC_OCEANS
+                },
+                center: [-150, 35],
+                zoom: 2
+            },
+            
+            north_atlantic: {
+                species: ['Humpback', 'Fin', 'Minke', 'Sei', 'North Atlantic Right', 'Right'],
+                filterLayers: {
+                    'humpback': NORTH_ATLANTIC_OCEANS
+                },
+                center: [-45, 42],
+                zoom: 2
+            },
+            
+            arctic: {
+                species: ['Beluga', 'Orca'],
+                filterLayers: {
+                    'orca': NORTH_ARCTIC_OCEANS
+                },
+                center: [-80, 70],
+                zoom: 2
+            },
+            
+            southern_ocean: {
+                species: ['Blue', 'Fin', 'Humpback', 'Southern Right', 'Orca', 'Sei'],
+                filterLayers: {
+                    'humpback': SOUTHERN_OCEANS,
+                    'orca': SOUTHERN_OCEANS
+                },
+                center: [0, -55],
+                zoom: 2
+            },
+            
             all: 'all',
             clear: 'clear'
         };
         
-        // Wait for map to be ready, then attach preset handlers
-        function initPresets() {
-            const presetBtns = document.querySelectorAll('.preset-btn[data-preset]');
-            
-            presetBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const presetName = btn.dataset.preset;
-                    const preset = presets[presetName];
-                    
-                    // Update active state
-                    presetBtns.forEach(b => b.classList.remove('active'));
-                    if (presetName !== 'clear') {
-                        btn.classList.add('active');
+        let activePreset = null;
+
+        // Global function to get active preset ocean filters for animation compatibility
+        window.getActivePresetFilters = function() {
+            return activePreset ? activePreset.filterLayers : null;
+        };
+
+        function waitForMap(callback) {
+            const check = () => {
+                if (typeof map !== 'undefined' && map.isStyleLoaded && map.isStyleLoaded()) {
+                    callback();
+                } else if (typeof map !== 'undefined' && map.loaded && map.loaded()) {
+                    callback();
+                } else {
+                    setTimeout(check, 100);
+                }
+            };
+            check();
+        }
+        
+        // Get all heatmap layer IDs from the map
+        function getHeatmapLayers() {
+            const style = map.getStyle();
+            if (!style || !style.layers) return [];
+            // robust: use layer type, not a naming convention
+            return style.layers
+                .filter(l => l.type === 'heatmap' && l.id)
+                .map(l => l.id);
+        }
+
+        
+        // Check if a layer matches a filter key (e.g., 'humpback', 'orca')
+        function layerMatchesKey(layerId, key) {
+            return layerId.toLowerCase().includes(key.toLowerCase());
+        }
+        
+        // Apply ocean filter to specific layers using setFilter
+        // Apply ocean/location restriction via heatmap-weight (does NOT override month filters)
+        function applyOceanFilters(filterLayers) {
+            if (!filterLayers) return;
+
+            waitForMap(() => {
+                const heatmapLayers = getHeatmapLayers();
+
+                heatmapLayers.forEach(layerId => {
+                    let oceanList = null;
+
+                    for (const [key, oceans] of Object.entries(filterLayers)) {
+                        if (layerMatchesKey(layerId, key)) {
+                            oceanList = oceans;
+                            break;
+                        }
                     }
-                    
-                    // Get all checkboxes in the legend
-                    const checkboxes = document.querySelectorAll('#legendSpecies input[type="checkbox"]');
-                    
-                    if (preset === 'all') {
-                        // Enable all species
-                        checkboxes.forEach(cb => {
-                            if (!cb.checked) {
-                                cb.checked = true;
-                                cb.dispatchEvent(new Event('change', { bubbles: true }));
-                            }
-                        });
-                    } else if (preset === 'clear') {
-                        // Disable all species
-                        checkboxes.forEach(cb => {
-                            if (cb.checked) {
-                                cb.checked = false;
-                                cb.dispatchEvent(new Event('change', { bubbles: true }));
-                            }
-                        });
-                    } else if (Array.isArray(preset)) {
-                        // First disable all, then enable selected
-                        checkboxes.forEach(cb => {
-                            const label = cb.closest('.legend-row')?.querySelector('.legend-name')?.textContent?.trim();
-                            const shouldBeChecked = preset.some(species => 
-                                label?.toLowerCase().includes(species.toLowerCase()) ||
-                                species.toLowerCase().includes(label?.toLowerCase() || '')
-                            );
-                            
-                            if (cb.checked !== shouldBeChecked) {
-                                cb.checked = shouldBeChecked;
-                                cb.dispatchEvent(new Event('change', { bubbles: true }));
-                            }
-                        });
-                    }
-                    
-                    // Scroll to map smoothly
-                    const mapElement = document.getElementById('map');
-                    if (mapElement) {
-                        mapElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
+
+                    try {
+                        if (oceanList) {
+                            map.setPaintProperty(layerId, 'heatmap-weight', [
+                                'case',
+                                ['in', ['get', 'ocean'], ['literal', oceanList]],
+                                1,
+                                0
+                            ]);
+                        } else {
+                            // IMPORTANT: don't touch filters; just restore weight
+                            map.setPaintProperty(layerId, 'heatmap-weight', 1);
+                        }
+                    } catch (e) { console.warn('Failed setPaintProperty for', layerId, e); }
                 });
             });
         }
+
         
-        // Initialize when DOM is ready and map has loaded
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                // Delay to ensure map legend is populated
-                setTimeout(initPresets, 1500);
+        // Clear all filters
+        // Only clear the ocean/location restriction (leave month filters alone)
+        function clearAllFilters() {
+            waitForMap(() => {
+                getHeatmapLayers().forEach(layerId => {
+                    try {
+                        map.setPaintProperty(layerId, 'heatmap-weight', 1);
+                    } catch (e) { console.warn('Failed setPaintProperty for', layerId, e); }
+                });
             });
+        }
+
+        
+        // Apply a preset
+        function applyPreset(presetName) {
+            const preset = presets[presetName];
+            const chips = document.querySelectorAll('.preset-chip');
+
+            // Stop animation when changing presets
+            if (typeof stopAnimation === 'function' && typeof isPlaying !== 'undefined' && isPlaying) {
+                stopAnimation();
+            }
+
+            // Update active chip styling
+            chips.forEach(c => c.classList.remove('active'));
+            const activeChip = document.querySelector(`.preset-chip[data-preset="${presetName}"]`);
+            if (activeChip && presetName !== 'clear') {
+                activeChip.classList.add('active');
+            }
+
+            waitForMap(() => {
+                console.log('Heatmap layer IDs:', getHeatmapLayers());
+                const checkboxes = document.querySelectorAll('#legendSpecies input[type="checkbox"]');
+                
+                if (preset === 'all') {
+                    // Show all, clear filters
+                    activePreset = null;
+                    clearAllFilters();
+                    
+                    checkboxes.forEach(cb => {
+                        if (!cb.checked) {
+                            cb.checked = true;
+                            cb.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                    
+                    map.flyTo({ center: [0, 20], zoom: 1.5, duration: 1500 });
+                    
+                } else if (preset === 'clear') {
+                    // Clear all
+                    activePreset = null;
+                    clearAllFilters();
+                    
+                    checkboxes.forEach(cb => {
+                        if (cb.checked) {
+                            cb.checked = false;
+                            cb.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                    
+                } else if (typeof preset === 'object') {
+                    activePreset = preset;
+                    
+                    // Clear existing filters first
+                    clearAllFilters();
+                    
+                    // Enable/disable species checkboxes
+                    checkboxes.forEach(cb => {
+                        const label = cb.closest('.legend-row')?.querySelector('.legend-name')?.textContent?.trim() || '';
+                        const shouldBeChecked = preset.species.some(s => 
+                            label.toLowerCase().includes(s.toLowerCase())
+                        );
+                        
+                        if (cb.checked !== shouldBeChecked) {
+                            cb.checked = shouldBeChecked;
+                            cb.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                    
+                    // Apply ocean filters after a short delay (let layers enable)
+                    setTimeout(() => {
+                        applyOceanFilters(preset.filterLayers);
+                    }, 300);
+                    
+                    // Fly to region
+                    if (preset.center && preset.zoom) {
+                        map.flyTo({
+                            center: preset.center,
+                            zoom: preset.zoom,
+                            duration: 1500
+                        });
+                    }
+                }
+                
+                // Scroll to map
+                document.getElementById('map')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+        
+        // Initialize
+        function init() {
+            // Preset chip handlers
+            document.querySelectorAll('.preset-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    applyPreset(chip.dataset.preset);
+                });
+            });
+            
+            // Re-apply filters when species are toggled
+            document.getElementById('legendSpecies')?.addEventListener('change', () => {
+                if (activePreset && activePreset.filterLayers) {
+                    setTimeout(() => {
+                        applyOceanFilters(activePreset.filterLayers);
+                    }, 100);
+                }
+            });
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => setTimeout(init, 1500));
         } else {
-            setTimeout(initPresets, 1500);
+            setTimeout(init, 1500);
         }
     })();
     </script>

@@ -16,39 +16,34 @@ class SpermWhaleScene {
         this.animationDuration = 0;
         this.isLoaded = false;
         
-        // Configuration optimized for Sperm Whale
+        // Configuration - ALL CONTROLS HERE
         this.config = {
-            // Whale path - simple swim from left to right with subtle curve at end
-            startPos: { x: -10, y: -1, z: -2 },    // Start far LEFT, slightly back
-            endPos: { x: 10, y: -2, z: 2 },     // End RIGHT, slightly forward and down
-            
-            // Whale rotation (in radians)
-            // Swim left to right with subtle turn toward camera at end
-            startRotation: { x: 0, y: Math.PI / 2, z: 0 },      // Facing RIGHT
-            endRotation: { x: 0.08, y: Math.PI / 2.5, z: 0 },   // Slight turn toward camera
-            
-            // Whale scale - subtle growth as it passes
-            startScale: 1,
-            endScale: 1.3,
+            // Swim controls
+            swimStartX: -12,
+            swimEndX: 12,
+            swimY: -1,
+            swimZ: 0,
+            swimSpeed: 0.5,
+            swimDuration: 4200,
+            scale: 1.2,
             
             // Camera
             cameraZ: 10,
             fov: 50,
             
-            // Underwater effects
+            // Effects
             enableParticles: true,
             particleCount: 150,
             enableFog: true,
             fogNear: 25,
             fogFar: 100,
             
-            // Colors - brighter for dark sperm whale
+            // Colors
             backgroundColor: 0x0a1628,
             fogColor: 0x1a5a8a,
             ambientColor: 0x88aacc,
             directionalColor: 0xffffff,
             
-            // Animation settings - just swim, no turn
             swimAnimation: 'Swim1_Anim',
         };
         
@@ -272,27 +267,24 @@ class SpermWhaleScene {
                 this.whaleGroup.add(this.whale);
                 this.scene.add(this.whaleGroup);
                 
-                // Setup animations - just swim animation
+                // Set initial position, rotation, scale from config
+                this.whaleGroup.position.set(this.config.swimStartX, this.config.swimY, this.config.swimZ);
+                this.whaleGroup.rotation.set(0, Math.PI / 2, 0); // Face right
+                this.whaleGroup.scale.setScalar(this.config.scale);
+                
+                // Setup swim animation
                 if (gltf.animations && gltf.animations.length > 0) {
                     this.mixer = new THREE.AnimationMixer(this.whale);
-                    this.animations = {};
                     
-                    // Find swim animation
                     const swimClip = gltf.animations.find(a => a.name === this.config.swimAnimation);
                     if (swimClip) {
-                        this.animations.swim = this.mixer.clipAction(swimClip);
-                        this.animations.swim.setLoop(THREE.LoopRepeat);
-                        this.animations.swimDuration = swimClip.duration;
-                        this.animations.swim.play();
-                        this.currentAnimation = 'swim';
-                        console.log('Loaded swim animation:', swimClip.name, 'Duration:', swimClip.duration);
+                        const action = this.mixer.clipAction(swimClip);
+                        action.setLoop(THREE.LoopRepeat);
+                        action.timeScale = this.config.swimSpeed;
+                        action.play();
                     }
-                    
-                    console.log('Available animations:', gltf.animations.map(a => a.name));
                 }
                 
-                // Initial position
-                this.updateWhaleTransform(0);
                 this.isLoaded = true;
             },
             (progress) => {
@@ -305,93 +297,15 @@ class SpermWhaleScene {
         );
     }
     
-    // Quadratic bezier curve for smooth path
-    bezierPoint(t, p0, p1, p2) {
-        const mt = 1 - t;
-        return {
-            x: mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x,
-            y: mt * mt * p0.y + 2 * mt * t * p1.y + t * t * p2.y,
-            z: mt * mt * p0.z + 2 * mt * t * p1.z + t * t * p2.z
-        };
-    }
-    
-    // Linear interpolation
-    lerp(a, b, t) {
-        return a + (b - a) * t;
-    }
-    
-    // Smooth step for easing
-    smoothstep(t) {
-        return t * t * (3 - 2 * t);
-    }
-    
-    // Ease out for more natural deceleration
-    easeOutCubic(t) {
-        return 1 - Math.pow(1 - t, 3);
-    }
-    
     updateWhaleTransform(progress) {
         if (!this.whaleGroup) return;
         
-        // Clamp progress
         progress = Math.max(0, Math.min(1, progress));
         
-        // Smooth easing for the whole journey
-        const eased = this.smoothstep(progress);
+        // Move left to right
+        const x = this.config.swimStartX + (this.config.swimEndX - this.config.swimStartX) * progress;
         
-        // Simple interpolation from start to end
-        const pos = {
-            x: this.lerp(this.config.startPos.x, this.config.endPos.x, eased),
-            y: this.lerp(this.config.startPos.y, this.config.endPos.y, eased),
-            z: this.lerp(this.config.startPos.z, this.config.endPos.z, eased)
-        };
-        
-        // Rotation - subtle turn happens in last 30% of journey
-        let rotX, rotY, rotZ;
-        if (progress < 0.7) {
-            // First 70%: maintain starting rotation
-            rotX = this.config.startRotation.x;
-            rotY = this.config.startRotation.y;
-            rotZ = this.config.startRotation.z;
-        } else {
-            // Last 30%: subtle turn toward camera
-            const turnProgress = (progress - 0.7) / 0.3;
-            const turnEased = this.smoothstep(turnProgress);
-            rotX = this.lerp(this.config.startRotation.x, this.config.endRotation.x, turnEased);
-            rotY = this.lerp(this.config.startRotation.y, this.config.endRotation.y, turnEased);
-            rotZ = this.lerp(this.config.startRotation.z, this.config.endRotation.z, turnEased);
-        }
-        
-        // Scale: gradual increase throughout
-        const scale = this.lerp(this.config.startScale, this.config.endScale, eased);
-        
-        // Keep swim animation playing throughout
-        if (this.animations && this.animations.swim) {
-            if (this.currentAnimation !== 'swim') {
-                this.animations.swim.reset();
-                this.animations.swim.fadeIn(0.3);
-                this.animations.swim.play();
-                this.currentAnimation = 'swim';
-            }
-            this.animations.swim.timeScale = 1;
-            if (this.mixer) {
-                this.mixer.update(0.016);
-            }
-        }
-        
-        // Add gentle swimming motion (subtle bobbing)
-        const swimBob = Math.sin(progress * Math.PI * 6) * 0.15;
-        pos.y += swimBob;
-        
-        // Apply transforms
-        this.whaleGroup.position.set(pos.x, pos.y, pos.z);
-        
-        // Add subtle body roll while swimming
-        const bodyRoll = Math.sin(progress * Math.PI * 4) * 0.03;
-        this.whaleGroup.rotation.set(rotX, rotY, rotZ + bodyRoll);
-        
-        // Scale
-        this.whaleGroup.scale.setScalar(scale);
+        this.whaleGroup.position.x = x;
     }
     
     setScrollProgress(progress) {
@@ -435,6 +349,11 @@ class SpermWhaleScene {
         
         const delta = this.clock.getDelta();
         
+        // Update swim animation
+        if (this.mixer) {
+            this.mixer.update(delta);
+        }
+        
         // Update particles
         this.updateParticles(delta);
         
@@ -446,12 +365,6 @@ class SpermWhaleScene {
         }
         
         this.renderer.render(this.scene, this.camera);
-    }
-    
-    // Public method to change animation
-    setAnimation(name) {
-        if (!this.mixer || !this.whale) return;
-        console.log('To change animation, set config.animationName before loading');
     }
     
     // Cleanup

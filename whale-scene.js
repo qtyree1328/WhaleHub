@@ -21,9 +21,9 @@ class WhaleScene {
         this.config = {
             // Whale path control points (start, middle, end)
             // Keeping z more consistent so whale doesn't "zoom" toward camera
-            startPos: { x: -9, y: -1.2, z: 0 },
-            midPos: { x: 3, y: -7 ,z: 0 },
-            endPos: { x: 14, y: -4.5, z: 0 },
+            startPos: { x: -10, y: -1.2, z: 0 },
+            midPos: { x: 3, y: -4 ,z: 0 },
+            endPos: { x: 10, y: -6, z: 0 },
             
             // Whale rotation (in radians)
             startRotation: { x: 0, y: Math.PI * 0.3, z: 0.05 },
@@ -31,10 +31,10 @@ class WhaleScene {
             
             // Whale scale - keep more consistent
             startScale: 0.2,
-            endScale: 0.6,
+            endScale: 0.7,
             
             // Camera - move back for wider view
-            cameraZ: 15,
+            cameraZ: 14,
             fov: 45,
             
             // Underwater effects
@@ -51,8 +51,13 @@ class WhaleScene {
             directionalColor: 0xffffff,
             
             // Animation
+            // Animation
             animationName: 'Jump1_Anim', // Set to null for first available
-            animationSpeed: .6, // 0.5 = animation plays at half speed relative to scroll (use less of the animation)
+
+            // Clip segment to play during progress 0->1 (fractions of the GLB clip)
+            // Example: 0.10 -> 0.55 plays 45% of the clip
+            clipStart: 0.0,
+            clipEnd: 0.37,
         };
         
         // Setup DRACO loader for compressed models
@@ -328,18 +333,16 @@ class WhaleScene {
         
         // Update animation time (sync to scroll)
         if (this.mixer && this.action && this.animationDuration > 0) {
-            // Calculate the target time in the animation
-            // animationSpeed controls how much of the animation plays during scroll
-            // 1.0 = full animation, 0.5 = half the animation, 0.3 = 30% of animation
-            let targetTime = progress * this.animationDuration * this.config.animationSpeed;
-            
-            // Clamp to animation duration
-            targetTime = Math.min(targetTime, this.animationDuration);
-            
-            // Directly set the action's time
+            const startF = Math.max(0, Math.min(1, this.config.clipStart ?? 0));
+            const endF   = Math.max(0, Math.min(1, this.config.clipEnd ?? 1));
+
+            // Allow either direction; if end < start, it will play backwards
+            const clipF = startF + (endF - startF) * progress;
+
+            let targetTime = clipF * this.animationDuration;
+            targetTime = Math.max(0, Math.min(this.animationDuration, targetTime));
+
             this.action.time = targetTime;
-            
-            // Force the mixer to update (with 0 delta since we set time directly)
             this.mixer.update(0);
         }
     }

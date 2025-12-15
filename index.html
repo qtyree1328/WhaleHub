@@ -1492,6 +1492,14 @@
         .info-panel-body::-webkit-scrollbar-thumb:hover {
             background: #aaa;
         }
+        /* Lock page scroll during intro */
+        html.no-scroll,
+        body.no-scroll {
+            overflow: hidden !important;
+            height: 100% !important;
+            overscroll-behavior: none;
+            touch-action: none;
+            }
     </style>
 </head>
 <body class="page-enter">
@@ -2719,99 +2727,210 @@
         const whaleContainer = document.getElementById('whaleScene');
         const scrollIndicator = document.getElementById('scrollIndicator');
         const highlights = document.querySelectorAll('.hero-highlight');
-        
+
         if (!hero || !whaleContainer) return;
-        
-        // Wait for Three.js and GLTFLoader to be available
-        function initWhaleScene() {
-            if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined') {
-                setTimeout(initWhaleScene, 100);
-                return;
+
+        // ---------------------------
+        // Scroll locking helpers
+        // ---------------------------
+        const SCROLL_KEYS = new Set(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' ','Spacebar']);
+
+        function preventScroll(e) { e.preventDefault(); }
+
+        function lockScroll() {
+            window.scrollTo(0, 0);
+            document.documentElement.classList.add('no-scroll');
+            document.body.classList.add('no-scroll');
+
+            window.addEventListener('wheel', preventScroll, { passive: false });
+            window.addEventListener('touchmove', preventScroll, { passive: false });
+            window.addEventListener('keydown', onKeyDown, { passive: false });
+        }
+
+        function unlockScroll() {
+            document.documentElement.classList.remove('no-scroll');
+            document.body.classList.remove('no-scroll');
+
+            window.removeEventListener('wheel', preventScroll, { passive: false });
+            window.removeEventListener('touchmove', preventScroll, { passive: false });
+            window.removeEventListener('keydown', onKeyDown, { passive: false });
+        }
+
+        function onKeyDown(e) {
+            if (SCROLL_KEYS.has(e.key)) e.preventDefault();
+        }
+
+        // ---------------------------
+        // Shared "apply progress" logic (your old updateScroll body)
+        // ---------------------------
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+        function applyWhaleProgress(progress, whaleScene) {
+            progress = clamp(progress, 0, 1);
+
+            // whale only
+            whaleScene.setScrollProgress(progress);
+
+            // keep your whale container fade logic if you want it during intro
+            let opacity = 1;
+            if (progress < 0.03) opacity = progress / 0.03;
+            else if (progress > 0.92) opacity = (1 - progress) / 0.08;
+            whaleContainer.style.opacity = opacity;
             }
-            
-            // Initialize the whale scene
-            const whaleScene = new WhaleScene(whaleContainer, 'models/humpback_whale.glb');
-            
-            // Customize whale animation
-            whaleScene.config.animationName = 'Jump1_Anim';
-            whaleScene.config.animationSpeed = 0.6; // Lower = slower (0.3 = 30% of animation during full scroll)
-            
-            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-            
-            function updateScroll() {
+
+        function applyTextProgress(progress) {
+            progress = clamp(progress, 0, 1);
+
+            // Scroll prompt hides once user scrolls a bit
+            if (scrollIndicator) {
+                if (progress > 0.05) scrollIndicator.classList.add('hidden');
+                else scrollIndicator.classList.remove('hidden');
+            }
+
+            // Highlight timing (your existing logic, but text-only now)
+            highlights.forEach((highlight, index) => {
+                const showAt = 0.0 + (index * 0.22);
+                const peakAt = showAt + 0.05;
+                const fadeAt = showAt + 0.55;
+                const hideAt = showAt + 0.85;
+
+                let highlightOpacity = 0;
+                if (progress >= showAt && progress < peakAt) {
+                highlightOpacity = (progress - showAt) / (peakAt - showAt);
+                } else if (progress >= peakAt && progress < fadeAt) {
+                highlightOpacity = 1;
+                } else if (progress >= fadeAt && progress < hideAt) {
+                highlightOpacity = 1 - (progress - fadeAt) / (hideAt - fadeAt);
+                }
+
+                highlight.style.opacity = highlightOpacity;
+                highlight.style.transform = `translateY(${(1 - highlightOpacity) * 30}px)`;
+            });
+            }
+
+        function waitForLoaded(whaleScene) {
+            return new Promise((resolve) => {
+            const tick = () => {
+                if (whaleScene && whaleScene.isLoaded) resolve();
+                else requestAnimationFrame(tick);
+            };
+            tick();
+            });
+        }
+
+        // ---------------------------
+        // Intro autoplay (0 -> 1)
+        // ---------------------------
+        async function playIntro(whaleScene) {
+            const INTRO_MS = 5000;     // duration of the intro (ms)
+            const CLIP_START = 0.0;   // fraction of clip
+            const CLIP_END   = 0.37;   // fraction of clip
+
+            whaleScene.config.clipStart = CLIP_START;
+            whaleScene.config.clipEnd = CLIP_END;
+
+            // Hide prompt during intro
+            if (scrollIndicator) scrollIndicator.classList.add('hidden');
+
+            lockScroll();
+            window.scrollTo(0, 0);
+
+            await waitForLoaded(whaleScene);
+
+            const t0 = performance.now();
+            return new Promise((resolve) => {
+            const step = (now) => {
+                const t = clamp((now - t0) / INTRO_MS, 0, 1);
+
+                // easeInOutCubic
+                const eased = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+
+                applyWhaleProgress(eased, whaleScene);
+
+                // keep highlights hidden during intro so they don't appear at the end
+                highlights.forEach(h => {
+                    h.style.opacity = 0;
+                    h.style.transform = 'translateY(30px)';
+                });
+
+                if (t < 1) requestAnimationFrame(step);
+                else resolve();
+            };
+            requestAnimationFrame(step);
+            });
+        }
+
+        // ---------------------------
+        // After intro: enable real scroll driving
+        // ---------------------------
+        function enableScrollTextDriving() {
+            // show prompt once intro finishes (until user scrolls a bit)
+            if (scrollIndicator) scrollIndicator.classList.remove('hidden');
+
+            function computeScrollProgress() {
                 const rect = hero.getBoundingClientRect();
                 const heroHeight = rect.height;
                 const viewportHeight = window.innerHeight;
-                
                 const scrollDistance = heroHeight - viewportHeight;
-                const progress = clamp(-rect.top / scrollDistance, 0, 1);
-                
-                // Update whale scene with scroll progress
-                whaleScene.setScrollProgress(progress);
-                
-                // Fade container in/out
-                let opacity = 1;
-                if (progress < 0.03) {
-                    opacity = progress / 0.03;
-                } else if (progress > 0.92) {
-                    opacity = (1 - progress) / 0.08;
-                }
-                whaleContainer.style.opacity = opacity;
-                
-                // Hide scroll indicator after scrolling starts
-                if (scrollIndicator) {
-                    if (progress > 0.05) {
-                        scrollIndicator.classList.add('hidden');
-                    } else {
-                        scrollIndicator.classList.remove('hidden');
-                    }
-                }
-                
-                // Show highlights progressively with longer fade windows
-                highlights.forEach((highlight, index) => {
-                    const showAt = 0.08 + (index * 0.22); // Start earlier, more spread
-                    const peakAt = showAt + 0.08; // When fully visible
-                    const fadeAt = showAt + 0.25; // Start fading
-                    const hideAt = showAt + 0.55; // Fully hidden
-                    
-                    let highlightOpacity = 0;
-                    if (progress >= showAt && progress < peakAt) {
-                        // Fading in
-                        highlightOpacity = (progress - showAt) / (peakAt - showAt);
-                    } else if (progress >= peakAt && progress < fadeAt) {
-                        // Fully visible
-                        highlightOpacity = 1;
-                    } else if (progress >= fadeAt && progress < hideAt) {
-                        // Fading out
-                        highlightOpacity = 1 - (progress - fadeAt) / (hideAt - fadeAt);
-                    }
-                    
-                    highlight.style.opacity = highlightOpacity;
-                    highlight.style.transform = `translateY(${(1 - highlightOpacity) * 30}px)`;
-                });
+                return clamp(-rect.top / scrollDistance, 0, 1);
             }
-            
+
             let ticking = false;
             function onScroll() {
                 if (!ticking) {
-                    requestAnimationFrame(() => {
-                        updateScroll();
-                        ticking = false;
-                    });
-                    ticking = true;
+                requestAnimationFrame(() => {
+                    applyTextProgress(computeScrollProgress());
+                    ticking = false;
+                });
+                ticking = true;
                 }
             }
-            
+
             window.addEventListener('scroll', onScroll, { passive: true });
-            window.addEventListener('resize', updateScroll, { passive: true });
-            
-            // Initial update
-            updateScroll();
+            window.addEventListener('resize', onScroll, { passive: true });
+
+            onScroll();
+            }
+
+        // ---------------------------
+        // Boot (same pattern you already use)
+        // ---------------------------
+        function initWhaleScene() {
+            if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined') {
+                setTimeout(initWhaleScene, 100);
+            return;
+            }
+
+            const whaleScene = new WhaleScene(whaleContainer, 'models/humpback_whale.glb');
+
+            // Keep your existing config
+            whaleScene.config.animationName = 'Jump1_Anim';
+            // whaleScene.config.animationSpeed = .3;
+
+            // Intro first, then unlock + attach scroll listeners
+            playIntro(whaleScene).then(() => {
+                // Freeze at end just in case (not strictly required anymore)
+                whaleScene.setScrollProgress(1);
+
+                // Fade out whale
+                whaleContainer.style.transition = 'opacity 0.8s ease';
+                whaleContainer.style.opacity = 0;
+
+                // Fully remove from layout & rendering after fade
+                setTimeout(() => {
+                    whaleContainer.style.display = 'none';
+                    if (whaleScene.dispose) whaleScene.dispose();
+                }, 800);
+
+                unlockScroll();
+                enableScrollTextDriving();
+            });
         }
-        
+
         initWhaleScene();
     })();
     </script>
+
 
     <!-- Footer -->
     <footer class="site-footer">

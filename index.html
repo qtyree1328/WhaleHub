@@ -2449,19 +2449,25 @@
         });
         
         // ============================================================
-        // EVENT LISTENERS
+        // EVENT LISTENERS (for traditional controls - not used with circular controls)
         // ============================================================
-        document.getElementById('monthSlider').addEventListener('input', (e) => {
-            setMonth(parseInt(e.target.value, 10));
-        });
-        
-        document.getElementById('playPause').addEventListener('click', () => {
-            if (isPlaying) {
-                stopAnimation();
-            } else {
-                startAnimation();
-            }
-        });
+        const monthSlider = document.getElementById('monthSlider');
+        if (monthSlider) {
+            monthSlider.addEventListener('input', (e) => {
+                setMonth(parseInt(e.target.value, 10));
+            });
+        }
+
+        const playPauseBtn = document.getElementById('playPause');
+        if (playPauseBtn) {
+            playPauseBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    stopAnimation();
+                } else {
+                    startAnimation();
+                }
+            });
+        }
         
         // ============================================================
         // ANIMATION SETTINGS PANEL

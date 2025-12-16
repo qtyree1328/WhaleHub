@@ -2294,7 +2294,7 @@ body {
 }
 
 .map-intro-content {
-  max-width: 800px;
+  width: min(100%, clamp(820px, 88vw, 1380px));
   margin: 0 auto;
 }
 
@@ -2306,10 +2306,17 @@ body {
 }
 
 .map-intro-text {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
   font-size: 17px;
   line-height: 1.8;
   color: #334155;
   margin: 0 0 40px 0;
+}
+
+.map-intro-text p {
+  margin: 0;
 }
 
 .map-intro-features {

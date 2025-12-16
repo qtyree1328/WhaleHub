@@ -70,14 +70,14 @@
             text-shadow: 0 4px 40px rgba(0,0,0,0.4);
             line-height: 1.1;
             letter-spacing: -0.03em;
-            margin: 0 0 16px 0;
+            margin: 0 0 28px 0;
         }
 
         .species-hero-title span {
             display: block;
             background: linear-gradient(135deg, #7ec8e3 0%, #a8e6cf 50%, #7ec8e3 100%);
             background-size: 200% 200%;
-            animation: gradientShift 4s ease infinite;
+            animation: gradientShift 7s ease-in-out infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -165,7 +165,7 @@
         }
 
         .map-intro-inner {
-            max-width: 720px;
+            width: min(100%, clamp(640px, 80vw, 1100px));
             margin: 0 auto;
         }
 
@@ -178,10 +178,17 @@
         }
 
         .map-intro-text {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
             font-size: 16px;
             line-height: 1.7;
             color: #475569;
             margin: 0 0 24px 0;
+        }
+
+        .map-intro-text p {
+            margin: 0;
         }
 
         @media (max-width: 768px) {
@@ -602,9 +609,14 @@
     <section class="map-intro">
         <div class="map-intro-inner">
             <h2 class="map-intro-title">Explore Migration Patterns</h2>
-            <p class="map-intro-text">
-                Use the interactive map below to visualize how different whale species share ocean habitats throughout the year. Toggle multiple species simultaneously to discover fascinating migration overlaps and seasonal patterns.
-            </p>
+            <div class="map-intro-text">
+                <p>
+                    Use the interactive map below to visualize how different whale species share ocean habitats throughout the year.
+                </p>
+                <p>
+                    Toggle multiple species simultaneously to discover fascinating migration overlaps and seasonal patterns.
+                </p>
+            </div>
         </div>
     </section>
 

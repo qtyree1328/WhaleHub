@@ -1582,23 +1582,29 @@
 <!-- Map Introduction Section -->
 <section id="mapIntro" class="map-intro">
     <div class="map-intro-content">
-        <h2 class="map-intro-title">Explore the Interactive Map</h2>
-        <p class="map-intro-text">
-            This density heatmap reveals global whale observation patterns across all seasons. 
-            Use the circular month selector to watch migration patterns shift throughout the year. 
-            Brighter areas indicate higher concentrations of sightings where multiple species converge.
-        </p>
+        <h2 class="map-intro-title">Whale Migration Density Animated Map</h2>
+        <div class="map-intro-text">
+            <p>
+                This density heatmap demonstrates global whale species density patterns across all seasons. Using observations from 11 species, this map shows where species co-occur globally. Brighter areas indicate more species in one location at a given time. Use the circular month selector to watch migration patterns shift throughout the year.
+            </p>
+            <p>
+
+            </p>
+            <p>
+                Click the circles to view some of the most popular whale watching locations in the world, and use the animation panel to adjust colors, style, and playback. 
+            </p>
+        </div>
         <div class="map-intro-features">
             <div class="intro-feature">
-                <span class="intro-feature-icon">📅</span>
+                <span class="intro-feature-icon"></span>
                 <span>Monthly Animation</span>
             </div>
             <div class="intro-feature">
-                <span class="intro-feature-icon">🔥</span>
+                <span class="intro-feature-icon">|</span>
                 <span>Density Heatmap</span>
             </div>
             <div class="intro-feature">
-                <span class="intro-feature-icon">📍</span>
+                <span class="intro-feature-icon">|</span>
                 <span>Location Details</span>
             </div>
         </div>
@@ -2271,13 +2277,18 @@
         }
         
         function openInfoPanel(location) {
+            console.log('openInfoPanel called with:', location);
             // Close settings panel if open
-            settingsPanel.classList.remove('open');
-            
+            const settingsPanelEl = document.getElementById('settingsPanel');
+            if (settingsPanelEl) {
+                settingsPanelEl.classList.remove('open');
+            }
+
             infoPanelTitle.textContent = location.name;
             infoPanelSubtitle.textContent = location.location;
             infoPanelBody.innerHTML = createLocationPanelHTML(location);
             infoPanel.classList.add('open');
+            console.log('Panel should now be open, classes:', infoPanel.className);
         }
         
         function closeInfoPanel() {
@@ -2372,6 +2383,7 @@
                 data: whaleGeoJSON
             });
             
+            // Add location markers ABOVE the heatmap by adding them last
             map.addLayer({
                 id: 'whale-locations-halo',
                 type: 'circle',
@@ -2389,7 +2401,7 @@
                     'circle-stroke-width': 0
                 }
             });
-            
+
             map.addLayer({
                 id: 'whale-locations-layer',
                 type: 'circle',
@@ -2417,10 +2429,17 @@
             });
             
             map.on('click', 'whale-locations-layer', (e) => {
-                if (!e.features || !e.features.length) return;
+                console.log('Location marker clicked!', e);
+                if (!e.features || !e.features.length) {
+                    console.log('No features found');
+                    return;
+                }
                 const feature = e.features[0];
+                console.log('Feature:', feature);
                 const idx = parseInt(feature.properties.index, 10);
+                console.log('Location index:', idx);
                 const location = WHALE_WATCHING_LOCATIONS[idx];
+                console.log('Location data:', location);
                 openInfoPanel(location);
             });
             

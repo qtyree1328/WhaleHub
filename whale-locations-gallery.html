@@ -57,6 +57,29 @@
             animation: fade-slide-up 0.6s ease-out 0.1s backwards;
         }
 
+        .clear-filters-btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .clear-filters-btn.visible {
+            display: inline-flex;
+        }
+
+        .clear-filters-btn:hover {
+            background: rgba(10, 74, 124, 0.08);
+        }
+
         .filter-group {
             display: flex;
             align-items: center;
@@ -428,6 +451,13 @@
                     <option value="name">Name (A-Z)</option>
                 </select>
             </div>
+            <button id="clearFilters" class="clear-filters-btn" type="button">
+                Clear
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </div>
 
         <!-- Stats Bar -->
@@ -470,6 +500,9 @@
 
         // Mapbox token
         const MAPBOX_TOKEN = 'pk.eyJ1IjoicXR5cmVlIiwiYSI6ImNtaHl5eHNmeDBoY3oybXEwNTIxNGgxYmsifQ.VqoAKKHQxQX-lNNPwVKHmw';
+        let locationsMap = null;
+        let mapLoaded = false;
+        let currentFilteredLocations = WHALE_WATCHING_LOCATIONS.slice();
 
         // Generate URL-safe ID from location name - handles special characters
         function generateLocationId(name) {
@@ -619,6 +652,9 @@
                 noResults.style.display = 'none';
                 grid.innerHTML = filtered.map((loc, i) => createLocationCard(loc, i)).join('');
             }
+
+            updateClearButtonVisibility();
+            updateMapData(filtered);
         }
 
         // Update stats
@@ -633,20 +669,28 @@
         }
 
         // Build GeoJSON for map
-        function buildLocationsGeoJSON() {
+        function buildLocationsGeoJSON(locations = WHALE_WATCHING_LOCATIONS) {
             return {
                 type: 'FeatureCollection',
-                features: WHALE_WATCHING_LOCATIONS.map((loc, idx) => ({
+                features: locations.map(loc => ({
                     type: 'Feature',
                     geometry: {
                         type: 'Point',
                         coordinates: loc.coordinates  // [lon, lat]
                     },
                     properties: {
-                        index: idx
+                        locationId: generateLocationId(loc.name)
                     }
                 }))
             };
+        }
+
+        function updateMapData(locations) {
+            currentFilteredLocations = locations;
+            if (!locationsMap || !mapLoaded) return;
+            const source = locationsMap.getSource('whale-locations');
+            if (!source) return;
+            source.setData(buildLocationsGeoJSON(locations));
         }
 
         // Initialize simple locations map
@@ -655,7 +699,7 @@
 
             mapboxgl.accessToken = MAPBOX_TOKEN;
 
-            const geojson = buildLocationsGeoJSON();
+            const geojson = buildLocationsGeoJSON(currentFilteredLocations);
             if (!geojson.features.length) return;
 
             const map = new mapboxgl.Map({
@@ -666,7 +710,10 @@
                 projection: 'globe'
             });
 
+            locationsMap = map;
+
             map.on('load', () => {
+                mapLoaded = true;
                 map.addSource('whale-locations', {
                     type: 'geojson',
                     data: geojson
@@ -711,14 +758,28 @@
                     map.on('click', 'whale-location-pins', (e) => {
                         if (!e.features || !e.features.length) return;
                         const feature = e.features[0];
-                        const idx = feature.properties.index;
-                        const loc = WHALE_WATCHING_LOCATIONS[idx];
-                        if (!loc) return;
-                        const id = generateLocationId(loc.name);
+                        const id = feature.properties.locationId;
+                        if (!id) return;
                         window.location.href = `location-detail.html?id=${id}`;
                     });
                 });
+
+                updateMapData(currentFilteredLocations);
             });
+        }
+
+        function updateClearButtonVisibility() {
+            const clearBtn = document.getElementById('clearFilters');
+            if (!clearBtn) return;
+            const regionActive = document.getElementById('regionFilter').value !== 'all';
+            const speciesActive = document.getElementById('speciesFilter').value !== 'all';
+            const monthActive = document.getElementById('monthFilter').value !== 'all';
+
+            if (regionActive || speciesActive || monthActive) {
+                clearBtn.classList.add('visible');
+            } else {
+                clearBtn.classList.remove('visible');
+            }
         }
 
         // Initialize
@@ -732,6 +793,16 @@
             ['regionFilter', 'speciesFilter', 'monthFilter', 'sortFilter'].forEach(id => {
                 document.getElementById(id).addEventListener('change', renderLocations);
             });
+
+            const clearBtn = document.getElementById('clearFilters');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    document.getElementById('regionFilter').value = 'all';
+                    document.getElementById('speciesFilter').value = 'all';
+                    document.getElementById('monthFilter').value = 'all';
+                    renderLocations();
+                });
+            }
         }
 
         document.addEventListener('DOMContentLoaded', init);

@@ -2670,17 +2670,6 @@
             }
         });
         
-        // Opacity slider
-        opacitySlider.addEventListener('input', () => {
-            const value = parseInt(opacitySlider.value);
-            opacityValue.textContent = value + '%';
-            updateSliderFill(opacitySlider);
-            
-            if (map.getLayer('density-heatmap')) {
-                map.setPaintProperty('density-heatmap', 'heatmap-opacity', value / 100);
-            }
-        });
-        
         // Reset to defaults
         resetSettings.addEventListener('click', () => {
             // Reset speed

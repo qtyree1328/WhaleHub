@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <meta name="description" content="Learn about the data sources, methodology, and scoring systems used in the Whale Migration Guide.">
+    <meta name="description" content="Learn about the data sources, hexagonal grid methodology, and density heatmap creation process used in the Whale Watchers Atlas.">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -279,11 +279,11 @@
                 <span class="whale-icon">
                     <img src="favicon.ico" alt="Whale Icon" class="whale-icon-img">
                 </span>
-                <span class="brand-text">Whale Migration Guide</span>
+                <span class="brand-text">Whale Watchers Atlas</span>
             </a>
             <div class="nav-links">
-                <a href="index.html" class="nav-link">Density Map</a>
-                <a href="species.html" class="nav-link">Species Tracking</a>
+                <a href="density-map.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link">Species Map</a>
                 <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
                 <a href="whale-locations-gallery.html" class="nav-link">Locations</a>
                 <a href="about.html" class="nav-link active">About</a>
@@ -295,8 +295,10 @@
         <div class="about-hero">
             <h1>About This Project</h1>
             <p>
-                The Whale Migration Guide combines scientific observation data with curated location information 
-                to help whale enthusiasts discover the best places and times to observe these magnificent creatures.
+                Whale Watchers Atlas combines 20 years of scientific observation data from 11 whale species with
+                curated whale watching location information. Explore animated density heatmaps showing species
+                diversity hotspots, track individual species migration patterns, and discover the best places
+                and times to observe these magnificent creatures.
             </p>
         </div>
 
@@ -326,22 +328,31 @@
             <div class="methodology-card">
                 <h4>Data Processing Pipeline</h4>
                 <p>
-                    Raw GBIF occurrence records are filtered for quality (coordinate precision, date accuracy), 
-                    deduplicated, and processed into monthly aggregations. The data is then converted to 
-                    Mapbox vector tilesets for efficient web visualization.
+                    Raw GBIF occurrence records are downloaded as individual species datasets, filtered for
+                    quality (coordinate precision, date accuracy), and processed using Python and GeoPandas.
+                    The H3 hexagonal grid system spatially aggregates observations, calculates species density,
+                    and applies persistence filtering before exporting to GeoJSON format for web visualization.
                 </p>
             </div>
 
             <h3>Species Coverage</h3>
-            <p>Currently, the following species have heatmap data available:</p>
+            <p>The density map combines observation data from <strong>11 whale species</strong> spanning 20 years (2005-2025):</p>
             <ul>
-                <li><strong>Blue Whale</strong> (Balaenoptera musculus) — 2006-2025 occurrence data</li>
-                <li><strong>Humpback Whale</strong> (Megaptera novaeangliae) — 2017-2025 occurrence data</li>
-                <li><strong>Sperm Whale</strong> (Physeter macrocephalus) — 2006-2025 occurrence data</li>
+                <li><strong>Blue Whale</strong> (Balaenoptera musculus)</li>
+                <li><strong>Humpback Whale</strong> (Megaptera novaeangliae)</li>
+                <li><strong>Sperm Whale</strong> (Physeter macrocephalus)</li>
+                <li><strong>Grey Whale</strong> (Eschrichtius robustus)</li>
+                <li><strong>Fin Whale</strong> (Balaenoptera physalus)</li>
+                <li><strong>Minke Whale</strong> (Balaenoptera acutorostrata)</li>
+                <li><strong>Beluga Whale</strong> (Delphinapterus leucas)</li>
+                <li><strong>Southern Right Whale</strong> (Eubalaena australis)</li>
+                <li><strong>North Atlantic Right Whale</strong> (Eubalaena glacialis)</li>
+                <li><strong>Sei Whale</strong> (Balaenoptera borealis)</li>
+                <li><strong>Orca</strong> (Orcinus orca)</li>
             </ul>
             <p>
-                Additional species (Orca, Gray Whale, Fin Whale, etc.) have informational pages but await 
-                sufficient quality observation data for mapping.
+                Individual species distribution maps are available on the Species Map page, allowing you to
+                explore migration patterns for each species independently.
             </p>
 
             <h3>Whale Watching Location Data</h3>
@@ -449,29 +460,90 @@
             </p>
         </section>
 
+        <!-- Density Heatmap Creation Section -->
+        <section class="about-section">
+            <h2><span class="icon">🔬</span> Density Heatmap Creation Process</h2>
+
+            <p>
+                The combined species density heatmap uses an advanced hexagonal grid system to eliminate
+                visual artifacts and provide accurate representation of whale species diversity across the globe.
+            </p>
+
+            <h3>Hexagonal Grid System (H3)</h3>
+            <p>
+                Instead of traditional square grid tiles that can create "striped" artifacts in heatmaps,
+                we use Uber's <strong>H3 hexagonal hierarchical spatial index</strong>. The density map
+                uses resolution 4 hexagons with approximately 47km edge length, providing optimal balance
+                between regional detail and computational efficiency.
+            </p>
+
+            <div class="methodology-card">
+                <h4>Why Hexagons?</h4>
+                <p>
+                    Hexagonal grids have uniform neighbor distances and no orientation bias, making them
+                    superior to square grids for spatial aggregation. Each hexagon has exactly 6 neighbors
+                    at equal distances, preventing the directional artifacts common in square grid systems.
+                </p>
+            </div>
+
+            <h3>Processing Pipeline</h3>
+            <p>The density heatmap generation involves several sophisticated steps:</p>
+
+            <ol style="padding-left: 24px; line-height: 1.8;">
+                <li><strong>Data Collection:</strong> GBIF observation data from 11 whale species across 20 years (2005-2025)</li>
+                <li><strong>Temporal Binning:</strong> Observations assigned to 12 monthly bins based on event dates</li>
+                <li><strong>Spatial Assignment:</strong> Each observation mapped to an H3 hexagonal cell using lat/lon coordinates</li>
+                <li><strong>Species Density Calculation:</strong> Count unique species per hexagon per month (density: 1-11)</li>
+                <li><strong>Persistence Filtering:</strong> Remove isolated single-month appearances to eliminate noise</li>
+                <li><strong>Point Generation:</strong> Generate 10 random points per hexagon with density property</li>
+                <li><strong>Ocean Clipping:</strong> Remove land-based points using Natural Earth ocean boundaries</li>
+                <li><strong>GeoJSON Export:</strong> Final dataset with density property for Mapbox heatmap-weight visualization</li>
+            </ol>
+
+            <h3>Persistence Threshold Filter</h3>
+            <p>
+                To reduce noise from single opportunistic sightings, the pipeline applies a temporal persistence
+                filter. Cell-month combinations are removed if they are completely isolated (no observations in
+                the previous or next month at that location). This ensures the heatmap shows consistent seasonal
+                patterns rather than random single occurrences.
+            </p>
+
+            <h3>Species Density vs. Observation Count</h3>
+            <div class="methodology-card">
+                <h4>Key Distinction</h4>
+                <p>
+                    The heatmap shows <strong>species diversity</strong> (how many different species overlap),
+                    not raw observation counts. A cell with 3 species counts the same whether there are 5 or
+                    500 individual observations. Brighter areas indicate where <em>more species</em> co-occur,
+                    revealing biodiversity hotspots and migration corridors.
+                </p>
+            </div>
+        </section>
+
         <!-- Map Technology Section -->
         <section class="about-section">
             <h2><span class="icon">🗺️</span> Map Technology</h2>
-            
+
             <p>
-                The interactive maps are built using Mapbox GL JS, a powerful JavaScript library for 
-                rendering vector maps with WebGL. This enables smooth animations, dynamic styling, 
+                The interactive maps are built using Mapbox GL JS, a powerful JavaScript library for
+                rendering vector maps with WebGL. This enables smooth animations, dynamic styling,
                 and efficient handling of large datasets.
             </p>
 
             <h3>Heatmap Visualization</h3>
             <p>
-                The density heatmaps represent aggregated whale observation points. Brighter/warmer colors 
-                indicate higher concentrations of recorded sightings. The monthly animation interpolates 
-                between months to show migration patterns over the year.
+                The density heatmaps use Mapbox's heatmap layer with the <code>density</code> property
+                as the heatmap-weight. This creates smooth gradients showing species diversity patterns.
+                The monthly animation smoothly transitions between months to visualize migration patterns
+                throughout the year.
             </p>
 
             <div class="methodology-card">
                 <h4>Important Note on Heatmaps</h4>
                 <p>
-                    Heatmap density reflects <em>observation effort</em> as much as actual whale presence. 
-                    Areas with more whale watching activity, research stations, or shipping traffic will 
-                    have more recorded sightings. Remote areas may have fewer records despite healthy 
+                    Heatmap density reflects <em>observation effort</em> as much as actual whale presence.
+                    Areas with more whale watching activity, research stations, or shipping traffic will
+                    have more recorded sightings. Remote areas may have fewer records despite healthy
                     whale populations.
                 </p>
             </div>
@@ -480,6 +552,8 @@
             <div class="tech-stack">
                 <span class="tech-badge">🗺️ Mapbox GL JS v3</span>
                 <span class="tech-badge">📊 GBIF Occurrence Data</span>
+                <span class="tech-badge">🔷 H3 Hexagonal Grid</span>
+                <span class="tech-badge">🐍 Python + GeoPandas</span>
                 <span class="tech-badge">🎨 CSS3 Animations</span>
                 <span class="tech-badge">⚡ Vanilla JavaScript</span>
                 <span class="tech-badge">🔤 Google Fonts (Inter)</span>
@@ -522,12 +596,21 @@
 
         <!-- Credits Section -->
         <div class="credits-section">
-            <h3>Created by Quintin Tyree</h3>
+            <h3>Created by Tyree Spatial</h3>
             <p>
+                <a href="https://tyreespatial.com" target="_blank" rel="noopener noreferrer" style="color: var(--primary); font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--primary);">View more work at tyreespatial.com</a>
+            </p>
+            <p style="margin-top: 16px;">
                 Whale observation data provided by <a href="https://www.gbif.org" target="_blank" rel="noopener noreferrer">GBIF.org</a><br>
                 Maps powered by <a href="https://www.mapbox.com" target="_blank" rel="noopener noreferrer">Mapbox</a>
             </p>
         </div>
     </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p class="footer-attribution"><a href="about.html">Created by Tyree Spatial</a></p>
+        </div>
+    </footer>
 </body>
 </html>

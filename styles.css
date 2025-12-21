@@ -2417,3 +2417,33 @@ body {
     gap: 20px;
   }
 }
+
+/* Shared footer */
+.site-footer {
+  background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+  border-top: 1px solid #dee2e6;
+  padding: 24px 20px;
+  text-align: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-attribution {
+  font-size: 14px;
+  color: #495057;
+  margin: 0;
+}
+
+.footer-attribution a {
+  color: #2c7ab8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-attribution a:hover {
+  text-decoration: underline;
+}

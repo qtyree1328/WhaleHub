@@ -16,6 +16,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
         :root { --primary: #0a4a7c; --primary-light: #1a6db0; --accent: #00c9a7; --text: #1a2b3c; --text-muted: #5a6d7e; --surface: #ffffff; --surface-alt: #f8fafc; --border: #e2e8f0; --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --shadow-md: 0 4px 12px rgba(0,0,0,0.1); --transition-fast: 0.15s ease; --transition-base: 0.25s ease; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -155,8 +156,8 @@
                 <span class="brand-text">Whale Watching Atlas</span>
             </a>
             <div class="nav-links">
-                <a href="index.html" class="nav-link">Density Map</a>
-                <a href="species.html" class="nav-link">Species Tracking</a>
+                <a href="density-map.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link">Species Map</a>
                 <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
                 <a href="whale-locations-gallery.html" class="nav-link active">Locations</a>
                 <a href="about.html" class="nav-link">About</a>
@@ -471,5 +472,11 @@
 
         document.addEventListener('DOMContentLoaded', initPage);
     </script>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p class="footer-attribution"><a href="about.html">Created by Tyree Spatial</a></p>
+        </div>
+    </footer>
 </body>
 </html>

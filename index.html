@@ -8,8 +8,6 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <meta name="description" content="Explore whale migration patterns, species diversity, and discover the best whale watching locations worldwide.">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1492,6 +1490,145 @@
         .info-panel-body::-webkit-scrollbar-thumb:hover {
             background: #aaa;
         }
+
+        /* Navigation hub tiles */
+        .navigation-hub {
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 50%, #f8fafc 100%);
+            padding: 80px 24px 100px;
+        }
+
+        .navigation-inner {
+            width: min(1100px, 96vw);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            align-items: stretch;
+        }
+
+        .nav-hub-header {
+            text-align: center;
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .nav-hub-header h2 {
+            font-size: clamp(28px, 4vw, 40px);
+            margin: 8px 0 12px 0;
+            color: #0a2a43;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-hub-subtitle {
+            margin: 0;
+            color: #4a5568;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #2c7ab8;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .navigation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px 14px;
+        }
+
+        .nav-card {
+            display: grid;
+            grid-template-columns: 56px 1fr auto;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 18px 18px 16px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+            border-color: #b6d7f2;
+        }
+
+        .nav-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #0b5fa1 0%, #4fb0e5 100%);
+            color: #fff;
+            font-size: 22px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 8px 20px rgba(15, 23, 42, 0.15);
+        }
+
+        .nav-card:nth-child(2) .nav-card-icon { background: linear-gradient(135deg, #0a6fb4, #3ec6cf); }
+        .nav-card:nth-child(3) .nav-card-icon { background: linear-gradient(135deg, #0f4c75, #45c4b0); }
+        .nav-card:nth-child(4) .nav-card-icon { background: linear-gradient(135deg, #5f2eea, #a450f6); }
+
+        .nav-card h3 {
+            margin: 0 0 6px 0;
+            font-size: 18px;
+            color: #0f172a;
+        }
+
+        .nav-card p {
+            margin: 0;
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .nav-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-card-cta {
+            font-weight: 700;
+            font-size: 13px;
+            color: #0a5fa1;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 720px) {
+            .navigation-inner {
+                width: 100%;
+                padding: 0 6px;
+            }
+
+            .navigation-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .nav-card {
+                grid-template-columns: 1fr;
+                text-align: left;
+                justify-items: flex-start;
+                gap: 8px;
+                padding: 12px 10px;
+            }
+
+            .nav-card-cta {
+                justify-self: flex-start;
+            }
+        }
+
         /* Lock page scroll during intro */
         html.no-scroll,
         body.no-scroll {
@@ -1513,8 +1650,8 @@
                 <span class="brand-text">Whale Watchers Atlas</span>
             </a>
             <div class="nav-links">
-                <a href="index.html" class="nav-link active">Density Map</a>
-                <a href="species.html" class="nav-link">Species Tracking</a>
+                <a href="density-map.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link">Species Map</a>
                 <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
                 <a href="whale-locations-gallery.html" class="nav-link">Locations</a>
                 <a href="about.html" class="nav-link">About</a>
@@ -1579,1158 +1716,52 @@
     <div id="whaleScene" aria-hidden="true"></div>
 </section>
 
-<!-- Map Introduction Section -->
-<section id="mapIntro" class="map-intro">
-    <div class="map-intro-content">
-        <h2 class="map-intro-title">Whale Migration Density Animated Map</h2>
-        <div class="map-intro-text">
-            <p>
-                This density heatmap demonstrates global whale species density patterns across all seasons. Using observations from 11 species, this map shows where species co-occur globally. Brighter areas indicate more species in one location at a given time. Use the circular month selector to watch migration patterns shift throughout the year.
-            </p>
-            <p>
-
-            </p>
-            <p>
-                Click the circles to view some of the most popular whale watching locations in the world, and use the animation panel to adjust colors, style, and playback. 
+<section class="navigation-hub" id="navigationHub">
+    <div class="navigation-inner">
+        <div class="nav-hub-header">
+            <p class="eyebrow">Choose your view</p>
+            <h2>Explore the Whale Watchers Atlas</h2>
+            <p class="nav-hub-subtitle">
+                Jump straight to the experience you want—seasonal density heatmaps, species-specific routes, location scouting, or species guides.
             </p>
         </div>
-        <div class="map-intro-features">
-            <div class="intro-feature">
-                <span class="intro-feature-icon"></span>
-                <span>Monthly Animation</span>
-            </div>
-            <div class="intro-feature">
-                <span class="intro-feature-icon">|</span>
-                <span>Density Heatmap</span>
-            </div>
-            <div class="intro-feature">
-                <span class="intro-feature-icon">|</span>
-                <span>Location Details</span>
-            </div>
+        <div class="navigation-grid">
+            <a class="nav-card" href="density-map.html">
+                <div class="nav-card-icon">🌊</div>
+                <div class="nav-card-body">
+                    <h3>Density Map</h3>
+                    <p>Watch monthly migration density and hotspots across the globe.</p>
+                </div>
+                <span class="nav-card-cta">View map →</span>
+            </a>
+            <a class="nav-card" href="species.html">
+                <div class="nav-card-icon">🐋</div>
+                <div class="nav-card-body">
+                    <h3>Species Map</h3>
+                    <p>Track individual species animations with custom colorways.</p>
+                </div>
+                <span class="nav-card-cta">Open species map →</span>
+            </a>
+            <a class="nav-card" href="whale-locations-gallery.html">
+                <div class="nav-card-icon">📍</div>
+                <div class="nav-card-body">
+                    <h3>Locations</h3>
+                    <p>Browse top whale watching sites with best months and tips.</p>
+                </div>
+                <span class="nav-card-cta">See locations →</span>
+            </a>
+            <a class="nav-card" href="whale-species-gallery.html">
+                <div class="nav-card-icon">📖</div>
+                <div class="nav-card-body">
+                    <h3>Whale Species</h3>
+                    <p>Dive into profiles covering behavior, habitats, and ID notes.</p>
+                </div>
+                <span class="nav-card-cta">View species →</span>
+            </a>
         </div>
     </div>
 </section>
-    <!-- Map Container -->
-    <div id="map">
-        <!-- Animation Settings Panel -->
-        <div class="settings-panel" id="settingsPanel">
-            <button class="settings-toggle" id="settingsToggle">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-                </svg>
-                <span>Animation</span>
-                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6 6-6"/>
-                </svg>
-            </button>
-            <div class="settings-dropdown">
-                <div class="settings-header">Animation Settings</div>
-                <div class="settings-content">
-                    <div class="setting-group">
-                        <div class="setting-label">
-                            <span>Transition Speed</span>
-                            <span class="setting-value" id="speedValue">1.0s</span>
-                        </div>
-                        <input type="range" class="setting-slider" id="speedSlider" min="200" max="3000" value="1000" step="100">
-                        <div class="setting-description">Time to transition between months</div>
-                        <div class="setting-presets">
-                            <button class="preset-btn" data-speed="400">Fast</button>
-                            <button class="preset-btn active" data-speed="1000">Normal</button>
-                            <button class="preset-btn" data-speed="2000">Slow</button>
-                        </div>
-                    </div>
-                    
-                    <div class="settings-divider"></div>
-                    
-                    <div class="setting-group">
-                        <div class="setting-label">
-                            <span>Color Scheme</span>
-                        </div>
-                        <div class="colormap-grid" id="colormapGrid">
-                            <button class="colormap-btn active" data-colormap="default" title="Default">
-                                <div class="colormap-preview" style="background: linear-gradient(to right, rgba(0,0,80,1), rgba(0,100,255,1), rgba(0,200,255,1), rgba(100,255,200,1), rgba(255,220,0,1), rgba(255,100,0,1), rgba(255,0,150,1));"></div>
-                                <span>Spectrum</span>
-                            </button>
-                            <button class="colormap-btn" data-colormap="ocean" title="Ocean">
-                                <div class="colormap-preview" style="background: linear-gradient(to right, #0a1628, #0d3b66, #1a759f, #34a0a4, #76c893, #b5e48c);"></div>
-                                <span>Ocean</span>
-                            </button>
-                            <button class="colormap-btn" data-colormap="thermal" title="Thermal">
-                                <div class="colormap-preview" style="background: linear-gradient(to right, #000033, #1a0066, #4d0099, #9900cc, #ff3366, #ffcc00);"></div>
-                                <span>Thermal</span>
-                            </button>
-                            <button class="colormap-btn" data-colormap="viridis" title="Viridis">
-                                <div class="colormap-preview" style="background: linear-gradient(to right, #440154, #3b528b, #21918c, #5ec962, #fde725);"></div>
-                                <span>Viridis</span>
-                            </button>
-                            <button class="colormap-btn" data-colormap="magma" title="Magma">
-                                <div class="colormap-preview" style="background: linear-gradient(to right, #000004, #3b0f70, #8c2981, #de4968, #fea16e, #fcfdbf);"></div>
-                                <span>Magma</span>
-                            </button>
-                            <button class="colormap-btn" data-colormap="cool" title="Cool">
-                                <div class="colormap-preview" style="background: linear-gradient(to right, #0d0887, #5302a3, #8b0aa5, #b83289, #db5c68, #f48849, #febd2a);"></div>
-                                <span>Plasma</span>
-                            </button>
-                        </div>
-                        <div class="setting-description">Visual style for density visualization</div>
-                    </div>
-                    
-                    <div class="settings-divider"></div>
-                    
-                    <div class="setting-group">
-                        <div class="setting-label">
-                            <span>Heatmap Intensity</span>
-                            <span class="setting-value" id="intensityValue">100%</span>
-                        </div>
-                        <input type="range" class="setting-slider" id="intensitySlider" min="20" max="200" value="100" step="10">
-                        <div class="setting-description">Brightness of species density overlay</div>
-                    </div>
-                    
-                    <div class="settings-divider"></div>
-                    
-                    <div class="setting-group">
-                        <div class="setting-label">
-                            <span>Heatmap Radius</span>
-                            <span class="setting-value" id="radiusValue">100%</span>
-                        </div>
-                        <input type="range" class="setting-slider" id="radiusSlider" min="50" max="200" value="100" step="10">
-                        <div class="setting-description">Spread of each data point</div>
-                    </div>
-                    
-                    <div class="settings-divider"></div>
-                    
-                    <button class="reset-btn" id="resetSettings">Reset to Defaults</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Circular Month Controls -->
-        <div id="controls" class="controls-bottom-left">
-            <!-- Content generated by CircularControls component -->
-        </div>
-        <!-- Month Display (bottom center) -->
-        <div id="monthBottom">January</div>
-        <!-- Legend -->
-        <div id="legend">
-            <div class="legend-title">Species Diversity</div>
-            <div class="legend-gradient">
-                <div class="gradient-bar" style="background: linear-gradient(to right, 
-                    rgba(0,0,80,0.4),
-                    rgba(0,100,255,0.6),
-                    rgba(0,200,255,0.7),
-                    rgba(100,255,200,0.8),
-                    rgba(255,220,0,0.9),
-                    rgba(255,100,0,0.95),
-                    rgba(255,0,150,1));"></div>
-                <div class="gradient-labels">
-                    <span>Lower</span>
-                    <span>Higher</span>
-                </div>
-            </div>
-            <div class="legend-note">
-                <span style="color: #000000;">●</span> Click pins for whale watching locations
-            </div>
-        </div>
-        <!-- Side Info Panel (overlay) -->
-        <div id="infoPanel" class="info-panel">
-            <button id="infoPanelClose" class="info-panel-close-fold" aria-label="Close"></button>
-            <div class="info-panel-header">
-                <div class="info-panel-title-group">
-                    <h3 id="infoPanelTitle">Location</h3>
-                    <p id="infoPanelSubtitle"></p>
-                </div>
-            </div>
-            <div id="infoPanelBody" class="info-panel-body">
-                <!-- filled dynamically -->
-            </div>
-        </div>
-    </div>
-    <script src="circular-controls.js"></script>
-    <script src="whale-locations.js"></script>
-    <script>
-    
-        // ============================================================
-        // CONFIGURATION
-        // ============================================================
-        const MAPBOX_TOKEN = 'pk.eyJ1IjoicXR5cmVlIiwiYSI6ImNtaHl5eHNmeDBoY3oybXEwNTIxNGgxYmsifQ.VqoAKKHQxQX-lNNPwVKHmw';
-        const TILESET_URL = 'mapbox://qtyree.wd11_12bin_p_hex2_40';
-        const SOURCE_LAYER = 'WD11_12bin_p_hex2_40';
-        
-        // ============================================================
-        // CONSTANTS
-        // ============================================================
-        const TOTAL_BINS = 12;
-        const BINS_PER_MONTH = 1;
-        
-        const MONTH_NAMES = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ];
-        
-        const MONTH_ABBREV = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        
-        const SPECIES_COLORS = {
-            "Blue Whale": "#2980b9",
-            "Sperm Whale": "#c0392b",
-            "Humpback Whale": "#3498db",
-            "Grey Whale": "#7f8c8d",
-            "Fin Whale": "#8e44ad",
-            "Minke Whale": "#27ae60",
-            "Beluga Whale": "#ecf0f1",
-            "Southern Right Whale": "#d35400",
-            "North Atlantic Right Whale": "#e67e22",
-            "Humpback whale": "#3498db",
-            "Blue whale": "#2980b9",
-            "Gray whale": "#7f8c8d",
-            "Grey whale": "#7f8c8d",
-            "Orca": "#2c3e50",
-            "Fin whale": "#8e44ad",
-            "Sperm whale": "#c0392b",
-            "Minke whale": "#27ae60",
-            "Southern right whale": "#d35400",
-            "North Atlantic right whale": "#e67e22",
-            "Right whale": "#d35400",
-            "Beluga whale": "#ecf0f1",
-            "Sei whale": "#9b59b6",
-            "Bryde's whale": "#1abc9c",
-            "Pilot whale": "#34495e",
-            "Beaked whale": "#f39c12",
-            "default": "#95a5a6"
-        };
-        
-        function getSpeciesColor(name) {
-            if (!name) return SPECIES_COLORS.default;
-            return SPECIES_COLORS[name] || SPECIES_COLORS.default;
-        }
-        
-        // ============================================================
-        // HELPER FUNCTIONS
-        // ============================================================
-        function binToMonth(bin) {
-            return Math.floor((bin - 1) / BINS_PER_MONTH) + 1;
-        }
-        
-        function binToHalf(bin) {
-            return ((bin - 1) % BINS_PER_MONTH) + 1;
-        }
-        
-        // ============================================================
-        // ANIMATION STATE
-        // ============================================================
-        let binA = 1;
-        let binB = 2;
-        let phase = 0;
-        let startTime = null;
-        let animFrame = null;
-        let isPlaying = false;
-        let morphDuration = 1000;
-        
-        mapboxgl.accessToken = MAPBOX_TOKEN;
-        
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/light-v11',
-            projection: 'globe',
-            center: [-110, 35],
-            zoom: 2
-        });
-        
-        const infoPanel = document.getElementById('infoPanel');
-        const infoPanelTitle = document.getElementById('infoPanelTitle');
-        const infoPanelSubtitle = document.getElementById('infoPanelSubtitle');
-        const infoPanelBody = document.getElementById('infoPanelBody');
-        const infoPanelClose = document.getElementById('infoPanelClose');
-        
-        // ============================================================
-        // CIRCULAR CONTROLS COMPONENT
-        // ============================================================
-        let circularControls = null;
-        
-        function initCircularControls() {
-            if (typeof CircularControls === 'undefined') {
-                console.warn('CircularControls not loaded');
-                return;
-            }
-            
-            circularControls = new CircularControls({
-                container: '#controls',
-                onMonthChange: (month) => {
-                    setMonthFromControls(month);
-                },
-                onPlayToggle: () => {
-                    isPlaying ? stopAnimation() : startAnimation();
-                },
-                getIsPlaying: () => isPlaying,
-                getCurrentMonth: () => binA
-            });
-        }
-        
-        // Called from circular controls component
-        function setMonthFromControls(month) {
-            stopAnimation();
-            binA = month;
-            binB = (binA % TOTAL_BINS) + 1;
-            document.getElementById('monthBottom').textContent = MONTH_NAMES[month - 1];
-            snapToCurrentMonth();
-        }
-        
-        // ============================================================
-        // ANIMATION FUNCTIONS
-        // ============================================================
-        function updateLabels() {
-            const month = binToMonth(binA);
-            const label = MONTH_NAMES[month - 1];
-            document.getElementById('monthBottom').textContent = label;
-            
-            // Update circular controls
-            if (circularControls) {
-                circularControls.externalSetMonth(month);
-            }
-        }
-        
-        function setFilterAll() {
-            if (map.getLayer('density-heatmap')) {
-                map.setFilter('density-heatmap', [
-                    'in', ['get', 'bin'], ['literal', [binA, binB]]
-                ]);
-            }
-        }
-        
-        function setWeightAll(phaseVal) {
-            if (map.getLayer('density-heatmap')) {
-                const densityWeight = [
-                    'interpolate',
-                    ['exponential', 1.5],
-                    ['get', 'density'],
-                    1, 0.3,
-                    2, 0.45,
-                    3, 0.55,
-                    4, 0.65,
-                    5, 0.75,
-                    6, 0.85,
-                    7, 0.92,
-                    8, 1.0
-                ];
-                
-                const weightExpr = [
-                    '*',
-                    densityWeight,
-                    [
-                        'case',
-                        ['==', ['get', 'bin'], binA], 1 - phaseVal,
-                        ['==', ['get', 'bin'], binB], phaseVal,
-                        0
-                    ]
-                ];
-                map.setPaintProperty('density-heatmap', 'heatmap-weight', weightExpr);
-            }
-        }
-        
-        // Snap to a clean state (no transition, just show binA)
-        function snapToCurrentMonth() {
-            if (map.getLayer('density-heatmap')) {
-                // Set filter to only show current month
-                map.setFilter('density-heatmap', [
-                    '==', ['get', 'bin'], binA
-                ]);
-                
-                // Set weight to full density weight (no phase blending)
-                const densityWeight = [
-                    'interpolate',
-                    ['exponential', 1.5],
-                    ['get', 'density'],
-                    1, 0.3,
-                    2, 0.45,
-                    3, 0.55,
-                    4, 0.65,
-                    5, 0.75,
-                    6, 0.85,
-                    7, 0.92,
-                    8, 1.0
-                ];
-                map.setPaintProperty('density-heatmap', 'heatmap-weight', densityWeight);
-            }
-        }
-        
-        function stepAnimation(timestamp) {
-            // Check isPlaying at the very start - exit immediately if stopped
-            if (!isPlaying) {
-                return;
-            }
-            
-            if (startTime === null) startTime = timestamp;
-            const elapsed = timestamp - startTime;
-            phase = Math.min(elapsed / morphDuration, 1);
-            
-            setWeightAll(phase);
-            
-            if (phase < 1) {
-                // Only schedule next frame if still playing
-                if (isPlaying) {
-                    animFrame = requestAnimationFrame(stepAnimation);
-                }
-            } else {
-                // Transition complete - move to next month
-                binA = binB;
-                binB = (binB % TOTAL_BINS) + 1;
-                setFilterAll();
-                updateLabels();
-                startTime = null;
-                phase = 0;
-                
-                // Only continue if still playing
-                if (isPlaying) {
-                    animFrame = requestAnimationFrame(stepAnimation);
-                }
-            }
-        }
-        
-        function startAnimation() {
-            if (isPlaying) return;
-            isPlaying = true;
-            document.getElementById('playPause').textContent = '⏸ Pause';
-            document.getElementById('playPause').classList.add('playing');
-            binB = (binA % TOTAL_BINS) + 1;
-            setFilterAll();
-            startTime = null;
-            phase = 0;
-            animFrame = requestAnimationFrame(stepAnimation);
-        }
-        
-        function stopAnimation() {
-            // Immediately set flag to stop
-            isPlaying = false;
-            
-            // Cancel any pending frame
-            if (animFrame) {
-                cancelAnimationFrame(animFrame);
-                animFrame = null;
-            }
-            
-            // Reset timing
-            startTime = null;
-            phase = 0;
-            
-            // Snap to clean state showing only current month
-            snapToCurrentMonth();
-            
-            // Update UI
-            document.getElementById('playPause').textContent = '▶ Play';
-            document.getElementById('playPause').classList.remove('playing');
-        }
-        
-        // ============================================================
-        // PANEL FUNCTIONS
-        // ============================================================
-        
-        function createCircularProgress(value, color) {
-            const radius = 21;
-            const circumference = 2 * Math.PI * radius;
-            const offset = circumference - (value / 100) * circumference;
-            
-            return `
-                <svg class="circle-svg" viewBox="0 0 50 50">
-                    <circle class="circle-bg" cx="25" cy="25" r="${radius}"></circle>
-                    <circle class="circle-progress" cx="25" cy="25" r="${radius}"
-                        stroke="${color}"
-                        stroke-dasharray="${circumference}"
-                        stroke-dashoffset="${offset}">
-                    </circle>
-                    <text x="25" y="28.5" text-anchor="middle" class="score-value" fill="${color}">
-                        ${value}
-                    </text>
-                </svg>
-            `;
-        }
-        
-        const MAX_SPECIES_LEVELS = 5;
-        
-        function createMonthlyDensityChart(location) {
-            const speciesMonthly = location.speciesMonthly;
-            if (!speciesMonthly || typeof speciesMonthly !== "object") {
-                return "";
-            }
-            const orderedSpecies = Object.keys(speciesMonthly);
-            const numMonths = 12;
-            const MAX_SPECIES_LEVELS = 5;
-            const monthlyCounts = new Array(numMonths).fill(0);
-            orderedSpecies.forEach(sp => {
-                const arr = speciesMonthly[sp] || [];
-                for (let m = 0; m < numMonths; m++) {
-                    if (arr[m] > 0) monthlyCounts[m] += 1;
-                }
-            });
-            const anyCount = monthlyCounts.some(c => c > 0);
-            if (!anyCount) return "";
-            const bars = monthlyCounts.map((count, monthIndex) => {
-                if (!count) {
-                    return `
-                        <div class="month-bar">
-                            <div class="bar-wrapper">
-                                <div class="stacked-bar" style="height:0%;"></div>
-                            </div>
-                            <div class="bar-label">${MONTH_ABBREV[monthIndex]}</div>
-                        </div>
-                    `;
-                }
-                const presentSpecies = orderedSpecies.filter(sp => {
-                    const arr = speciesMonthly[sp];
-                    return Array.isArray(arr) && arr[monthIndex] > 0;
-                });
-                const clampedCount = Math.min(count, MAX_SPECIES_LEVELS);
-                const barHeightPercent = (clampedCount / MAX_SPECIES_LEVELS) * 100;
-                const segments = presentSpecies.map(sp => {
-                    const color = getSpeciesColor(sp);
-                    return `
-                        <div class="species-segment"
-                            style="background:${color}; height:${100 / presentSpecies.length}%"
-                            title="${sp}">
-                        </div>
-                    `;
-                }).join("");
-                const tooltipSpecies = presentSpecies.map(sp => {
-                    const color = getSpeciesColor(sp);
-                    return `
-                        <div class="tooltip-species">
-                            <span class="tooltip-color" style="background:${color};"></span>${sp}
-                        </div>
-                    `;
-                }).join("");
-                return `
-                    <div class="month-bar">
-                        <div class="month-tooltip">
-                            <div class="tooltip-title">${MONTH_NAMES[monthIndex]}</div>
-                            <div style="font-size:11px;margin-bottom:4px;">${count} species</div>
-                            ${tooltipSpecies}
-                        </div>
-                        <div class="bar-count">${count}</div>
-                        <div class="bar-wrapper">
-                            <div class="stacked-bar"
-                                style="height:${barHeightPercent}%; min-height:4px;">
-                                ${segments}
-                            </div>
-                        </div>
-                        <div class="bar-label">${MONTH_ABBREV[monthIndex]}</div>
-                    </div>
-                `;
-            }).join("");
-            const legendItems = orderedSpecies.map(sp => {
-                const color = getSpeciesColor(sp);
-                return `
-                    <div class="legend-item">
-                        <span class="legend-color" style="background:${color};"></span>
-                        ${sp.replace(" whale", "")}
-                    </div>
-                `;
-            }).join("");
-            return `
-                <div class="monthly-density-chart">
-                    <div class="chart-title">
-                        Species Stacked by Month
-                    </div>
-                    <div class="month-bars">${bars}</div>
-                    <div class="species-legend">${legendItems}</div>
-                </div>
-            `;
-        }
-        
-        function formatNumber(num) {
-            if (!num) return 'N/A';
-            return num.toLocaleString();
-        }
-        
-        function createLocationPanelHTML(location) {
-            const accessibilityClass = location.accessibility.toLowerCase();
-            const bestMonthsHTML = location.bestMonths.map(m => 
-                `<span class="month-badge">${MONTH_NAMES[m-1].substring(0,3)}</span>`
-            ).join('');
-            
-            const monthlyChartHTML = createMonthlyDensityChart(location);
-            
-            const images = location.imageUrls && Array.isArray(location.imageUrls) && location.imageUrls.length > 0 
-                ? location.imageUrls 
-                : [location.imageUrl || 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop'];
-            
-            const hasMultipleImages = images.length > 1;
-            const imageUrl = images[0];
-            
-            return `
-                <div class="location-panel-header-media" data-images='${JSON.stringify(images)}' data-current-index="0">
-                    <img src="${imageUrl}" alt="${location.name}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop';">
-                    <div class="panel-image-nav ${hasMultipleImages ? '' : 'hidden'}">
-                        <button class="panel-nav-btn panel-prev-btn" disabled onclick="panelPrevImage(event)">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-                        </button>
-                        <button class="panel-nav-btn panel-next-btn" onclick="panelNextImage(event)">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                        </button>
-                    </div>
-                    <div class="panel-image-counter ${hasMultipleImages ? '' : 'hidden'}">1 / ${images.length}</div>
-                    <div class="location-name-overlay-panel">
-                        <h3 class="location-name">${location.name}</h3>
-                        <p class="location-region">${location.location}</p>
-                    </div>
-                </div>
-                <div class="location-panel-content">
-                    <div class="score-container">
-                        <div class="score-circle">
-                            <div class="score-tooltip">Quality of whale behaviors and interactions (breaching, feeding, etc.)</div>
-                            ${createCircularProgress(location.entertainment, '#FF6B6B')}
-                            <div class="score-label">Experience</div>
-                        </div>
-                        <div class="score-circle">
-                            <div class="score-tooltip">Likelihood of seeing whales clearly based on success rate and conditions</div>
-                            ${createCircularProgress(location.visibility, '#4CAF50')}
-                            <div class="score-label">Sighting Rate</div>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">What Makes It Special</div>
-                        <div class="info-text">${location.specialNotes}</div>
-                    </div>
-                    
-                    ${monthlyChartHTML}
-                    
-                    <div class="species-list">
-                        <div class="species-title">Species Present</div>
-                        <div class="species-tags">
-                            ${location.species.map(s => `<span class="species-tag">${s}</span>`).join('')}
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">Best Months</div>
-                        <div class="best-months">${bestMonthsHTML}</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">Accessibility</div>
-                        <span class="accessibility-badge ${accessibilityClass}">${location.accessibility}</span>
-                    </div>
-                    
-                    <div class="tourism-stats">
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-label">Industry Size</div>
-                                <div class="stat-value">${location.industrySize || 'N/A'}</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-label">Annual Visitors</div>
-                                <div class="stat-value">${formatNumber(location.annualVisitors)}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        function panelPrevImage(event) {
-            event.stopPropagation();
-            const mediaContainer = document.querySelector('.location-panel-header-media');
-            if (!mediaContainer) return;
-            
-            const images = JSON.parse(mediaContainer.dataset.images);
-            let currentIndex = parseInt(mediaContainer.dataset.currentIndex);
-            
-            if (currentIndex > 0) {
-                currentIndex--;
-                mediaContainer.dataset.currentIndex = currentIndex;
-                updatePanelImage(mediaContainer, images, currentIndex);
-            }
-        }
-        
-        function panelNextImage(event) {
-            event.stopPropagation();
-            const mediaContainer = document.querySelector('.location-panel-header-media');
-            if (!mediaContainer) return;
-            
-            const images = JSON.parse(mediaContainer.dataset.images);
-            let currentIndex = parseInt(mediaContainer.dataset.currentIndex);
-            
-            if (currentIndex < images.length - 1) {
-                currentIndex++;
-                mediaContainer.dataset.currentIndex = currentIndex;
-                updatePanelImage(mediaContainer, images, currentIndex);
-            }
-        }
-        
-        function updatePanelImage(container, images, index) {
-            const img = container.querySelector('img');
-            const counter = container.querySelector('.panel-image-counter');
-            const prevBtn = container.querySelector('.panel-prev-btn');
-            const nextBtn = container.querySelector('.panel-next-btn');
-            
-            img.style.opacity = '0';
-            setTimeout(() => {
-                img.src = images[index];
-                img.style.opacity = '1';
-            }, 150);
-            
-            counter.textContent = `${index + 1} / ${images.length}`;
-            prevBtn.disabled = index === 0;
-            nextBtn.disabled = index === images.length - 1;
-        }
-        
-        function openInfoPanel(location) {
-            console.log('openInfoPanel called with:', location);
-            // Close settings panel if open
-            const settingsPanelEl = document.getElementById('settingsPanel');
-            if (settingsPanelEl) {
-                settingsPanelEl.classList.remove('open');
-            }
 
-            infoPanelTitle.textContent = location.name;
-            infoPanelSubtitle.textContent = location.location;
-            infoPanelBody.innerHTML = createLocationPanelHTML(location);
-            infoPanel.classList.add('open');
-            console.log('Panel should now be open, classes:', infoPanel.className);
-        }
-        
-        function closeInfoPanel() {
-            infoPanel.classList.remove('open');
-        }
-        
-        infoPanelClose.addEventListener('click', closeInfoPanel);
-        
-        // ============================================================
-        // MAP LOAD
-        // ============================================================
-        map.on('load', () => {
-            initCircularControls();
-            map.addSource('density-points', {
-                type: 'vector',
-                url: TILESET_URL
-            });
-            
-            map.addLayer({
-                'id': 'density-heatmap',
-                'type': 'heatmap',
-                'source': 'density-points',
-                'source-layer': SOURCE_LAYER,
-                'maxzoom': 9,
-                'paint': {
-                    'heatmap-weight': [
-                        'interpolate',
-                        ['exponential', 1.5],
-                        ['get', 'density'],
-                        1, 0.3,
-                        2, 0.45,
-                        3, 0.55,
-                        4, 0.65,
-                        5, 0.75,
-                        6, 0.85,
-                        7, 0.92,
-                        8, 1.0
-                    ],
-                    'heatmap-intensity': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 1.0,
-                        5, 1.5,
-                        8, 2.0
-                    ],
-                    'heatmap-color': [
-                        'interpolate',
-                        ['linear'],
-                        ['heatmap-density'],
-                        0.0, 'rgba(0,0,0,0)',
-                        0.1, 'rgba(0,0,80,0.3)',
-                        0.25, 'rgba(0,100,255,0.5)',
-                        0.4, 'rgba(0,200,255,0.65)',
-                        0.55, 'rgba(100,255,200,0.75)',
-                        0.7, 'rgba(255,220,0,0.85)',
-                        0.85, 'rgba(255,100,0,0.95)',
-                        1.0, 'rgba(255,0,150,1)'
-                    ],
-                    'heatmap-radius': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 3,
-                        4, 15,
-                        8, 30
-                    ],
-                    'heatmap-opacity': 0.85,
-                    'heatmap-opacity-transition': { duration: 0, delay: 0 },
-                    'heatmap-radius-transition': { duration: 0, delay: 0 },
-                    'heatmap-weight-transition': { duration: 0, delay: 0 }
-                },
-                'filter': ['in', ['get', 'bin'], ['literal', [binA, binB]]]
-            });
-            
-            const whaleGeoJSON = {
-                type: 'FeatureCollection',
-                features: WHALE_WATCHING_LOCATIONS.map((loc, idx) => ({
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: loc.coordinates
-                    },
-                    properties: {
-                        index: idx
-                    }
-                }))
-            };
-            
-            map.addSource('whale-locations', {
-                type: 'geojson',
-                data: whaleGeoJSON
-            });
-            
-            // Add location markers ABOVE the heatmap by adding them last
-            map.addLayer({
-                id: 'whale-locations-halo',
-                type: 'circle',
-                source: 'whale-locations',
-                paint: {
-                    'circle-radius': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 6,
-                        4, 8,
-                        8, 10
-                    ],
-                    'circle-color': 'rgba(0,0,0,0.3)',
-                    'circle-stroke-width': 0
-                }
-            });
-
-            map.addLayer({
-                id: 'whale-locations-layer',
-                type: 'circle',
-                source: 'whale-locations',
-                paint: {
-                    'circle-radius': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 4,
-                        4, 5,
-                        8, 7
-                    ],
-                    'circle-color': '#000000',
-                    'circle-stroke-color': '#ffffff',
-                    'circle-stroke-width': 1.5
-                }
-            });
-            
-            map.on('mouseenter', 'whale-locations-layer', () => {
-                map.getCanvas().style.cursor = 'pointer';
-            });
-            map.on('mouseleave', 'whale-locations-layer', () => {
-                map.getCanvas().style.cursor = '';
-            });
-            
-            map.on('click', 'whale-locations-layer', (e) => {
-                console.log('Location marker clicked!', e);
-                if (!e.features || !e.features.length) {
-                    console.log('No features found');
-                    return;
-                }
-                const feature = e.features[0];
-                console.log('Feature:', feature);
-                const idx = parseInt(feature.properties.index, 10);
-                console.log('Location index:', idx);
-                const location = WHALE_WATCHING_LOCATIONS[idx];
-                console.log('Location data:', location);
-                openInfoPanel(location);
-            });
-            
-            setFilterAll();
-            setWeightAll(0);
-            updateLabels();
-        });
-        
-        // ============================================================
-        // EVENT LISTENERS (for traditional controls - not used with circular controls)
-        // ============================================================
-        const monthSlider = document.getElementById('monthSlider');
-        if (monthSlider) {
-            monthSlider.addEventListener('input', (e) => {
-                setMonth(parseInt(e.target.value, 10));
-            });
-        }
-
-        const playPauseBtn = document.getElementById('playPause');
-        if (playPauseBtn) {
-            playPauseBtn.addEventListener('click', () => {
-                if (isPlaying) {
-                    stopAnimation();
-                } else {
-                    startAnimation();
-                }
-            });
-        }
-        
-        // ============================================================
-        // ANIMATION SETTINGS PANEL
-        // ============================================================
-        const settingsPanel = document.getElementById('settingsPanel');
-        const settingsToggle = document.getElementById('settingsToggle');
-        const speedSlider = document.getElementById('speedSlider');
-        const speedValue = document.getElementById('speedValue');
-        const intensitySlider = document.getElementById('intensitySlider');
-        const intensityValue = document.getElementById('intensityValue');
-        const radiusSlider = document.getElementById('radiusSlider');
-        const radiusValue = document.getElementById('radiusValue');
-        const resetSettings = document.getElementById('resetSettings');
-        const presetBtns = document.querySelectorAll('.preset-btn[data-speed]');
-        const colormapBtns = document.querySelectorAll('.colormap-btn');
-        
-        // Colormap definitions
-        const COLORMAPS = {
-            default: [
-                [0.0, 'rgba(0,0,0,0)'],
-                [0.1, 'rgba(0,0,80,0.3)'],
-                [0.25, 'rgba(0,100,255,0.5)'],
-                [0.4, 'rgba(0,200,255,0.65)'],
-                [0.55, 'rgba(100,255,200,0.75)'],
-                [0.7, 'rgba(255,220,0,0.85)'],
-                [0.85, 'rgba(255,100,0,0.95)'],
-                [1.0, 'rgba(255,0,150,1)']
-            ],
-            ocean: [
-                [0.0, 'rgba(0,0,0,0)'],
-                [0.1, 'rgba(10,22,40,0.4)'],
-                [0.25, 'rgba(13,59,102,0.55)'],
-                [0.4, 'rgba(26,117,159,0.65)'],
-                [0.55, 'rgba(52,160,164,0.75)'],
-                [0.7, 'rgba(118,200,147,0.85)'],
-                [0.85, 'rgba(181,228,140,0.92)'],
-                [1.0, 'rgba(217,249,187,1)']
-            ],
-            thermal: [
-                [0.0, 'rgba(0,0,0,0)'],
-                [0.1, 'rgba(0,0,51,0.4)'],
-                [0.25, 'rgba(26,0,102,0.55)'],
-                [0.4, 'rgba(77,0,153,0.65)'],
-                [0.55, 'rgba(153,0,204,0.75)'],
-                [0.7, 'rgba(255,51,102,0.85)'],
-                [0.85, 'rgba(255,153,51,0.92)'],
-                [1.0, 'rgba(255,204,0,1)']
-            ],
-            viridis: [
-                [0.0, 'rgba(0,0,0,0)'],
-                [0.1, 'rgba(68,1,84,0.4)'],
-                [0.25, 'rgba(59,82,139,0.55)'],
-                [0.4, 'rgba(33,145,140,0.65)'],
-                [0.55, 'rgba(94,201,98,0.75)'],
-                [0.7, 'rgba(170,220,50,0.85)'],
-                [0.85, 'rgba(212,235,30,0.92)'],
-                [1.0, 'rgba(253,231,37,1)']
-            ],
-            magma: [
-                [0.0, 'rgba(0,0,0,0)'],
-                [0.1, 'rgba(0,0,4,0.4)'],
-                [0.25, 'rgba(59,15,112,0.55)'],
-                [0.4, 'rgba(140,41,129,0.65)'],
-                [0.55, 'rgba(222,73,104,0.75)'],
-                [0.7, 'rgba(254,161,110,0.85)'],
-                [0.85, 'rgba(254,220,175,0.92)'],
-                [1.0, 'rgba(252,253,191,1)']
-            ],
-            cool: [
-                [0.0, 'rgba(0,0,0,0)'],
-                [0.1, 'rgba(13,8,135,0.4)'],
-                [0.25, 'rgba(83,2,163,0.55)'],
-                [0.4, 'rgba(139,10,165,0.65)'],
-                [0.55, 'rgba(185,50,137,0.75)'],
-                [0.7, 'rgba(219,92,104,0.85)'],
-                [0.85, 'rgba(244,136,73,0.92)'],
-                [1.0, 'rgba(254,189,42,1)']
-            ]
-        };
-        
-        let currentColormap = 'default';
-        
-        // Default values
-        const defaults = {
-            speed: 1000,
-            intensity: 100,
-            radius: 100,
-            colormap: 'default'
-        };
-        
-        // Toggle panel open/close
-        settingsToggle.addEventListener('click', () => {
-            settingsPanel.classList.toggle('open');
-        });
-        
-        // Close panel when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!settingsPanel.contains(e.target)) {
-                settingsPanel.classList.remove('open');
-            }
-        });
-        
-        // Update slider track fill
-        function updateSliderFill(slider) {
-            const min = parseFloat(slider.min);
-            const max = parseFloat(slider.max);
-            const val = parseFloat(slider.value);
-            const percentage = ((val - min) / (max - min)) * 100;
-            slider.style.background = `linear-gradient(to right, #2c7ab8 ${percentage}%, #e0e0e0 ${percentage}%)`;
-        }
-        
-        // Apply colormap to heatmap layer
-        function applyColormap(colormapName) {
-            if (!map.getLayer('density-heatmap')) return;
-            
-            const colormap = COLORMAPS[colormapName] || COLORMAPS.default;
-            const colorExpr = ['interpolate', ['linear'], ['heatmap-density']];
-            
-            colormap.forEach(([stop, color]) => {
-                colorExpr.push(stop, color);
-            });
-            
-            map.setPaintProperty('density-heatmap', 'heatmap-color', colorExpr);
-            currentColormap = colormapName;
-        }
-        
-        // Colormap selection
-        colormapBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const colormapName = btn.dataset.colormap;
-                applyColormap(colormapName);
-                
-                colormapBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
-        
-        // Speed slider
-        speedSlider.addEventListener('input', () => {
-            const value = parseInt(speedSlider.value);
-            morphDuration = value;
-            speedValue.textContent = (value / 1000).toFixed(1) + 's';
-            updateSliderFill(speedSlider);
-            
-            // Update preset buttons
-            presetBtns.forEach(btn => {
-                btn.classList.toggle('active', parseInt(btn.dataset.speed) === value);
-            });
-        });
-        
-        // Speed presets
-        presetBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const speed = parseInt(btn.dataset.speed);
-                speedSlider.value = speed;
-                morphDuration = speed;
-                speedValue.textContent = (speed / 1000).toFixed(1) + 's';
-                updateSliderFill(speedSlider);
-                
-                presetBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
-        
-        // Intensity slider
-        intensitySlider.addEventListener('input', () => {
-            const value = parseInt(intensitySlider.value);
-            intensityValue.textContent = value + '%';
-            updateSliderFill(intensitySlider);
-            
-            if (map.getLayer('density-heatmap')) {
-                const intensityMultiplier = value / 100;
-                map.setPaintProperty('density-heatmap', 'heatmap-intensity', [
-                    'interpolate',
-                    ['linear'],
-                    ['zoom'],
-                    0, 1.0 * intensityMultiplier,
-                    5, 1.5 * intensityMultiplier,
-                    8, 2.0 * intensityMultiplier
-                ]);
-            }
-        });
-        
-        // Radius slider
-        radiusSlider.addEventListener('input', () => {
-            const value = parseInt(radiusSlider.value);
-            radiusValue.textContent = value + '%';
-            updateSliderFill(radiusSlider);
-            
-            if (map.getLayer('density-heatmap')) {
-                const radiusMultiplier = value / 100;
-                map.setPaintProperty('density-heatmap', 'heatmap-radius', [
-                    'interpolate',
-                    ['linear'],
-                    ['zoom'],
-                    0, 3 * radiusMultiplier,
-                    4, 15 * radiusMultiplier,
-                    8, 30 * radiusMultiplier
-                ]);
-            }
-        });
-        
-        // Reset to defaults
-        resetSettings.addEventListener('click', () => {
-            // Reset speed
-            speedSlider.value = defaults.speed;
-            morphDuration = defaults.speed;
-            speedValue.textContent = '1.0s';
-            updateSliderFill(speedSlider);
-            presetBtns.forEach(btn => {
-                btn.classList.toggle('active', parseInt(btn.dataset.speed) === defaults.speed);
-            });
-            
-            // Reset colormap
-            applyColormap(defaults.colormap);
-            colormapBtns.forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.colormap === defaults.colormap);
-            });
-            
-            // Reset intensity
-            intensitySlider.value = defaults.intensity;
-            intensityValue.textContent = '100%';
-            updateSliderFill(intensitySlider);
-            if (map.getLayer('density-heatmap')) {
-                map.setPaintProperty('density-heatmap', 'heatmap-intensity', [
-                    'interpolate',
-                    ['linear'],
-                    ['zoom'],
-                    0, 1.0,
-                    5, 1.5,
-                    8, 2.0
-                ]);
-            }
-            
-            // Reset radius
-            radiusSlider.value = defaults.radius;
-            radiusValue.textContent = '100%';
-            updateSliderFill(radiusSlider);
-            if (map.getLayer('density-heatmap')) {
-                map.setPaintProperty('density-heatmap', 'heatmap-radius', [
-                    'interpolate',
-                    ['linear'],
-                    ['zoom'],
-                    0, 3,
-                    4, 15,
-                    8, 30
-                ]);
-            }
-        });
-        
-        // Initialize slider fills on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            updateSliderFill(speedSlider);
-            updateSliderFill(intensitySlider);
-            updateSliderFill(radiusSlider);
-        });
-        
-        // Also initialize when map loads (in case DOMContentLoaded already fired)
-        map.on('load', () => {
-            initCircularControls();
-            updateSliderFill(speedSlider);
-            updateSliderFill(intensitySlider);
-            updateSliderFill(radiusSlider);
-        });
-    </script>
-    
     <!-- Three.js Whale Scene Controller -->
     <script>
     (function() {
@@ -2946,34 +1977,8 @@
     <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-content">
-            <p class="footer-attribution">Data collected and processed by <strong>Quintin Tyree</strong></p>
+            <p class="footer-attribution"><a href="about.html">Created by Tyree Spatial</a></p>
         </div>
     </footer>
-    
-    <style>
-        .site-footer {
-            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-            border-top: 1px solid #dee2e6;
-            padding: 24px 20px;
-            text-align: center;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .footer-attribution {
-            font-size: 14px;
-            color: #495057;
-            margin: 0;
-        }
-        
-        .footer-attribution strong {
-            color: #2c7ab8;
-            font-weight: 600;
-        }
-    </style>
 </body>
 </html>

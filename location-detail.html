@@ -111,11 +111,21 @@
         .map-overlay-bg.visible { display: block; }
         .map-legend { position: absolute; bottom: 10px; left: 10px; background: rgba(255,255,255,0.95); padding: 10px 12px; border-radius: 8px; font-size: 11px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 5; }
         .map-legend.hidden { display: none; }
-        .map-legend-title { font-weight: 600; margin-bottom: 6px; color: #333; }
+        .map-legend-title { font-weight: 600; margin-bottom: 6px; color: #333; display: flex; justify-content: space-between; align-items: center; }
+        .map-legend-close { display: none; background: none; border: none; font-size: 16px; color: #666; cursor: pointer; padding: 0 4px; line-height: 1; }
         .map-legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
         .map-legend-item:last-child { margin-bottom: 0; }
         .map-legend-color { width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .map-legend-label { color: #555; }
+        .map-legend-toggle { display: none; position: absolute; bottom: 10px; left: 10px; z-index: 6; background: rgba(255,255,255,0.95); border: none; border-radius: 6px; padding: 6px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; font-size: 10px; font-weight: 600; color: #333; }
+        .map-legend-toggle svg { width: 12px; height: 12px; margin-right: 4px; vertical-align: middle; }
+        .map-legend-toggle.active { background: var(--primary); color: white; }
+        @media (max-width: 768px) {
+            .map-legend-toggle { display: inline-flex; align-items: center; }
+            .map-legend { transform: translateY(calc(100% + 20px)); transition: transform 0.2s ease; }
+            .map-legend.mobile-visible { transform: translateY(0); }
+            .map-legend-close { display: block; }
+        }
         .mapboxgl-popup-content { padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .description-text p {margin: 0 0 1rem 0;   /* bottom space between paragraphs */}
 
@@ -145,7 +155,46 @@
         .lightbox-nav.prev { left: -70px; }
         .lightbox-nav.next { right: -70px; }
         .lightbox-counter { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; font-weight: 500; }
-        @media (max-width: 768px) { .location-hero { height: 350px; } .location-hero-title { font-size: 32px; } .location-hero-tagline { font-size: 15px; } .location-hero-content { padding: 24px; } .species-grid { grid-template-columns: 1fr; } .nav-links { display: none; } }
+        @media (max-width: 768px) {
+            .location-hero { height: 350px; }
+            .location-hero-title { font-size: 32px; }
+            .location-hero-tagline { font-size: 15px; }
+            .location-hero-content { padding: 24px; }
+            .species-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+
+            /* Fix expanded map controls */
+            .location-map-card.expanded {
+                top: 56px !important; /* Account for mobile navbar height (nav-links hidden) */
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+            }
+            .location-map-card.expanded .location-map-header {
+                padding: 6px 10px;
+                gap: 6px;
+            }
+            .location-map-card.expanded .location-map-header h3 {
+                font-size: 10px;
+                display: none; /* Hide title to save space */
+            }
+            .location-map-card.expanded .map-controls {
+                width: 100%;
+                justify-content: space-between;
+                gap: 4px;
+            }
+            .location-map-card.expanded .map-view-toggle { font-size: 9px; }
+            .location-map-card.expanded .map-view-btn { padding: 3px 6px; font-size: 9px; }
+            .location-map-card.expanded .year-select { padding: 2px 4px; font-size: 9px; max-width: 70px; }
+            .location-map-card.expanded .map-month-control { gap: 2px; }
+            .location-map-card.expanded .map-month-label { font-size: 9px; min-width: 22px; padding: 2px 4px; }
+            .location-map-card.expanded .map-month-slider { width: 40px; }
+            .location-map-card.expanded .expand-btn { padding: 3px 6px; font-size: 9px; }
+            .location-map-card.expanded .expand-btn svg { width: 10px; height: 10px; }
+            .location-map-card.expanded .location-map-container {
+                height: calc(100vh - 56px - 40px) !important; /* navbar + header */
+            }
+        }
     </style>
 </head>
 <body>
@@ -216,7 +265,19 @@
                             <button class="expand-btn" id="expandBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Expand</button>
                         </div>
                     </div>
-                    <div class="location-map-container" id="mapContainer"><div class="map-legend" id="mapLegend"><div class="map-legend-title">Species</div><div id="legendItems"></div></div></div>
+                    <div class="location-map-container" id="mapContainer">
+                        <button class="map-legend-toggle" id="mapLegendToggle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                            Legend
+                        </button>
+                        <div class="map-legend" id="mapLegend">
+                            <div class="map-legend-title">
+                                Species
+                                <button class="map-legend-close" id="mapLegendClose">&times;</button>
+                            </div>
+                            <div id="legendItems"></div>
+                        </div>
+                    </div>
                 </div>
             </aside>
         </div>
@@ -471,6 +532,37 @@
         }
 
         document.addEventListener('DOMContentLoaded', initPage);
+
+        // Mobile Legend Toggle
+        (function() {
+            const legendToggle = document.getElementById('mapLegendToggle');
+            const legend = document.getElementById('mapLegend');
+            const legendClose = document.getElementById('mapLegendClose');
+
+            function openLegend() {
+                legend.classList.add('mobile-visible');
+                legendToggle.classList.add('active');
+            }
+
+            function closeLegend() {
+                legend.classList.remove('mobile-visible');
+                legendToggle.classList.remove('active');
+            }
+
+            if (legendToggle) {
+                legendToggle.addEventListener('click', function() {
+                    if (legend.classList.contains('mobile-visible')) {
+                        closeLegend();
+                    } else {
+                        openLegend();
+                    }
+                });
+            }
+
+            if (legendClose) {
+                legendClose.addEventListener('click', closeLegend);
+            }
+        })();
     </script>
 
     <footer class="site-footer">

@@ -288,6 +288,11 @@
         /* ============================================================
            MAP CARD - Enhanced with better controls
            ============================================================ */
+        :root {
+            /* Fixed navbar height from styles.css is ~60px; bump a bit for safety */
+            --navbar-height: 72px;
+        }
+
         .species-map-card {
             background: var(--primary);
             border-radius: var(--radius-lg);
@@ -295,14 +300,16 @@
             box-shadow: var(--shadow-md);
             position: relative;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         .species-map-card.expanded {
             position: fixed;
-            top: 96px;
+            top: calc(var(--navbar-height, 72px) + 16px);
             left: 24px;
             right: 24px;
-            bottom: 24px;
+            bottom: 16px;
             z-index: 100;
             border-radius: var(--radius-lg);
             margin: 0;
@@ -310,7 +317,9 @@
         }
 
         .species-map-card.expanded .species-map-container {
-            height: calc(100vh - 96px - 120px) !important;
+            flex: 1;
+            min-height: 0;
+            height: auto !important;
         }
 
         .species-map-header {

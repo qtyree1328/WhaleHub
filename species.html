@@ -389,30 +389,499 @@
             line-height: 1.4;
         }
 
+        /* Hide close button on desktop */
+        .legend-close {
+            display: none;
+        }
+
+        /* Top Control Buttons - hidden on desktop, visible on mobile */
+        .bottom-controls {
+            display: none;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            flex-direction: row;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-controls {
+                display: flex;
+            }
+        }
+
+        .bottom-control-btn {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .bottom-control-btn:hover {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .bottom-control-btn.active {
+            background: var(--primary, #0a4a7c);
+            color: white;
+        }
+
+        .bottom-control-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-controls {
+                top: 12px;
+                right: 12px;
+                gap: 8px;
+            }
+
+            .bottom-control-btn {
+                padding: 10px 14px;
+                font-size: 11px;
+                border-radius: 10px;
+            }
+
+            .bottom-control-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bottom-controls {
+                top: 10px;
+                right: 10px;
+                gap: 6px;
+            }
+
+            .bottom-control-btn {
+                padding: 8px 12px;
+                font-size: 10px;
+            }
+
+            .bottom-control-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        /* Hide old legend toggle on desktop - we use bottom buttons now */
+        .legend-toggle {
+            display: none !important;
+        }
+
+        /* Hide old animations toggle - we use bottom buttons now */
+        .animations-toggle {
+            display: none !important;
+        }
+
+        /* Show circular controls - no background box */
+        #controls {
+            display: block;
+        }
+
+        /* Legend - side panel on desktop */
+        .legend-close {
+            display: none;
+        }
+
+        .legend-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 99;
+        }
+
+        .legend-overlay.visible {
+            display: block;
+        }
+
+        /* Mobile: Legend becomes bottom sheet */
         @media (max-width: 768px) {
             #legend {
-                top: auto;
-                left: 12px;
-                right: 12px;
-                bottom: 90px;
-                width: auto;
+                position: fixed !important;
+                top: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100%;
                 max-width: none;
-                max-height: 55vh;
-                border-radius: 16px;
-                padding: 18px;
+                max-height: 50vh;
+                border-radius: 20px 20px 0 0;
+                padding: 20px;
                 overflow-y: auto;
-                background: rgba(255, 255, 255, 0.97);
-                z-index: 20;
+                background: rgba(255, 255, 255, 0.98);
+                z-index: 100;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+            }
+
+            #legend.mobile-visible {
+                transform: translateY(0);
+            }
+
+            #legend .legend-title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .legend-close {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #666;
+                cursor: pointer;
+                padding: 4px 8px;
+                line-height: 1;
+            }
+        }
+
+        /* Animations panel - bottom sheet on mobile only */
+        @media (max-width: 768px) {
+            .settings-panel {
+                position: fixed !important;
+                top: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100%;
+                z-index: 100;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .settings-panel.mobile-visible {
+                transform: translateY(0);
+            }
+
+            .settings-toggle {
+                display: none !important;
+            }
+
+            .settings-dropdown {
+                position: relative !important;
+                top: auto !important;
+                right: auto !important;
+                width: 100% !important;
+                max-height: 50vh;
+                overflow-y: auto;
+                border-radius: 20px 20px 0 0 !important;
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15) !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            transform: none !important;
+        }
+
+        .settings-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+
+        .settings-close {
+            display: block !important;
+        }
+
+        .animations-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 99;
+        }
+
+        .animations-overlay.visible {
+            display: block;
+        }
+
+        /* Mobile Legend Toggle Button - DEPRECATED, using bottom controls */
+        .legend-toggle-old {
+            display: none;
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 15;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .legend-toggle:hover {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .legend-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .legend-toggle .toggle-text {
+            display: inline;
+        }
+
+        .legend-toggle.active {
+            background: var(--primary, #0a4a7c);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .legend-toggle {
+                display: flex;
+            }
+
+            #legend {
+                position: fixed;
+                top: auto;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                max-width: none;
+                max-height: 50vh;
+                border-radius: 20px 20px 0 0;
+                padding: 20px;
+                overflow-y: auto;
+                background: rgba(255, 255, 255, 0.98);
+                z-index: 100;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+            }
+
+            #legend.mobile-visible {
+                transform: translateY(0);
+            }
+
+            #legend .legend-title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .legend-close {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #666;
+                cursor: pointer;
+                padding: 4px 8px;
+                line-height: 1;
+            }
+
+            /* Overlay when legend is open */
+            .legend-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: 99;
+            }
+
+            .legend-overlay.visible {
+                display: block;
             }
         }
 
         @media (max-width: 520px) {
+            .legend-toggle {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .legend-toggle .toggle-text {
+                display: none;
+            }
+
             #legend {
-                left: 0;
-                right: 0;
-                bottom: 0;
-                border-radius: 0;
-                max-height: 70vh;
+                max-height: 60vh;
+                padding: 16px;
+            }
+        }
+
+        /* Mobile Animations Toggle Button */
+        .animations-toggle {
+            display: none;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 15;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .animations-toggle:hover {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .animations-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .animations-toggle .toggle-text {
+            display: inline;
+        }
+
+        .animations-toggle.active {
+            background: var(--primary, #0a4a7c);
+            color: white;
+        }
+
+        /* Hide close button on desktop */
+        .settings-close {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .animations-toggle {
+                display: flex;
+            }
+
+            .settings-panel {
+                position: fixed !important;
+                top: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100%;
+                z-index: 100;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .settings-panel.mobile-visible {
+                transform: translateY(0);
+            }
+
+            .settings-toggle {
+                display: none !important;
+            }
+
+            .settings-dropdown {
+                position: relative !important;
+                top: auto !important;
+                right: auto !important;
+                width: 100% !important;
+                max-height: 50vh;
+                overflow-y: auto;
+                border-radius: 20px 20px 0 0 !important;
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15) !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+            }
+
+            .settings-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .settings-close {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #666;
+                cursor: pointer;
+                padding: 4px 8px;
+                line-height: 1;
+            }
+
+            .settings-content {
+                padding: 12px 16px;
+            }
+
+            .setting-group {
+                margin-bottom: 12px;
+            }
+
+            .setting-label span {
+                font-size: 12px;
+            }
+
+            .setting-description {
+                font-size: 10px;
+            }
+
+            /* Animations overlay */
+            .animations-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: 99;
+            }
+
+            .animations-overlay.visible {
+                display: block;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .animations-toggle {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .animations-toggle .toggle-text {
+                display: none;
+            }
+
+            .settings-dropdown {
+                max-height: 60vh;
+            }
+
+            .setting-label span {
+                font-size: 11px;
+            }
+
+            .setting-value {
+                font-size: 10px;
             }
         }
 
@@ -480,21 +949,39 @@
         }
         .setting-value { color: #2c7ab8; font-weight: 600; }
         .setting-slider {
+            -webkit-appearance: none;
+            appearance: none;
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: #e2e8f0;
+            background: linear-gradient(to right, #2c7ab8 0%, #e0e0e0 0%);
             outline: none;
-            -webkit-appearance: none;
             cursor: pointer;
         }
         .setting-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 16px; height: 16px;
+            appearance: none;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            background: #2c7ab8;
+            background: #fff;
+            border: 3px solid #2c7ab8;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(44, 122, 184, 0.3);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .setting-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(44, 122, 184, 0.3);
+        }
+        .setting-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #2c7ab8;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         }
         .setting-description { font-size: 11px; color: #888; margin-top: 6px; }
         .setting-presets { display: flex; gap: 6px; margin-top: 10px; }
@@ -527,12 +1014,422 @@
         .reset-btn:hover { background: #f1f5f9; color: #475569; }
 
         #monthBottom, .month-display { display: none; }
-        #controls { position: absolute; bottom: 24px; right: 24px; z-index: 10; }
+
+        /* Circular controls - positioned top left, no background box */
+        #controls {
+            position: absolute !important;
+            top: 16px !important;
+            left: 16px !important;
+            bottom: auto !important;
+            right: auto !important;
+            z-index: 10 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* Circular control styling - matching density map */
+        .control-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .circular-selector {
+            position: relative;
+            width: 180px !important;
+            height: 180px !important;
+            margin: 0 auto;
+        }
+
+        .month-wheel {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .month-marker {
+            position: absolute;
+            width: 36px !important;
+            height: 36px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            user-select: none;
+            z-index: 2;
+        }
+
+        .month-marker:hover {
+            background: rgba(44, 122, 184, 0.15);
+            color: #2c7ab8;
+            transform: scale(1.1);
+        }
+
+        .month-marker.active {
+            background: #2c7ab8;
+            color: white;
+            box-shadow: 0 2px 8px rgba(44, 122, 184, 0.4);
+            transform: scale(1.15);
+        }
+
+        .center-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px !important;
+            height: 90px !important;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+        }
+
+        .center-month {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c7ab8;
+            margin-bottom: 2px;
+        }
+
+        .center-hint {
+            font-size: 8px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rotation-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #2c7ab8 60%, #2c7ab8 100%);
+            transform-origin: left center;
+            z-index: 1;
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .rotation-indicator::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #2c7ab8;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(44, 122, 184, 0.5);
+        }
+
+        .drag-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            cursor: grab;
+            z-index: 4;
+        }
+
+        .drag-ring:active {
+            cursor: grabbing;
+        }
+
+        .drag-ring::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border-radius: 50%;
+            border: 2px dashed rgba(44, 122, 184, 0.2);
+            pointer-events: none;
+        }
+
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 14px;
+            gap: 6px;
+        }
+
+        .control-button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #2c7ab8;
+            color: white;
+        }
+
+        .control-button:hover {
+            background: #1e5a8a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(44, 122, 184, 0.3);
+        }
+
+        .control-button.playing {
+            background: #e74c3c;
+        }
+
+        .control-button.playing:hover {
+            background: #c0392b;
+        }
+
+        .nav-arrows {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .nav-arrow {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #666;
+        }
+
+        .nav-arrow:hover {
+            background: #2c7ab8;
+            color: white;
+        }
+
+        .nav-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
 
         @media (max-width: 768px) {
             .settings-panel { top: 10px; right: 10px; }
             .settings-dropdown { width: 260px; }
-            #controls { bottom: 16px; right: 16px; }
+            #controls {
+                top: 12px !important;
+                left: 12px !important;
+            }
+            .circular-selector {
+                width: 140px !important;
+                height: 140px !important;
+            }
+            .month-marker {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 8px;
+            }
+            .center-display {
+                width: 70px !important;
+                height: 70px !important;
+            }
+            .center-month {
+                font-size: 11px;
+            }
+            .center-hint {
+                font-size: 7px;
+            }
+            .control-header {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+            .nav-arrows {
+                gap: 6px;
+                margin-top: 8px;
+            }
+            .nav-arrow {
+                width: 26px;
+                height: 26px;
+            }
+            .nav-arrow svg {
+                width: 12px;
+                height: 12px;
+            }
+            .play-controls {
+                margin-top: 10px;
+            }
+            .control-button {
+                padding: 6px 14px;
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #controls {
+                top: 10px !important;
+                left: 10px !important;
+            }
+            .circular-selector {
+                width: 105px !important;
+                height: 105px !important;
+            }
+            .month-marker {
+                width: 22px !important;
+                height: 22px !important;
+                font-size: 7px;
+            }
+            .center-display {
+                width: 52px !important;
+                height: 52px !important;
+            }
+            .center-month {
+                font-size: 9px;
+            }
+            .center-hint {
+                font-size: 6px;
+            }
+            .control-header {
+                font-size: 9px;
+            }
+            .nav-arrows {
+                gap: 4px;
+                margin-top: 6px;
+            }
+            .nav-arrow {
+                width: 24px;
+                height: 24px;
+            }
+            .nav-arrow svg {
+                width: 12px;
+                height: 12px;
+            }
+            .play-controls {
+                margin-top: 8px;
+            }
+            .control-button {
+                padding: 5px 12px;
+                font-size: 10px;
+                border-radius: 14px;
+            }
+            .rotation-indicator {
+                display: none;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+            #controls {
+                top: 8px !important;
+                left: 8px !important;
+            }
+            .control-header {
+                display: none;
+            }
+            .circular-selector {
+                width: 90px !important;
+                height: 90px !important;
+            }
+            .month-marker {
+                width: 18px !important;
+                height: 18px !important;
+                font-size: 6px;
+            }
+            .center-display {
+                width: 44px !important;
+                height: 44px !important;
+            }
+            .center-month {
+                font-size: 8px;
+            }
+            .center-play-icon {
+                font-size: 8px;
+            }
+            .center-hint {
+                display: none;
+            }
+            .rotation-indicator {
+                display: none;
+            }
+            .nav-arrows {
+                gap: 2px;
+                margin-top: 4px;
+            }
+            .nav-arrow {
+                width: 22px !important;
+                height: 22px !important;
+            }
+            .play-controls {
+                margin-top: 6px;
+            }
+            .control-button {
+                padding: 4px 10px;
+                font-size: 9px;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #controls {
+                top: 8px !important;
+                left: 8px !important;
+            }
+            .control-header {
+                display: none;
+            }
+            .circular-selector {
+                width: 85px !important;
+                height: 85px !important;
+            }
+            .month-marker {
+                width: 17px !important;
+                height: 17px !important;
+                font-size: 6px;
+            }
+            .center-display {
+                width: 42px !important;
+                height: 42px !important;
+            }
+            .center-month {
+                font-size: 8px;
+            }
+            .center-play-icon {
+                font-size: 8px;
+            }
+            .center-hint {
+                display: none;
+            }
+            .rotation-indicator {
+                display: none;
+            }
+            .nav-arrows {
+                margin-top: 4px;
+                gap: 2px;
+            }
+            .nav-arrow {
+                width: 20px;
+                height: 20px;
+            }
+            .play-controls {
+                margin-top: 4px;
+            }
+            .control-button {
+                padding: 3px 8px;
+                font-size: 8px;
+            }
         }
 
     </style>
@@ -658,14 +1555,39 @@
 
     <!-- Map Container -->
     <div id="map">
+        <!-- Bottom Control Buttons -->
+        <div class="bottom-controls">
+            <button class="bottom-control-btn" id="layerControlBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                Species Layer Control
+            </button>
+            <button class="bottom-control-btn" id="animationControlBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                Animations
+            </button>
+        </div>
+
+        <!-- Legend Overlay -->
+        <div class="legend-overlay" id="legendOverlay"></div>
+
         <div id="legend">
-            <div class="legend-title">Species Layers</div>
+            <div class="legend-title">
+                Species Layers
+                <button class="legend-close" id="legendClose">&times;</button>
+            </div>
             <div id="legendSpecies"></div>
             <div class="legend-note">
                 Click checkboxes to show/hide species.<br>
                 Brighter color = higher observation density.
             </div>
         </div>
+
+        <!-- Animations Overlay -->
+        <div class="animations-overlay" id="animationsOverlay"></div>
 
         <div class="settings-panel" id="settingsPanel">
             <button class="settings-toggle" id="settingsToggle">
@@ -679,7 +1601,10 @@
                 </svg>
             </button>
             <div class="settings-dropdown">
-                <div class="settings-header">Animation Settings</div>
+                <div class="settings-header">
+                    Animation Settings
+                    <button class="settings-close" id="settingsClose">&times;</button>
+                </div>
                 <div class="settings-content">
                     <div class="setting-group">
                         <div class="setting-label">
@@ -727,6 +1652,95 @@
     <script src="config.js"></script>
     <script src="circular-controls.js"></script>
     <script src="species-map.js"></script>
+
+    <!-- Control Scripts -->
+    <script>
+    (function() {
+        // Legend Panel Toggle
+        const layerControlBtn = document.getElementById('layerControlBtn');
+        const legend = document.getElementById('legend');
+        const legendOverlay = document.getElementById('legendOverlay');
+        const legendClose = document.getElementById('legendClose');
+
+        function openLegend() {
+            legend.classList.add('mobile-visible');
+            legendOverlay.classList.add('visible');
+            layerControlBtn.classList.add('active');
+        }
+
+        function closeLegend() {
+            legend.classList.remove('mobile-visible');
+            legendOverlay.classList.remove('visible');
+            layerControlBtn.classList.remove('active');
+        }
+
+        if (layerControlBtn) {
+            layerControlBtn.addEventListener('click', function() {
+                if (legend.classList.contains('mobile-visible')) {
+                    closeLegend();
+                } else {
+                    openLegend();
+                }
+            });
+        }
+
+        if (legendOverlay) {
+            legendOverlay.addEventListener('click', closeLegend);
+        }
+
+        if (legendClose) {
+            legendClose.addEventListener('click', closeLegend);
+        }
+
+        // Animations Panel Toggle
+        const animationControlBtn = document.getElementById('animationControlBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const animationsOverlay = document.getElementById('animationsOverlay');
+        const settingsClose = document.getElementById('settingsClose');
+
+        function openAnimations() {
+            settingsPanel.classList.add('mobile-visible');
+            animationsOverlay.classList.add('visible');
+            animationControlBtn.classList.add('active');
+        }
+
+        function closeAnimations() {
+            settingsPanel.classList.remove('mobile-visible');
+            animationsOverlay.classList.remove('visible');
+            animationControlBtn.classList.remove('active');
+        }
+
+        if (animationControlBtn) {
+            animationControlBtn.addEventListener('click', function() {
+                if (settingsPanel.classList.contains('mobile-visible')) {
+                    closeAnimations();
+                } else {
+                    openAnimations();
+                }
+            });
+        }
+
+        if (animationsOverlay) {
+            animationsOverlay.addEventListener('click', closeAnimations);
+        }
+
+        if (settingsClose) {
+            settingsClose.addEventListener('click', closeAnimations);
+        }
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (legend.classList.contains('mobile-visible')) {
+                    closeLegend();
+                }
+                if (settingsPanel.classList.contains('mobile-visible')) {
+                    closeAnimations();
+                }
+            }
+        });
+    })();
+    </script>
     
     <footer class="site-footer">
         <div class="footer-content">

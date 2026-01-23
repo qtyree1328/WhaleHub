@@ -1892,7 +1892,7 @@ body {
 
 #hero {
   position: relative;
-  min-height: 500vh; /* Extra tall for text + cards with spacing */
+  min-height: 320vh;
   background: linear-gradient(180deg,
     #0a1628 0%,
     #0c1f38 15%,
@@ -1971,19 +1971,19 @@ body {
 
 /* Position highlights on alternating sides */
 .highlight-1 {
-  top: 28%;
+  top: 24%;
   right: 8%;
   text-align: right;
 }
 
 .highlight-2 {
-  top: 40%;
+  top: 34%;
   left: 8%;
   text-align: left;
 }
 
 .highlight-3 {
-  top: 52%;
+  top: 44%;
   right: 8%;
   text-align: right;
 }
@@ -2338,7 +2338,7 @@ body {
 /* Mobile Responsive */
 @media (max-width: 900px) {
   #hero {
-    min-height: 320vh;
+    min-height: 240vh;
   }
 
   .hero-scene {
@@ -2358,15 +2358,15 @@ body {
 
   /* Position highlights in upper portion - leaves gap before cards */
   .highlight-1 {
-    top: 30% !important;
+    top: 26% !important;
   }
 
   .highlight-2 {
-    top: 40% !important;
+    top: 34% !important;
   }
 
   .highlight-3 {
-    top: 50% !important;
+    top: 42% !important;
   }
 
   .highlight-text {
@@ -2412,15 +2412,15 @@ body {
 
   /* Position highlights in upper portion - leaves gap before cards */
   .highlight-1 {
-    top: 32% !important;
+    top: 28% !important;
   }
 
   .highlight-2 {
-    top: 42% !important;
+    top: 36% !important;
   }
 
   .highlight-3 {
-    top: 52% !important;
+    top: 44% !important;
   }
 
   .highlight-text {

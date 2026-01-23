@@ -3515,10 +3515,14 @@
 
         // Mobile nav toggle
         const navbar = document.getElementById('navbar');
-        const navToggle = navbar.querySelector('.nav-toggle');
-        if (navToggle) {
+        const navToggle = navbar ? navbar.querySelector('.nav-toggle') : null;
+        if (navToggle && navbar) {
             navToggle.addEventListener('click', () => {
                 navbar.classList.toggle('nav-open');
+            });
+
+            navbar.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => navbar.classList.remove('nav-open'));
             });
         }
 

@@ -592,7 +592,7 @@
             justify-content: space-between;
             font-size: 11px;
             font-weight: 700;
-            color: #333;
+            color: #fff;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 8px;
@@ -659,25 +659,25 @@
             display: flex;
             justify-content: space-between;
             font-size: 10px;
-            color: #666;
+            color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
         }
 
         .legend-note {
             font-size: 10px;
-            color: #666;
+            color: rgba(255, 255, 255, 0.6);
             margin-top: 8px;
             padding-top: 8px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .legend-description {
             font-size: 10px;
-            color: #555;
+            color: rgba(255, 255, 255, 0.7);
             line-height: 1.4;
             margin-top: 8px;
             padding-top: 8px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .legend-close {
@@ -1825,15 +1825,18 @@
                 display: none;
             }
 
+            :root {
+                --sidebar-width: 0px;
+                --mobile-panel-height: 230px;
+            }
+
             .map-wrapper {
                 left: 0 !important;
                 right: 0 !important;
                 top: var(--nav-height) !important;
-                bottom: 220px;
-            }
-
-            :root {
-                --sidebar-width: 0px;
+                bottom: var(--mobile-panel-height) !important;
+                height: auto !important;
+                min-height: auto !important;
             }
 
             #map {
@@ -1854,6 +1857,7 @@
 
             .mobile-bottom-panel {
                 display: block;
+                height: var(--mobile-panel-height);
             }
 
             .mobile-basemap-container {
@@ -2038,8 +2042,8 @@
         }
 
         @media (max-width: 480px) {
-            .map-wrapper {
-                bottom: 210px;
+            :root {
+                --mobile-panel-height: 220px;
             }
 
             .mobile-bottom-content {

@@ -1343,21 +1343,24 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            cursor: pointer;
+            cursor: default;
             transition: all 0.2s;
             text-align: center;
             position: relative;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
-        .mobile-species-card:hover,
-        .mobile-species-card.active {
+        .mobile-species-card:hover {
             background: rgba(255, 255, 255, 0.15);
         }
 
         .mobile-species-card .mobile-toggle {
             position: absolute;
             top: 8px;
-            right: 8px;
+            left: 8px;
+            z-index: 10;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .mobile-species-card .mobile-toggle .toggle-switch {
@@ -1372,6 +1375,34 @@
 
         .mobile-species-card .mobile-toggle input:checked + .toggle-slider::before {
             transform: translateX(16px);
+        }
+
+        .mobile-species-card .mobile-info-btn {
+            position: absolute;
+            top: 8px;
+            left: auto;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            z-index: 10;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-species-card .mobile-info-btn:hover {
+            background: rgba(78, 205, 196, 0.3);
+            border-color: #4ecdc4;
         }
 
         .mobile-species-card img {
@@ -1389,50 +1420,6 @@
             color: #fff;
             text-transform: uppercase;
             line-height: 1.2;
-        }
-
-        .mobile-bottom-sheet {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-height: 70vh;
-            background: rgba(10, 35, 66, 0.98);
-            backdrop-filter: blur(10px);
-            border-radius: 20px 20px 0 0;
-            z-index: 60;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-            overflow-y: auto;
-        }
-
-        .mobile-bottom-sheet.open {
-            transform: translateY(0);
-        }
-
-        .mobile-sheet-handle {
-            width: 40px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-            margin: 12px auto;
-        }
-
-        .mobile-sheet-content {
-            padding: 0 20px 30px;
-        }
-
-        .mobile-sheet-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 55;
-        }
-
-        .mobile-sheet-overlay.visible {
-            display: block;
         }
 
         /* ============================================================
@@ -1903,13 +1890,6 @@
         <div class="mobile-species-cards" id="mobileSpeciesCards"></div>
     </div>
 
-    <!-- Mobile Bottom Sheet -->
-    <div class="mobile-sheet-overlay" id="mobileSheetOverlay"></div>
-    <div class="mobile-bottom-sheet" id="mobileBottomSheet">
-        <div class="mobile-sheet-handle"></div>
-        <div class="mobile-sheet-content" id="mobileSheetContent"></div>
-    </div>
-
     <!-- Scripts -->
     <script src="whale-species.js"></script>
     <script src="config.js"></script>
@@ -2346,6 +2326,7 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
+                    ${whaleData ? `<a href="whale-detail.html?id=${whaleData.id}" class="mobile-info-btn" title="More info">i</a>` : ''}
                     ${image ? `<img src="${image}" alt="${species.name}">` : ''}
                     <div class="species-name">${species.name}</div>
                 `;
@@ -2355,18 +2336,6 @@
                     toggleSpeciesVisibility(species.id, e.target.checked);
                     syncDesktopCheckbox(species.id, e.target.checked);
                     updateAllSpeciesToggle();
-                });
-
-                mobileCard.addEventListener('click', (e) => {
-                    if (!e.target.closest('.mobile-toggle')) {
-                        const sheet = document.getElementById('mobileBottomSheet');
-                        // If sheet is open and showing this species, close it
-                        if (sheet.classList.contains('open') && sheet.dataset.speciesId === species.id) {
-                            closeMobileSheet();
-                        } else {
-                            openMobileSheet(species);
-                        }
-                    }
                 });
 
                 mobileContainer.appendChild(mobileCard);
@@ -2390,62 +2359,6 @@
         const toggle = document.getElementById('allSpeciesToggle');
         if (toggle) toggle.checked = allChecked;
         allSpeciesOn = allChecked;
-    }
-
-    // ============================================================
-    // MOBILE BOTTOM SHEET
-    // ============================================================
-    function openMobileSheet(species) {
-        const sheet = document.getElementById('mobileBottomSheet');
-        const overlay = document.getElementById('mobileSheetOverlay');
-        const content = document.getElementById('mobileSheetContent');
-        if (!sheet || !content) return;
-
-        const whaleData = getWhaleData(species.name);
-        const image = getWhaleImage(species.id);
-        const baseColor = species.color.base || '#4ecdc4';
-
-        content.innerHTML = `
-            <div style="position: relative; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
-                <label class="toggle-switch" style="--species-color: ${baseColor}">
-                    <input type="checkbox" id="mobileSheetToggle-${species.id}">
-                    <span class="toggle-slider"></span>
-                </label>
-                <span style="color: rgba(255,255,255,0.7); font-size: 12px;">Show on map</span>
-                ${whaleData ? `<a href="whale-detail.html?id=${whaleData.id}" style="position: absolute; right: 0; top: 0; width: 32px; height: 32px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; color: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none;">i</a>` : ''}
-            </div>
-            <div class="species-image-area" style="margin-bottom: 16px; min-height: 100px;">
-                ${image ? `<img src="${image}" alt="${species.name}" class="species-image">` : ''}
-            </div>
-            <div style="margin-bottom: 16px;">
-                <div class="species-name-expanded" style="border-left: 4px solid ${baseColor}; padding-left: 12px;">${species.name}</div>
-                <div class="species-scientific" style="padding-left: 16px;">${species.scientificName || ''}</div>
-            </div>
-            ${whaleData ? `<a href="whale-species-gallery.html#${whaleData.id}" style="display: block; text-align: center; margin-top: 20px; padding: 12px; background: rgba(78, 205, 196, 0.2); border-radius: 8px; color: #4ecdc4; text-decoration: none; font-weight: 600;">Learn More</a>` : ''}
-        `;
-
-        const toggle = document.getElementById(`mobileSheetToggle-${species.id}`);
-        if (toggle) {
-            toggle.checked = map.getLayoutProperty(species.id, 'visibility') !== 'none';
-            toggle.addEventListener('change', (e) => {
-                toggleSpeciesVisibility(species.id, e.target.checked);
-                syncDesktopCheckbox(species.id, e.target.checked);
-                syncMobileCheckbox(species.id, e.target.checked);
-            });
-        }
-
-        sheet.dataset.speciesId = species.id;
-        sheet.classList.add('open');
-        overlay.classList.add('visible');
-    }
-
-    function closeMobileSheet() {
-        const sheet = document.getElementById('mobileBottomSheet');
-        if (sheet) {
-            sheet.classList.remove('open');
-            sheet.dataset.speciesId = '';
-        }
-        document.getElementById('mobileSheetOverlay')?.classList.remove('visible');
     }
 
     // ============================================================
@@ -2868,11 +2781,9 @@
             });
         }
 
-        // Mobile sheet
-        document.getElementById('mobileSheetOverlay')?.addEventListener('click', closeMobileSheet);
+        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                closeMobileSheet();
                 mapTipsTooltip?.classList.remove('show');
                 // Close mobile floating panels
                 document.querySelectorAll('.mobile-floating-panel').forEach(p => p.classList.remove('open'));

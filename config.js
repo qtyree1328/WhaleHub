@@ -80,8 +80,7 @@ const HEATMAP_PAINT_BASE = {
     ],
     'heatmap-opacity': 0.85,
     'heatmap-opacity-transition': { duration: 0, delay: 0 },
-    'heatmap-radius-transition': { duration: 0, delay: 0 },
-    'heatmap-weight-transition': { duration: 0, delay: 0 }
+    'heatmap-radius-transition': { duration: 0, delay: 0 }
 };
 
 // Helper function to get species config by common name

@@ -1,0 +1,3051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Whale Migration Density Map - Whale Watchers Atlas</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="description" content="Explore whale migration patterns, species diversity, and discover the best whale watching locations worldwide.">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Make sure map can host absolutely positioned children (panel, controls, etc.) */
+        #map {
+            position: relative;
+        }
+        
+        /* CIRCULAR MONTH CONTROLS - Force absolute positioning (top left), no background box */
+        #controls {
+            position: absolute !important;
+            top: 16px !important;
+            left: 16px !important;
+            bottom: auto !important;
+            right: auto !important;
+            z-index: 10 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+        
+        /* ANIMATION SETTINGS DROPDOWN PANEL */
+        .settings-panel {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 10;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .settings-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+        
+        .settings-toggle:hover {
+            background: #fff;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .settings-toggle svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .settings-panel.open .settings-toggle svg {
+            transform: rotate(90deg);
+        }
+        
+        .settings-toggle .chevron {
+            width: 14px;
+            height: 14px;
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .settings-panel.open .settings-toggle .chevron {
+            transform: rotate(180deg);
+        }
+        
+        .settings-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+            
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .settings-panel.open .settings-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .settings-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .settings-content {
+            padding: 16px 18px;
+        }
+        
+        .setting-group {
+            margin-bottom: 18px;
+        }
+        
+        .setting-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .setting-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .setting-label span {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .setting-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c7ab8;
+            background: #e3f2fd;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+        
+        .setting-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, #2c7ab8 0%, #e0e0e0 0%);
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .setting-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #2c7ab8;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        
+        .setting-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(44, 122, 184, 0.3);
+        }
+        
+        .setting-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #2c7ab8;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .setting-description {
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        
+        .setting-presets {
+            display: flex;
+            gap: 4px;
+            margin-top: 10px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .preset-btn:hover {
+            border-color: #2c7ab8;
+            color: #2c7ab8;
+            background: #f0f7ff;
+        }
+        
+        .preset-btn.active {
+            border-color: #2c7ab8;
+            background: #2c7ab8;
+            color: #0f172a;
+        }
+        
+        .settings-divider {
+            height: 1px;
+            background: #eee;
+            margin: 16px 0;
+        }
+        
+        .reset-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background: #f5f5f5;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .reset-btn:hover {
+            background: #e74c3c;
+            color: #0f172a;
+        }
+        
+        /* Colormap grid styles */
+        .colormap-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+        }
+        
+        .colormap-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 6px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .colormap-btn:hover {
+            border-color: #2c7ab8;
+            transform: translateY(-1px);
+        }
+        
+        .colormap-btn.active {
+            border-color: #2c7ab8;
+            background: #f0f7ff;
+            box-shadow: 0 2px 8px rgba(44, 122, 184, 0.2);
+        }
+        
+        .colormap-preview {
+            width: 100%;
+            height: 12px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .colormap-btn span {
+            font-size: 9px;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .colormap-btn.active span {
+            color: #2c7ab8;
+        }
+        
+        /* ============================================================
+           MOBILE LEGEND TOGGLE
+           ============================================================ */
+        .legend-toggle {
+            display: none;
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            z-index: 15;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 10px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .legend-toggle:hover {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .legend-toggle svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .legend-toggle.active {
+            background: var(--primary, #0a4a7c);
+            color: white;
+        }
+
+        .legend-close {
+            display: none;
+        }
+
+        .legend-overlay {
+            display: none;
+        }
+
+        /* ============================================================
+           RESPONSIVE STYLES FOR MOBILE AND NARROW SCREENS
+           ============================================================ */
+
+        /* Tablet and smaller */
+        @media (max-width: 768px) {
+            .legend-toggle {
+                display: flex;
+            }
+
+            #legend {
+                position: fixed;
+                top: auto;
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+                max-width: none !important;
+                width: auto;
+                padding: 16px !important;
+                border-radius: 16px;
+                background: rgba(255, 255, 255, 0.98);
+                z-index: 100;
+                transform: translateY(calc(100% + 20px));
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+            }
+
+            #legend.mobile-visible {
+                transform: translateY(0);
+            }
+
+            #legend .legend-title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 12px;
+            }
+
+            .legend-close {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 20px;
+                color: #666;
+                cursor: pointer;
+                padding: 2px 6px;
+                line-height: 1;
+            }
+
+            .legend-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: 99;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s, visibility 0.3s;
+            }
+
+            .legend-overlay.visible {
+                display: block;
+                opacity: 1;
+                visibility: visible;
+            }
+
+            #controls {
+                top: 12px !important;
+                left: 12px !important;
+            }
+
+            .control-header {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+
+            .circular-selector {
+                width: 140px !important;
+                height: 140px !important;
+            }
+
+            .month-marker {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 8px;
+            }
+
+            .center-display {
+                width: 70px !important;
+                height: 70px !important;
+            }
+
+            .center-month {
+                font-size: 11px;
+            }
+
+            .center-hint {
+                font-size: 7px;
+            }
+
+            .nav-arrows {
+                gap: 6px;
+                margin-top: 8px;
+            }
+
+            .nav-arrow {
+                width: 28px;
+                height: 28px;
+            }
+
+            .nav-arrow svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .play-controls {
+                margin-top: 10px;
+            }
+
+            .control-button {
+                padding: 6px 16px;
+                font-size: 11px;
+            }
+
+            .legend-title {
+                font-size: 10px;
+            }
+
+            .legend-note {
+                font-size: 9px;
+            }
+            
+            #monthBottom {
+                font-size: 14px !important;
+                padding: 6px 14px !important;
+            }
+            
+            .settings-panel {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .settings-toggle {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+            
+            .settings-toggle span {
+                display: none;
+            }
+            
+            .settings-toggle svg:first-child {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .settings-toggle .chevron {
+                display: none;
+            }
+            
+            .settings-dropdown {
+                width: 240px;
+            }
+            
+            /* Info panel adjustments */
+            .info-panel {
+                width: 320px;
+                max-width: 85vw;
+            }
+        }
+        
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            #controls {
+                top: 10px !important;
+                left: 10px !important;
+            }
+            
+            .control-header {
+                font-size: 9px;
+                margin: 0 auto;
+            }
+            
+            .circular-selector {
+                width: 105px !important;
+                height: 105px !important;
+            }
+
+            .month-marker {
+                width: 22px !important;
+                height: 22px !important;
+                font-size: 7px;
+            }
+
+            .center-display {
+                width: 52px !important;
+                height: 52px !important;
+            }
+            
+            .center-month {
+                font-size: 9px;
+            }
+            
+            .center-hint {
+                font-size: 6px;
+            }
+            
+            .rotation-indicator {
+                display: none;
+            }
+            
+            .nav-arrows {
+                gap: 4px;
+                margin-top: 6px;
+            }
+            
+            .nav-arrow {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .nav-arrow svg {
+                width: 12px;
+                height: 12px;
+            }
+            
+            .play-controls {
+                margin-top: 8px;
+            }
+            
+            .control-button {
+                padding: 5px 12px;
+                font-size: 10px;
+                border-radius: 14px;
+            }
+            
+            .legend-toggle {
+                bottom: 12px;
+                right: 12px;
+                padding: 6px 10px;
+                font-size: 10px;
+            }
+
+            #legend {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                padding: 14px !important;
+            }
+
+            #monthBottom {
+                font-size: 11px !important;
+                padding: 4px 10px !important;
+                bottom: 12px !important;
+            }
+            
+            .settings-panel {
+                top: 8px;
+                right: 8px;
+            }
+            
+            .settings-toggle {
+                padding: 6px 10px;
+            }
+            
+            .settings-dropdown {
+                width: 200px;
+                right: 0;
+            }
+            
+            .settings-header {
+                padding: 10px 12px;
+                font-size: 10px;
+            }
+            
+            .settings-content {
+                padding: 10px 12px;
+            }
+            
+            .setting-label span {
+                font-size: 11px;
+            }
+            
+            .setting-value {
+                font-size: 10px;
+                padding: 2px 6px;
+            }
+            
+            .setting-description {
+                font-size: 9px;
+            }
+            
+            .setting-presets {
+                gap: 2px;
+            }
+            
+            .preset-btn {
+                padding: 5px 6px;
+                font-size: 9px;
+            }
+            
+            .colormap-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2px;
+            }
+            
+            .colormap-btn {
+                padding: 5px 3px;
+            }
+            
+            .colormap-preview {
+                height: 8px;
+            }
+            
+            .colormap-btn span {
+                font-size: 7px;
+            }
+            
+            .reset-btn {
+                padding: 6px;
+                font-size: 10px;
+            }
+            
+            .settings-divider {
+                margin: 10px 0;
+            }
+            
+            /* Info panel adjustments */
+            .info-panel {
+                width: 100%;
+                max-width: 100vw;
+            }
+        }
+        
+        /* Very small screens */
+        @media (max-width: 360px) {
+            #controls {
+                top: 8px !important;
+                left: 8px !important;
+            }
+            
+            .control-header {
+                display: none;
+            }
+            
+            .circular-selector {
+                width: 90px !important;
+                height: 90px !important;
+            }
+
+            .month-marker {
+                width: 18px !important;
+                height: 18px !important;
+                font-size: 6px;
+            }
+
+            .center-display {
+                width: 44px !important;
+                height: 44px !important;
+            }
+
+            .center-month {
+                font-size: 8px;
+            }
+
+            .center-hint {
+                display: none;
+            }
+            
+            .nav-arrows {
+                gap: 2px;
+                margin-top: 4px;
+            }
+            
+            .nav-arrow {
+                width: 22px;
+                height: 22px;
+            }
+            
+            .play-controls {
+                margin-top: 6px;
+            }
+            
+            .control-button {
+                padding: 4px 10px;
+                font-size: 9px;
+            }
+
+            .legend-toggle {
+                bottom: 8px;
+                right: 8px;
+                padding: 5px 8px;
+                font-size: 9px;
+            }
+
+            #legend {
+                left: 8px;
+                right: 8px;
+                bottom: 8px;
+                padding: 12px !important;
+            }
+
+            #monthBottom {
+                font-size: 10px !important;
+                padding: 3px 8px !important;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #controls {
+                top: 8px !important;
+                left: 8px !important;
+            }
+            
+            .control-header {
+                display: none;
+            }
+            
+            .circular-selector {
+                width: 85px !important;
+                height: 85px !important;
+            }
+
+            .month-marker {
+                width: 17px !important;
+                height: 17px !important;
+                font-size: 6px;
+            }
+
+            .center-display {
+                width: 42px !important;
+                height: 42px !important;
+            }
+
+            .center-month {
+                font-size: 8px;
+            }
+
+            .center-hint {
+                display: none;
+            }
+            
+            .rotation-indicator {
+                display: none;
+            }
+            
+            .nav-arrows {
+                margin-top: 4px;
+                gap: 2px;
+            }
+            
+            .nav-arrow {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .play-controls {
+                margin-top: 4px;
+            }
+            
+            .control-button {
+                padding: 3px 8px;
+                font-size: 8px;
+            }
+
+            .legend-toggle {
+                bottom: 8px;
+                right: 8px;
+                padding: 4px 6px;
+                font-size: 8px;
+            }
+
+            #legend {
+                left: 8px;
+                right: 8px;
+                bottom: 8px;
+                padding: 10px !important;
+            }
+
+            #monthBottom {
+                font-size: 10px !important;
+                padding: 3px 8px !important;
+            }
+        }
+
+        /* Show circular controls */
+        #controls {
+            display: block;
+        }
+
+        /* CIRCULAR MONTH SELECTOR STYLES - HIDDEN */
+        #controls-old {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .control-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .circular-selector {
+            position: relative;
+            width: 180px !important;
+            height: 180px !important;
+            margin: 0 auto;
+        }
+
+        .month-wheel {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .month-marker {
+            position: absolute;
+            width: 36px !important;
+            height: 36px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            user-select: none;
+            z-index: 2;
+        }
+
+        .month-marker:hover {
+            background: rgba(44, 122, 184, 0.15);
+            color: #2c7ab8;
+            transform: scale(1.1);
+        }
+
+        .month-marker.active {
+            background: #2c7ab8;
+            color: white;
+            box-shadow: 0 2px 8px rgba(44, 122, 184, 0.4);
+            transform: scale(1.15);
+        }
+
+        .center-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px !important;
+            height: 90px !important;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+        }
+        
+        .center-month {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c7ab8;
+            margin-bottom: 2px;
+        }
+        
+        .center-hint {
+            font-size: 8px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Rotation indicator line */
+        .rotation-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #2c7ab8 60%, #2c7ab8 100%);
+            transform-origin: left center;
+            z-index: 1;
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .rotation-indicator::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #2c7ab8;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(44, 122, 184, 0.5);
+        }
+        
+        /* Drag ring for rotation */
+        .drag-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            cursor: grab;
+            z-index: 4;
+        }
+        
+        .drag-ring:active {
+            cursor: grabbing;
+        }
+        
+        .drag-ring::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border-radius: 50%;
+            border: 2px dashed rgba(44, 122, 184, 0.2);
+            pointer-events: none;
+        }
+        
+        /* Play button below wheel */
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 14px;
+            gap: 6px;
+        }
+        
+        .control-button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #2c7ab8;
+            color: white;
+        }
+        
+        .control-button:hover {
+            background: #1e5a8a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(44, 122, 184, 0.3);
+        }
+        
+        .control-button.playing {
+            background: #e74c3c;
+        }
+        
+        .control-button.playing:hover {
+            background: #c0392b;
+        }
+        
+        /* Navigation arrows */
+        .nav-arrows {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .nav-arrow {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #666;
+        }
+        
+        .nav-arrow:hover {
+            background: #2c7ab8;
+            color: white;
+        }
+        
+        .nav-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Hide the old slider */
+        #monthSlider {
+            display: none;
+        }
+        
+        .month-display {
+            display: none;
+        }
+        
+        /* SIDE PANEL – overlays from right, map stays same size */
+        .info-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 400px;
+            max-width: 90vw;
+            background: #ffffff;
+            box-shadow: -4px 0 18px rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(calc(100% + 5px)); /* Extra 5px to ensure fully hidden */
+            transition: transform 0.3s ease, visibility 0.3s ease;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            z-index: 15; /* Higher than settings panel (z-index: 10) */
+            visibility: hidden; /* Hide when closed */
+        }
+        .info-panel.open {
+            transform: translateX(0);
+            visibility: visible;
+        }
+        .info-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px 16px;
+            border-bottom: 1px solid #eee;
+            min-height: 50px;
+        }
+        .info-panel-title-group h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .info-panel-title-group p {
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* Fold tab close button - top left corner */
+        .info-panel-close-fold {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f0f0f0 50%, transparent 50%);
+            border: none;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.2s ease;
+        }
+        
+        .info-panel-close-fold::before {
+            content: '×';
+            position: absolute;
+            top: 6px;
+            left: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            line-height: 1;
+            transition: all 0.2s ease;
+        }
+        
+        .info-panel-close-fold:hover {
+            background: linear-gradient(135deg, #e0e0e0 50%, transparent 50%);
+        }
+        
+        .info-panel-close-fold:hover::before {
+            color: #333;
+        }
+        
+        /* Adjust header to account for fold */
+        .info-panel-header {
+            padding-left: 50px;
+        }
+        /* Body fills the rest of panel height and scrolls as needed */
+        .info-panel-body {
+            flex: 1;
+            overflow-y: auto;
+        }
+        /* Full-width media header inside panel */
+        .location-panel-header-media {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            
+        }
+        .location-panel-header-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.3s ease;
+        }
+        /* Image carousel navigation for panel */
+        .panel-image-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 8px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .panel-image-nav.hidden {
+            display: none;
+        }
+        
+        .panel-nav-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            transition: all 0.2s ease;
+        }
+        
+        .panel-nav-btn:hover {
+            background: rgba(0,0,0,0.7);
+        }
+        
+        .panel-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .panel-image-counter {
+            position: absolute;
+            bottom: 50px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            z-index: 5;
+        }
+        
+        .panel-image-counter.hidden {
+            display: none;
+        }
+        .location-name-overlay-panel {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 24px 18px 10px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.85));
+            color: #0f172a;
+        }
+        .location-name-overlay-panel .location-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .location-name-overlay-panel .location-region {
+            font-size: 13px;
+            margin: 4px 0 0 0;
+            opacity: 0.95;
+        }
+        /* Main content uses full width of panel */
+        .location-panel-content {
+            padding: 18px;
+        }
+        .score-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+            justify-content: center;
+        }
+        .score-circle {
+            text-align: center;
+            position: relative;
+            cursor: help;
+        }
+        
+        .score-circle:hover .score-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .score-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: normal;
+            max-width: 200px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            margin-top: 8px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .score-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-bottom-color: rgba(0, 0, 0, 0.9);
+        }
+        .circle-svg {
+            width: 50px;
+            height: 50px;
+        }
+        .circle-bg {
+            fill: none;
+            stroke: #f0f0f0;
+            stroke-width: 5;
+        }
+        .circle-progress {
+            fill: none;
+            stroke-width: 5;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.6s ease;
+            transform-origin: center;
+            transform: rotate(-90deg);
+        }
+        .score-value {
+            font-size: 14px;
+            font-weight: 700;
+            fill: #333;
+        }
+        .score-label {
+            font-size: 10px;
+            color: #666;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .species-list {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+        .species-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 7px;
+        }
+        .species-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .species-tag {
+            background: white;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 11px;
+            color: #2c7ab8;
+            border: 1px solid #e0e0e0;
+            font-weight: 500;
+        }
+        .info-section {
+            margin-bottom: 14px;
+        }
+        .info-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        .info-text {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.5;
+        }
+        .best-months {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+        .month-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .accessibility-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .excellent { background: #d4edda; color: #155724; }
+        .good { background: #d1ecf1; color: #0c5460; }
+        .moderate { background: #fff3cd; color: #856404; }
+        /* Monthly density chart styles */
+        .monthly-density-chart {
+            background: #f8f9fa;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+        
+        .chart-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        
+        .month-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 80px;
+            gap: 2px;
+            padding: 0 4px;
+        }
+        
+        .month-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .bar-wrapper {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        
+        .bar-fill {
+            width: 100%;
+            background: linear-gradient(to top, #2c7ab8, #4a9fd8);
+            border-radius: 2px 2px 0 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .month-bar:hover .bar-fill {
+            background: linear-gradient(to top, #1e5a8a, #2c7ab8);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .bar-label {
+            font-size: 8px;
+            color: #666;
+            font-weight: 600;
+            line-height: 1;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        /* Stacked species bar-specific styles */
+        .stacked-bar {
+            width: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+            border-radius: 2px 2px 0 0;
+            
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .species-segment {
+            width: 100%;
+        }
+        
+        .bar-count {
+            font-size: 9px;
+            color: #444;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .month-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: #0f172a;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            min-width: 120px;
+            max-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 20;
+        }
+        
+        .month-bar {
+            position: relative;
+        }
+        
+        .month-bar:hover .month-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .tooltip-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+        
+        .tooltip-species {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 10px;
+            margin-bottom: 2px;
+        }
+        
+        .tooltip-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .species-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 10px;
+            color: #555;
+        }
+        
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 4px;
+            border: 1px solid rgba(0,0,0,0.15);
+        }
+        /* Tourism stats section */
+        .tourism-stats {
+            background: #f0f7ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            font-size: 13px;
+            color: #1976d2;
+            font-weight: 600;
+        }
+        /* Scrollbar styling inside panel content (optional) */
+        .info-panel-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .info-panel-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .info-panel-body::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+        .info-panel-body::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+        /* Density hero */
+        /* Density hero */
+        .density-hero {
+            display: none;
+        }
+
+        .density-hero-inner {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .density-hero-title {
+            font-size: clamp(42px, 8vw, 80px);
+            line-height: 1.1;
+            margin: 0 0 32px 0;
+            letter-spacing: -0.03em;
+            color: #ffffff;
+            font-weight: 800;
+            text-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .density-hero-lead {
+            margin: 0;
+            font-size: 17px;
+            line-height: 1.6;
+            color: #334155;
+            max-width: 780px;
+        }
+        /* Text section directly above the map */
+        .map-intro {
+            position: relative;
+            padding: 80px 24px 48px;
+            margin: 0 auto;
+            background: linear-gradient(180deg,
+                #0a1628 0%,
+                #0d2440 20%,
+                #134e7a 45%,
+                #1a6eb0 65%,
+                #2d8fd4 80%,
+                #7ec8e3 92%,
+                #f8f9fa 100%
+            );
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .map-intro::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 2px, transparent 2px),
+                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 1px, transparent 1px),
+                radial-gradient(circle at 60% 20%, rgba(255,255,255,0.1) 1.5px, transparent 1.5px);
+            background-size: 100px 100px, 150px 150px, 80px 80px, 120px 120px;
+            animation: float-particles 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-particles {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
+        }
+
+        .map-intro-content {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 900px);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .map-intro-text {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            font-size: clamp(16px, 2.5vw, 20px);
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .map-intro-text p {
+            margin: 0;
+        }
+
+        .density-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+            width: 100%;
+            margin: 0;
+        }
+
+        .density-stat {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            padding: 24px 20px;
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .density-stat-value {
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 800;
+            color: #7ec8e3;
+            margin: 0 0 8px 0;
+        }
+
+        .density-stat-label {
+            margin: 0;
+            font-size: clamp(13px, 2vw, 15px);
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+        }
+
+        .map-quick-notes {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 28px 32px;
+            color: #1e293b;
+            line-height: 1.7;
+            width: 100%;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .map-quick-notes h3 {
+            margin: 0 0 20px 0;
+            color: #0a5fa1;
+            font-size: clamp(20px, 3vw, 24px);
+            letter-spacing: 0.01em;
+            font-weight: 700;
+        }
+
+        .map-quick-notes p {
+            margin: 0 0 18px 0;
+            color: #334155;
+            font-size: clamp(15px, 2vw, 17px);
+            line-height: 1.8;
+        }
+
+        .map-quick-notes p:last-child {
+            margin-bottom: 0;
+        }
+
+        .map-quick-notes ul {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .density-hero-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .map-intro {
+                padding: 60px 20px 36px;
+                min-height: 50vh;
+            }
+
+            .map-intro-content {
+                gap: 32px;
+            }
+
+            .map-intro-text {
+                gap: 16px;
+            }
+
+            .density-stats {
+                gap: 16px;
+                grid-template-columns: 1fr;
+            }
+
+            .density-stat {
+                padding: 20px 16px;
+            }
+
+            .map-quick-notes {
+                padding: 20px 24px;
+            }
+
+            .map-quick-notes h3 {
+                margin: 0 0 16px 0;
+            }
+
+            .map-quick-notes p {
+                margin: 0 0 14px 0;
+            }
+        }
+    </style>
+</head>
+<body class="page-enter">
+    <!-- Navigation Bar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <span class="whale-icon">
+                    <img src="favicon.ico" alt="Whale Icon" class="whale-icon-img">
+                </span>
+                <span class="brand-text">Whale Watchers Atlas</span>
+            </a>
+            <div class="nav-links">
+                <a href="density-map.html" class="nav-link active">Density Map</a>
+                <a href="species.html" class="nav-link">Species Map</a>
+                <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
+                <a href="whale-locations-gallery.html" class="nav-link">Locations</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+    <!-- Description Section -->
+    <!-- <div id="description">
+        <h1>Whale Species Diversity & Watching Locations</h1>
+        <p>
+            This interactive map reveals where different whale species overlap throughout the year,
+            combined with <strong>premier whale watching locations</strong> worldwide. This heat map was made from GBIF accumulated whale observations of 9 species: Blue Whale, Sperm Whale, Humpback Whale, Right Whale, Fin Whale, Minke Whale, Beluga Whale, and Grey Whale.
+            Navigate to the next page to see the species specific distributions!
+            Click the <span style="color: #000000; font-weight: 600;">black POI pins</span> to discover top viewing spots with detailed information.
+        </p>
+        <p>
+            <strong>How to use:</strong> Drag the circular dial to rotate through months, click month labels, or use the arrows. 
+            Brighter colors show where multiple species overlap.
+        </p>
+    </div> -->
+<section id="mapIntro" class="map-intro">
+    <div class="map-intro-content">
+        <h1 class="density-hero-title">Whale Migration Density Animated Map</h1>
+        <div class="density-stats">
+            <div class="density-stat">
+                <div class="density-stat-value">11 species</div>
+                <p class="density-stat-label">Combined into one diversity layer</p>
+            </div>
+            <div class="density-stat">
+                <div class="density-stat-value">20 years</div>
+                <p class="density-stat-label">Temporal window of reported sightings</p>
+            </div>
+            <div class="density-stat">
+                <div class="density-stat-value">Monthly bins</div>
+                <p class="density-stat-label">Spatial + temporal density blending</p>
+            </div>
+        </div>
+        <div class="map-intro-text">
+            <p>
+                This density heatmap demonstrates global whale species density patterns across all seasons. Animated seasonal density built from 11 whale species and 20 years of observations. Values are aggregated by spatial hexagons and monthly bins to show where species overlap through the year. Brighter areas indicate more species in one location at a given time. Use the circular month selector to watch migration patterns shift throughout the year.
+            </p>
+        </div>
+        <div class="map-quick-notes">
+            <h3>How to read this map</h3>
+            <p>Click the circles to view some of the most popular whale watching locations in the world, and use the animation panel to adjust colors, style, and playback.</p>
+            <p>Drag the circular dial (bottom-left) to scrub months or press play to animate.</p>
+            <p>Brighter hexes indicate higher combined density across all tracked species.</p>
+        </div>
+    </div>
+</section>
+
+    <!-- Map Container -->
+    <div id="map">
+        <!-- Animation Settings Panel -->
+        <div class="settings-panel" id="settingsPanel">
+            <button class="settings-toggle" id="settingsToggle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+                </svg>
+                <span>Animation</span>
+                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </button>
+            <div class="settings-dropdown">
+                <div class="settings-header">Animation Settings</div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Transition Speed</span>
+                            <span class="setting-value" id="speedValue">1.0s</span>
+                        </div>
+                        <input type="range" class="setting-slider" id="speedSlider" min="200" max="3000" value="1000" step="100">
+                        <div class="setting-description">Time to transition between months</div>
+                        <div class="setting-presets">
+                            <button class="preset-btn" data-speed="400">Fast</button>
+                            <button class="preset-btn active" data-speed="1000">Normal</button>
+                            <button class="preset-btn" data-speed="2000">Slow</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-divider"></div>
+                    
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Color Scheme</span>
+                        </div>
+                        <div class="colormap-grid" id="colormapGrid">
+                            <button class="colormap-btn active" data-colormap="default" title="Default">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, rgba(0,0,80,1), rgba(0,100,255,1), rgba(0,200,255,1), rgba(100,255,200,1), rgba(255,220,0,1), rgba(255,100,0,1), rgba(255,0,150,1));"></div>
+                                <span>Spectrum</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="ocean" title="Ocean">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #0a1628, #0d3b66, #1a759f, #34a0a4, #76c893, #b5e48c);"></div>
+                                <span>Ocean</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="thermal" title="Thermal">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #000033, #1a0066, #4d0099, #9900cc, #ff3366, #ffcc00);"></div>
+                                <span>Thermal</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="viridis" title="Viridis">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #440154, #3b528b, #21918c, #5ec962, #fde725);"></div>
+                                <span>Viridis</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="magma" title="Magma">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #000004, #3b0f70, #8c2981, #de4968, #fea16e, #fcfdbf);"></div>
+                                <span>Magma</span>
+                            </button>
+                            <button class="colormap-btn" data-colormap="cool" title="Cool">
+                                <div class="colormap-preview" style="background: linear-gradient(to right, #0d0887, #5302a3, #8b0aa5, #b83289, #db5c68, #f48849, #febd2a);"></div>
+                                <span>Plasma</span>
+                            </button>
+                        </div>
+                        <div class="setting-description">Visual style for density visualization</div>
+                    </div>
+                    
+                    <div class="settings-divider"></div>
+                    
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Heatmap Intensity</span>
+                            <span class="setting-value" id="intensityValue">100%</span>
+                        </div>
+                        <input type="range" class="setting-slider" id="intensitySlider" min="20" max="200" value="100" step="10">
+                        <div class="setting-description">Brightness of species density overlay</div>
+                    </div>
+                    
+                    <div class="settings-divider"></div>
+                    
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Heatmap Radius</span>
+                            <span class="setting-value" id="radiusValue">100%</span>
+                        </div>
+                        <input type="range" class="setting-slider" id="radiusSlider" min="50" max="200" value="100" step="10">
+                        <div class="setting-description">Spread of each data point</div>
+                    </div>
+                    
+                    <div class="settings-divider"></div>
+                    
+                    <button class="reset-btn" id="resetSettings">Reset to Defaults</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Circular Month Controls -->
+        <div id="controls" class="controls-bottom-left">
+            <!-- Content generated by CircularControls component -->
+        </div>
+        <!-- Month Display (hidden) -->
+        <div id="monthBottom">January</div>
+
+        <!-- Mobile Legend Toggle Button -->
+        <button class="legend-toggle" id="legendToggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 9h18M9 21V9"/>
+            </svg>
+            <span>Legend</span>
+        </button>
+
+        <!-- Mobile Legend Overlay -->
+        <div class="legend-overlay" id="legendOverlay"></div>
+
+        <!-- Legend -->
+        <div id="legend">
+            <div class="legend-title">
+                Species Diversity
+                <button class="legend-close" id="legendClose">&times;</button>
+            </div>
+            <div class="legend-gradient">
+                <div class="gradient-bar" style="background: linear-gradient(to right, 
+                    rgba(0,0,80,0.4),
+                    rgba(0,100,255,0.6),
+                    rgba(0,200,255,0.7),
+                    rgba(100,255,200,0.8),
+                    rgba(255,220,0,0.9),
+                    rgba(255,100,0,0.95),
+                    rgba(255,0,150,1));"></div>
+                <div class="gradient-labels">
+                    <span>Lower</span>
+                    <span>Higher</span>
+                </div>
+            </div>
+            <div class="legend-note">
+                <span style="color: #000000;">●</span> Click pins for whale watching locations
+            </div>
+        </div>
+        <!-- Side Info Panel (overlay) -->
+        <div id="infoPanel" class="info-panel">
+            <button id="infoPanelClose" class="info-panel-close-fold" aria-label="Close"></button>
+            <div class="info-panel-header">
+                <div class="info-panel-title-group">
+                    <h3 id="infoPanelTitle">Location</h3>
+                    <p id="infoPanelSubtitle"></p>
+                </div>
+            </div>
+            <div id="infoPanelBody" class="info-panel-body">
+                <!-- filled dynamically -->
+            </div>
+        </div>
+    </div>
+    <script src="circular-controls.js"></script>
+    <script src="whale-locations.js"></script>
+    <script>
+    
+        // ============================================================
+        // CONFIGURATION
+        // ============================================================
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoicXR5cmVlIiwiYSI6ImNtaHl5eHNmeDBoY3oybXEwNTIxNGgxYmsifQ.VqoAKKHQxQX-lNNPwVKHmw';
+        const TILESET_URL = 'mapbox://qtyree.wd11_12bin_p_hex2_40';
+        const SOURCE_LAYER = 'WD11_12bin_p_hex2_40';
+        
+        // ============================================================
+        // CONSTANTS
+        // ============================================================
+        const TOTAL_BINS = 12;
+        const BINS_PER_MONTH = 1;
+        
+        const MONTH_NAMES = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        
+        const MONTH_ABBREV = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        const SPECIES_COLORS = {
+            "Blue Whale": "#2980b9",
+            "Sperm Whale": "#c0392b",
+            "Humpback Whale": "#3498db",
+            "Grey Whale": "#7f8c8d",
+            "Fin Whale": "#8e44ad",
+            "Minke Whale": "#27ae60",
+            "Beluga Whale": "#ecf0f1",
+            "Southern Right Whale": "#d35400",
+            "North Atlantic Right Whale": "#e67e22",
+            "Humpback whale": "#3498db",
+            "Blue whale": "#2980b9",
+            "Gray whale": "#7f8c8d",
+            "Grey whale": "#7f8c8d",
+            "Orca": "#2c3e50",
+            "Fin whale": "#8e44ad",
+            "Sperm whale": "#c0392b",
+            "Minke whale": "#27ae60",
+            "Southern right whale": "#d35400",
+            "North Atlantic right whale": "#e67e22",
+            "Right whale": "#d35400",
+            "Beluga whale": "#ecf0f1",
+            "Sei whale": "#9b59b6",
+            "Bryde's whale": "#1abc9c",
+            "Pilot whale": "#34495e",
+            "Beaked whale": "#f39c12",
+            "default": "#95a5a6"
+        };
+        
+        function getSpeciesColor(name) {
+            if (!name) return SPECIES_COLORS.default;
+            return SPECIES_COLORS[name] || SPECIES_COLORS.default;
+        }
+        
+        // ============================================================
+        // HELPER FUNCTIONS
+        // ============================================================
+        function binToMonth(bin) {
+            return Math.floor((bin - 1) / BINS_PER_MONTH) + 1;
+        }
+        
+        function binToHalf(bin) {
+            return ((bin - 1) % BINS_PER_MONTH) + 1;
+        }
+        
+        // ============================================================
+        // ANIMATION STATE
+        // ============================================================
+        let binA = 1;
+        let binB = 2;
+        let phase = 0;
+        let startTime = null;
+        let animFrame = null;
+        let isPlaying = false;
+        let morphDuration = 1000;
+        
+        mapboxgl.accessToken = MAPBOX_TOKEN;
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v11',
+            projection: 'globe',
+            center: [-110, 35],
+            zoom: 2
+        });
+        
+        const infoPanel = document.getElementById('infoPanel');
+        const infoPanelTitle = document.getElementById('infoPanelTitle');
+        const infoPanelSubtitle = document.getElementById('infoPanelSubtitle');
+        const infoPanelBody = document.getElementById('infoPanelBody');
+        const infoPanelClose = document.getElementById('infoPanelClose');
+        
+        // ============================================================
+        // CIRCULAR CONTROLS COMPONENT
+        // ============================================================
+        let circularControls = null;
+        
+        function initCircularControls() {
+            if (typeof CircularControls === 'undefined') {
+                console.warn('CircularControls not loaded');
+                return;
+            }
+            
+            circularControls = new CircularControls({
+                container: '#controls',
+                onMonthChange: (month) => {
+                    setMonthFromControls(month);
+                },
+                onPlayToggle: () => {
+                    isPlaying ? stopAnimation() : startAnimation();
+                },
+                getIsPlaying: () => isPlaying,
+                getCurrentMonth: () => binA
+            });
+        }
+        
+        // Called from circular controls component
+        function setMonthFromControls(month) {
+            stopAnimation();
+            binA = month;
+            binB = (binA % TOTAL_BINS) + 1;
+            document.getElementById('monthBottom').textContent = MONTH_NAMES[month - 1];
+            snapToCurrentMonth();
+        }
+        
+        // ============================================================
+        // ANIMATION FUNCTIONS
+        // ============================================================
+        function updateLabels() {
+            const month = binToMonth(binA);
+            const label = MONTH_NAMES[month - 1];
+            document.getElementById('monthBottom').textContent = label;
+            
+            // Update circular controls
+            if (circularControls) {
+                circularControls.externalSetMonth(month);
+            }
+        }
+        
+        function setFilterAll() {
+            if (map.getLayer('density-heatmap')) {
+                map.setFilter('density-heatmap', [
+                    'in', ['get', 'bin'], ['literal', [binA, binB]]
+                ]);
+            }
+        }
+        
+        function setWeightAll(phaseVal) {
+            if (map.getLayer('density-heatmap')) {
+                const densityWeight = [
+                    'interpolate',
+                    ['exponential', 1.5],
+                    ['get', 'density'],
+                    1, 0.3,
+                    2, 0.45,
+                    3, 0.55,
+                    4, 0.65,
+                    5, 0.75,
+                    6, 0.85,
+                    7, 0.92,
+                    8, 1.0
+                ];
+                
+                const weightExpr = [
+                    '*',
+                    densityWeight,
+                    [
+                        'case',
+                        ['==', ['get', 'bin'], binA], 1 - phaseVal,
+                        ['==', ['get', 'bin'], binB], phaseVal,
+                        0
+                    ]
+                ];
+                map.setPaintProperty('density-heatmap', 'heatmap-weight', weightExpr);
+            }
+        }
+        
+        // Snap to a clean state (no transition, just show binA)
+        function snapToCurrentMonth() {
+            if (map.getLayer('density-heatmap')) {
+                // Set filter to only show current month
+                map.setFilter('density-heatmap', [
+                    '==', ['get', 'bin'], binA
+                ]);
+                
+                // Set weight to full density weight (no phase blending)
+                const densityWeight = [
+                    'interpolate',
+                    ['exponential', 1.5],
+                    ['get', 'density'],
+                    1, 0.3,
+                    2, 0.45,
+                    3, 0.55,
+                    4, 0.65,
+                    5, 0.75,
+                    6, 0.85,
+                    7, 0.92,
+                    8, 1.0
+                ];
+                map.setPaintProperty('density-heatmap', 'heatmap-weight', densityWeight);
+            }
+        }
+        
+        function stepAnimation(timestamp) {
+            // Check isPlaying at the very start - exit immediately if stopped
+            if (!isPlaying) {
+                return;
+            }
+            
+            if (startTime === null) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            phase = Math.min(elapsed / morphDuration, 1);
+            
+            setWeightAll(phase);
+            
+            if (phase < 1) {
+                // Only schedule next frame if still playing
+                if (isPlaying) {
+                    animFrame = requestAnimationFrame(stepAnimation);
+                }
+            } else {
+                // Transition complete - move to next month
+                binA = binB;
+                binB = (binB % TOTAL_BINS) + 1;
+                setFilterAll();
+                updateLabels();
+                startTime = null;
+                phase = 0;
+                
+                // Only continue if still playing
+                if (isPlaying) {
+                    animFrame = requestAnimationFrame(stepAnimation);
+                }
+            }
+        }
+        
+        function startAnimation() {
+            if (isPlaying) return;
+            isPlaying = true;
+            document.getElementById('playPause').textContent = '⏸ Pause';
+            document.getElementById('playPause').classList.add('playing');
+            binB = (binA % TOTAL_BINS) + 1;
+            setFilterAll();
+            startTime = null;
+            phase = 0;
+            animFrame = requestAnimationFrame(stepAnimation);
+        }
+        
+        function stopAnimation() {
+            // Immediately set flag to stop
+            isPlaying = false;
+            
+            // Cancel any pending frame
+            if (animFrame) {
+                cancelAnimationFrame(animFrame);
+                animFrame = null;
+            }
+            
+            // Reset timing
+            startTime = null;
+            phase = 0;
+            
+            // Snap to clean state showing only current month
+            snapToCurrentMonth();
+            
+            // Update UI
+            document.getElementById('playPause').textContent = '▶ Play';
+            document.getElementById('playPause').classList.remove('playing');
+        }
+        
+        // ============================================================
+        // PANEL FUNCTIONS
+        // ============================================================
+        
+        function createCircularProgress(value, color) {
+            const radius = 21;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (value / 100) * circumference;
+            
+            return `
+                <svg class="circle-svg" viewBox="0 0 50 50">
+                    <circle class="circle-bg" cx="25" cy="25" r="${radius}"></circle>
+                    <circle class="circle-progress" cx="25" cy="25" r="${radius}"
+                        stroke="${color}"
+                        stroke-dasharray="${circumference}"
+                        stroke-dashoffset="${offset}">
+                    </circle>
+                    <text x="25" y="28.5" text-anchor="middle" class="score-value" fill="${color}">
+                        ${value}
+                    </text>
+                </svg>
+            `;
+        }
+        
+        const MAX_SPECIES_LEVELS = 5;
+        
+        function createMonthlyDensityChart(location) {
+            const speciesMonthly = location.speciesMonthly;
+            if (!speciesMonthly || typeof speciesMonthly !== "object") {
+                return "";
+            }
+            const orderedSpecies = Object.keys(speciesMonthly);
+            const numMonths = 12;
+            const MAX_SPECIES_LEVELS = 5;
+            const monthlyCounts = new Array(numMonths).fill(0);
+            orderedSpecies.forEach(sp => {
+                const arr = speciesMonthly[sp] || [];
+                for (let m = 0; m < numMonths; m++) {
+                    if (arr[m] > 0) monthlyCounts[m] += 1;
+                }
+            });
+            const anyCount = monthlyCounts.some(c => c > 0);
+            if (!anyCount) return "";
+            const bars = monthlyCounts.map((count, monthIndex) => {
+                if (!count) {
+                    return `
+                        <div class="month-bar">
+                            <div class="bar-wrapper">
+                                <div class="stacked-bar" style="height:0%;"></div>
+                            </div>
+                            <div class="bar-label">${MONTH_ABBREV[monthIndex]}</div>
+                        </div>
+                    `;
+                }
+                const presentSpecies = orderedSpecies.filter(sp => {
+                    const arr = speciesMonthly[sp];
+                    return Array.isArray(arr) && arr[monthIndex] > 0;
+                });
+                const clampedCount = Math.min(count, MAX_SPECIES_LEVELS);
+                const barHeightPercent = (clampedCount / MAX_SPECIES_LEVELS) * 100;
+                const segments = presentSpecies.map(sp => {
+                    const color = getSpeciesColor(sp);
+                    return `
+                        <div class="species-segment"
+                            style="background:${color}; height:${100 / presentSpecies.length}%"
+                            title="${sp}">
+                        </div>
+                    `;
+                }).join("");
+                const tooltipSpecies = presentSpecies.map(sp => {
+                    const color = getSpeciesColor(sp);
+                    return `
+                        <div class="tooltip-species">
+                            <span class="tooltip-color" style="background:${color};"></span>${sp}
+                        </div>
+                    `;
+                }).join("");
+                return `
+                    <div class="month-bar">
+                        <div class="month-tooltip">
+                            <div class="tooltip-title">${MONTH_NAMES[monthIndex]}</div>
+                            <div style="font-size:11px;margin-bottom:4px;">${count} species</div>
+                            ${tooltipSpecies}
+                        </div>
+                        <div class="bar-count">${count}</div>
+                        <div class="bar-wrapper">
+                            <div class="stacked-bar"
+                                style="height:${barHeightPercent}%; min-height:4px;">
+                                ${segments}
+                            </div>
+                        </div>
+                        <div class="bar-label">${MONTH_ABBREV[monthIndex]}</div>
+                    </div>
+                `;
+            }).join("");
+            const legendItems = orderedSpecies.map(sp => {
+                const color = getSpeciesColor(sp);
+                return `
+                    <div class="legend-item">
+                        <span class="legend-color" style="background:${color};"></span>
+                        ${sp.replace(" whale", "")}
+                    </div>
+                `;
+            }).join("");
+            return `
+                <div class="monthly-density-chart">
+                    <div class="chart-title">
+                        Species Stacked by Month
+                    </div>
+                    <div class="month-bars">${bars}</div>
+                    <div class="species-legend">${legendItems}</div>
+                </div>
+            `;
+        }
+        
+        function formatNumber(num) {
+            if (!num) return 'N/A';
+            return num.toLocaleString();
+        }
+        
+        function createLocationPanelHTML(location) {
+            const accessibilityClass = location.accessibility.toLowerCase();
+            const bestMonthsHTML = location.bestMonths.map(m => 
+                `<span class="month-badge">${MONTH_NAMES[m-1].substring(0,3)}</span>`
+            ).join('');
+            
+            const monthlyChartHTML = createMonthlyDensityChart(location);
+            
+            const images = location.imageUrls && Array.isArray(location.imageUrls) && location.imageUrls.length > 0 
+                ? location.imageUrls 
+                : [location.imageUrl || 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop'];
+            
+            const hasMultipleImages = images.length > 1;
+            const imageUrl = images[0];
+            
+            return `
+                <div class="location-panel-header-media" data-images='${JSON.stringify(images)}' data-current-index="0">
+                    <img src="${imageUrl}" alt="${location.name}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop';">
+                    <div class="panel-image-nav ${hasMultipleImages ? '' : 'hidden'}">
+                        <button class="panel-nav-btn panel-prev-btn" disabled onclick="panelPrevImage(event)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button class="panel-nav-btn panel-next-btn" onclick="panelNextImage(event)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="panel-image-counter ${hasMultipleImages ? '' : 'hidden'}">1 / ${images.length}</div>
+                    <div class="location-name-overlay-panel">
+                        <h3 class="location-name">${location.name}</h3>
+                        <p class="location-region">${location.location}</p>
+                    </div>
+                </div>
+                <div class="location-panel-content">
+                    <div class="score-container">
+                        <div class="score-circle">
+                            <div class="score-tooltip">Quality of whale behaviors and interactions (breaching, feeding, etc.)</div>
+                            ${createCircularProgress(location.entertainment, '#FF6B6B')}
+                            <div class="score-label">Experience</div>
+                        </div>
+                        <div class="score-circle">
+                            <div class="score-tooltip">Likelihood of seeing whales clearly based on success rate and conditions</div>
+                            ${createCircularProgress(location.visibility, '#4CAF50')}
+                            <div class="score-label">Sighting Rate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">What Makes It Special</div>
+                        <div class="info-text">${location.specialNotes}</div>
+                    </div>
+                    
+                    ${monthlyChartHTML}
+                    
+                    <div class="species-list">
+                        <div class="species-title">Species Present</div>
+                        <div class="species-tags">
+                            ${location.species.map(s => `<span class="species-tag">${s}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">Best Months</div>
+                        <div class="best-months">${bestMonthsHTML}</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">Accessibility</div>
+                        <span class="accessibility-badge ${accessibilityClass}">${location.accessibility}</span>
+                    </div>
+                    
+                    <div class="tourism-stats">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">Industry Size</div>
+                                <div class="stat-value">${location.industrySize || 'N/A'}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Annual Visitors</div>
+                                <div class="stat-value">${formatNumber(location.annualVisitors)}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function panelPrevImage(event) {
+            event.stopPropagation();
+            const mediaContainer = document.querySelector('.location-panel-header-media');
+            if (!mediaContainer) return;
+            
+            const images = JSON.parse(mediaContainer.dataset.images);
+            let currentIndex = parseInt(mediaContainer.dataset.currentIndex);
+            
+            if (currentIndex > 0) {
+                currentIndex--;
+                mediaContainer.dataset.currentIndex = currentIndex;
+                updatePanelImage(mediaContainer, images, currentIndex);
+            }
+        }
+        
+        function panelNextImage(event) {
+            event.stopPropagation();
+            const mediaContainer = document.querySelector('.location-panel-header-media');
+            if (!mediaContainer) return;
+            
+            const images = JSON.parse(mediaContainer.dataset.images);
+            let currentIndex = parseInt(mediaContainer.dataset.currentIndex);
+            
+            if (currentIndex < images.length - 1) {
+                currentIndex++;
+                mediaContainer.dataset.currentIndex = currentIndex;
+                updatePanelImage(mediaContainer, images, currentIndex);
+            }
+        }
+        
+        function updatePanelImage(container, images, index) {
+            const img = container.querySelector('img');
+            const counter = container.querySelector('.panel-image-counter');
+            const prevBtn = container.querySelector('.panel-prev-btn');
+            const nextBtn = container.querySelector('.panel-next-btn');
+            
+            img.style.opacity = '0';
+            setTimeout(() => {
+                img.src = images[index];
+                img.style.opacity = '1';
+            }, 150);
+            
+            counter.textContent = `${index + 1} / ${images.length}`;
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === images.length - 1;
+        }
+        
+        function openInfoPanel(location) {
+            console.log('openInfoPanel called with:', location);
+            // Close settings panel if open
+            const settingsPanelEl = document.getElementById('settingsPanel');
+            if (settingsPanelEl) {
+                settingsPanelEl.classList.remove('open');
+            }
+
+            infoPanelTitle.textContent = location.name;
+            infoPanelSubtitle.textContent = location.location;
+            infoPanelBody.innerHTML = createLocationPanelHTML(location);
+            infoPanel.classList.add('open');
+            console.log('Panel should now be open, classes:', infoPanel.className);
+        }
+        
+        function closeInfoPanel() {
+            infoPanel.classList.remove('open');
+        }
+        
+        infoPanelClose.addEventListener('click', closeInfoPanel);
+        
+        // ============================================================
+        // MAP LOAD
+        // ============================================================
+        map.on('load', () => {
+            initCircularControls();
+            map.addSource('density-points', {
+                type: 'vector',
+                url: TILESET_URL
+            });
+            
+            map.addLayer({
+                'id': 'density-heatmap',
+                'type': 'heatmap',
+                'source': 'density-points',
+                'source-layer': SOURCE_LAYER,
+                'maxzoom': 9,
+                'paint': {
+                    'heatmap-weight': [
+                        'interpolate',
+                        ['exponential', 1.5],
+                        ['get', 'density'],
+                        1, 0.3,
+                        2, 0.45,
+                        3, 0.55,
+                        4, 0.65,
+                        5, 0.75,
+                        6, 0.85,
+                        7, 0.92,
+                        8, 1.0
+                    ],
+                    'heatmap-intensity': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 1.0,
+                        5, 1.5,
+                        8, 2.0
+                    ],
+                    'heatmap-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['heatmap-density'],
+                        0.0, 'rgba(0,0,0,0)',
+                        0.1, 'rgba(0,0,80,0.3)',
+                        0.25, 'rgba(0,100,255,0.5)',
+                        0.4, 'rgba(0,200,255,0.65)',
+                        0.55, 'rgba(100,255,200,0.75)',
+                        0.7, 'rgba(255,220,0,0.85)',
+                        0.85, 'rgba(255,100,0,0.95)',
+                        1.0, 'rgba(255,0,150,1)'
+                    ],
+                    'heatmap-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 3,
+                        4, 15,
+                        8, 30
+                    ],
+                    'heatmap-opacity': 0.85,
+                    'heatmap-opacity-transition': { duration: 0, delay: 0 },
+                    'heatmap-radius-transition': { duration: 0, delay: 0 },
+                    'heatmap-weight-transition': { duration: 0, delay: 0 }
+                },
+                'filter': ['in', ['get', 'bin'], ['literal', [binA, binB]]]
+            });
+            
+            const whaleGeoJSON = {
+                type: 'FeatureCollection',
+                features: WHALE_WATCHING_LOCATIONS.map((loc, idx) => ({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: loc.coordinates
+                    },
+                    properties: {
+                        index: idx
+                    }
+                }))
+            };
+            
+            map.addSource('whale-locations', {
+                type: 'geojson',
+                data: whaleGeoJSON
+            });
+            
+            // Add location markers ABOVE the heatmap by adding them last
+            map.addLayer({
+                id: 'whale-locations-halo',
+                type: 'circle',
+                source: 'whale-locations',
+                paint: {
+                    'circle-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 6,
+                        4, 8,
+                        8, 10
+                    ],
+                    'circle-color': 'rgba(0,0,0,0.3)',
+                    'circle-stroke-width': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'whale-locations-layer',
+                type: 'circle',
+                source: 'whale-locations',
+                paint: {
+                    'circle-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 4,
+                        4, 5,
+                        8, 7
+                    ],
+                    'circle-color': '#000000',
+                    'circle-stroke-color': '#ffffff',
+                    'circle-stroke-width': 1.5
+                }
+            });
+            
+            map.on('mouseenter', 'whale-locations-layer', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'whale-locations-layer', () => {
+                map.getCanvas().style.cursor = '';
+            });
+            
+            map.on('click', 'whale-locations-layer', (e) => {
+                console.log('Location marker clicked!', e);
+                if (!e.features || !e.features.length) {
+                    console.log('No features found');
+                    return;
+                }
+                const feature = e.features[0];
+                console.log('Feature:', feature);
+                const idx = parseInt(feature.properties.index, 10);
+                console.log('Location index:', idx);
+                const location = WHALE_WATCHING_LOCATIONS[idx];
+                console.log('Location data:', location);
+                openInfoPanel(location);
+            });
+            
+            setFilterAll();
+            setWeightAll(0);
+            updateLabels();
+        });
+        
+        // ============================================================
+        // EVENT LISTENERS (for traditional controls - not used with circular controls)
+        // ============================================================
+        const monthSlider = document.getElementById('monthSlider');
+        if (monthSlider) {
+            monthSlider.addEventListener('input', (e) => {
+                setMonth(parseInt(e.target.value, 10));
+            });
+        }
+
+        const playPauseBtn = document.getElementById('playPause');
+        if (playPauseBtn) {
+            playPauseBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    stopAnimation();
+                } else {
+                    startAnimation();
+                }
+            });
+        }
+        
+        // ============================================================
+        // ANIMATION SETTINGS PANEL
+        // ============================================================
+        const settingsPanel = document.getElementById('settingsPanel');
+        const settingsToggle = document.getElementById('settingsToggle');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        const intensitySlider = document.getElementById('intensitySlider');
+        const intensityValue = document.getElementById('intensityValue');
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusValue = document.getElementById('radiusValue');
+        const resetSettings = document.getElementById('resetSettings');
+        const presetBtns = document.querySelectorAll('.preset-btn[data-speed]');
+        const colormapBtns = document.querySelectorAll('.colormap-btn');
+        
+        // Colormap definitions
+        const COLORMAPS = {
+            default: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(0,0,80,0.3)'],
+                [0.25, 'rgba(0,100,255,0.5)'],
+                [0.4, 'rgba(0,200,255,0.65)'],
+                [0.55, 'rgba(100,255,200,0.75)'],
+                [0.7, 'rgba(255,220,0,0.85)'],
+                [0.85, 'rgba(255,100,0,0.95)'],
+                [1.0, 'rgba(255,0,150,1)']
+            ],
+            ocean: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(10,22,40,0.4)'],
+                [0.25, 'rgba(13,59,102,0.55)'],
+                [0.4, 'rgba(26,117,159,0.65)'],
+                [0.55, 'rgba(52,160,164,0.75)'],
+                [0.7, 'rgba(118,200,147,0.85)'],
+                [0.85, 'rgba(181,228,140,0.92)'],
+                [1.0, 'rgba(217,249,187,1)']
+            ],
+            thermal: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(0,0,51,0.4)'],
+                [0.25, 'rgba(26,0,102,0.55)'],
+                [0.4, 'rgba(77,0,153,0.65)'],
+                [0.55, 'rgba(153,0,204,0.75)'],
+                [0.7, 'rgba(255,51,102,0.85)'],
+                [0.85, 'rgba(255,153,51,0.92)'],
+                [1.0, 'rgba(255,204,0,1)']
+            ],
+            viridis: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(68,1,84,0.4)'],
+                [0.25, 'rgba(59,82,139,0.55)'],
+                [0.4, 'rgba(33,145,140,0.65)'],
+                [0.55, 'rgba(94,201,98,0.75)'],
+                [0.7, 'rgba(170,220,50,0.85)'],
+                [0.85, 'rgba(212,235,30,0.92)'],
+                [1.0, 'rgba(253,231,37,1)']
+            ],
+            magma: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(0,0,4,0.4)'],
+                [0.25, 'rgba(59,15,112,0.55)'],
+                [0.4, 'rgba(140,41,129,0.65)'],
+                [0.55, 'rgba(222,73,104,0.75)'],
+                [0.7, 'rgba(254,161,110,0.85)'],
+                [0.85, 'rgba(254,220,175,0.92)'],
+                [1.0, 'rgba(252,253,191,1)']
+            ],
+            cool: [
+                [0.0, 'rgba(0,0,0,0)'],
+                [0.1, 'rgba(13,8,135,0.4)'],
+                [0.25, 'rgba(83,2,163,0.55)'],
+                [0.4, 'rgba(139,10,165,0.65)'],
+                [0.55, 'rgba(185,50,137,0.75)'],
+                [0.7, 'rgba(219,92,104,0.85)'],
+                [0.85, 'rgba(244,136,73,0.92)'],
+                [1.0, 'rgba(254,189,42,1)']
+            ]
+        };
+        
+        let currentColormap = 'default';
+        
+        // Default values
+        const defaults = {
+            speed: 1000,
+            intensity: 100,
+            radius: 100,
+            colormap: 'default'
+        };
+        
+        // Toggle panel open/close
+        settingsToggle.addEventListener('click', () => {
+            settingsPanel.classList.toggle('open');
+        });
+        
+        // Close panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!settingsPanel.contains(e.target)) {
+                settingsPanel.classList.remove('open');
+            }
+        });
+        
+        // Update slider track fill
+        function updateSliderFill(slider) {
+            const min = parseFloat(slider.min);
+            const max = parseFloat(slider.max);
+            const val = parseFloat(slider.value);
+            const percentage = ((val - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, #2c7ab8 ${percentage}%, #e0e0e0 ${percentage}%)`;
+        }
+        
+        // Apply colormap to heatmap layer
+        function applyColormap(colormapName) {
+            if (!map.getLayer('density-heatmap')) return;
+            
+            const colormap = COLORMAPS[colormapName] || COLORMAPS.default;
+            const colorExpr = ['interpolate', ['linear'], ['heatmap-density']];
+            
+            colormap.forEach(([stop, color]) => {
+                colorExpr.push(stop, color);
+            });
+            
+            map.setPaintProperty('density-heatmap', 'heatmap-color', colorExpr);
+            currentColormap = colormapName;
+        }
+        
+        // Colormap selection
+        colormapBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const colormapName = btn.dataset.colormap;
+                applyColormap(colormapName);
+                
+                colormapBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Speed slider
+        speedSlider.addEventListener('input', () => {
+            const value = parseInt(speedSlider.value);
+            morphDuration = value;
+            speedValue.textContent = (value / 1000).toFixed(1) + 's';
+            updateSliderFill(speedSlider);
+            
+            // Update preset buttons
+            presetBtns.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.speed) === value);
+            });
+        });
+        
+        // Speed presets
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const speed = parseInt(btn.dataset.speed);
+                speedSlider.value = speed;
+                morphDuration = speed;
+                speedValue.textContent = (speed / 1000).toFixed(1) + 's';
+                updateSliderFill(speedSlider);
+                
+                presetBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Intensity slider
+        intensitySlider.addEventListener('input', () => {
+            const value = parseInt(intensitySlider.value);
+            intensityValue.textContent = value + '%';
+            updateSliderFill(intensitySlider);
+            
+            if (map.getLayer('density-heatmap')) {
+                const intensityMultiplier = value / 100;
+                map.setPaintProperty('density-heatmap', 'heatmap-intensity', [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    0, 1.0 * intensityMultiplier,
+                    5, 1.5 * intensityMultiplier,
+                    8, 2.0 * intensityMultiplier
+                ]);
+            }
+        });
+        
+        // Radius slider
+        radiusSlider.addEventListener('input', () => {
+            const value = parseInt(radiusSlider.value);
+            radiusValue.textContent = value + '%';
+            updateSliderFill(radiusSlider);
+            
+            if (map.getLayer('density-heatmap')) {
+                const radiusMultiplier = value / 100;
+                map.setPaintProperty('density-heatmap', 'heatmap-radius', [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    0, 3 * radiusMultiplier,
+                    4, 15 * radiusMultiplier,
+                    8, 30 * radiusMultiplier
+                ]);
+            }
+        });
+        
+        // Reset to defaults
+        resetSettings.addEventListener('click', () => {
+            // Reset speed
+            speedSlider.value = defaults.speed;
+            morphDuration = defaults.speed;
+            speedValue.textContent = '1.0s';
+            updateSliderFill(speedSlider);
+            presetBtns.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.speed) === defaults.speed);
+            });
+            
+            // Reset colormap
+            applyColormap(defaults.colormap);
+            colormapBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.colormap === defaults.colormap);
+            });
+            
+            // Reset intensity
+            intensitySlider.value = defaults.intensity;
+            intensityValue.textContent = '100%';
+            updateSliderFill(intensitySlider);
+            if (map.getLayer('density-heatmap')) {
+                map.setPaintProperty('density-heatmap', 'heatmap-intensity', [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    0, 1.0,
+                    5, 1.5,
+                    8, 2.0
+                ]);
+            }
+            
+            // Reset radius
+            radiusSlider.value = defaults.radius;
+            radiusValue.textContent = '100%';
+            updateSliderFill(radiusSlider);
+            if (map.getLayer('density-heatmap')) {
+                map.setPaintProperty('density-heatmap', 'heatmap-radius', [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    0, 3,
+                    4, 15,
+                    8, 30
+                ]);
+            }
+        });
+        
+        // Initialize slider fills on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSliderFill(speedSlider);
+            updateSliderFill(intensitySlider);
+            updateSliderFill(radiusSlider);
+        });
+        
+        // Also initialize when map loads (in case DOMContentLoaded already fired)
+        map.on('load', () => {
+            initCircularControls();
+            updateSliderFill(speedSlider);
+            updateSliderFill(intensitySlider);
+            updateSliderFill(radiusSlider);
+        });
+
+        // Mobile Legend Toggle
+        (function() {
+            const legendToggle = document.getElementById('legendToggle');
+            const legend = document.getElementById('legend');
+            const legendOverlay = document.getElementById('legendOverlay');
+            const legendClose = document.getElementById('legendClose');
+
+            function openLegend() {
+                legend.classList.add('mobile-visible');
+                legendOverlay.classList.add('visible');
+                legendToggle.classList.add('active');
+            }
+
+            function closeLegend() {
+                legend.classList.remove('mobile-visible');
+                legendOverlay.classList.remove('visible');
+                legendToggle.classList.remove('active');
+            }
+
+            if (legendToggle) {
+                legendToggle.addEventListener('click', function() {
+                    if (legend.classList.contains('mobile-visible')) {
+                        closeLegend();
+                    } else {
+                        openLegend();
+                    }
+                });
+            }
+
+            if (legendOverlay) {
+                legendOverlay.addEventListener('click', closeLegend);
+            }
+
+            if (legendClose) {
+                legendClose.addEventListener('click', closeLegend);
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && legend.classList.contains('mobile-visible')) {
+                    closeLegend();
+                }
+            });
+        })();
+    </script>
+
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p class="footer-attribution"><a href="about.html">Created by Tyree Spatial</a></p>
+        </div>
+    </footer>
+</body>
+</html>

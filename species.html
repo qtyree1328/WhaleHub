@@ -11,1430 +11,1608 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
     <link rel="stylesheet" href="styles.css">
-    
-    <!-- Three.js for whale animation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
-    <script src="sperm-whale-scene.js"></script>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* Hero Section */
-        #species-hero {
-            position: relative;
-            min-height: 120vh;
-            background: linear-gradient(180deg, 
-                #0a1628 0%, #0d2440 20%, #134e7a 45%,
-                #1a6eb0 65%, #2d8fd4 80%, #7ec8e3 92%, #f8f9fa 100%
-            );
-            overflow: hidden;
-        }
+        :root {
+            --nav-height: 72px;
+            --mobile-ctrl-top: calc(var(--nav-height) + 20px); /* Shared height for projection + floating buttons */
 
-        #species-hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 1px, transparent 1px),
-                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 2px, transparent 2px),
-                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 1px, transparent 1px);
-            background-size: 100px 100px, 150px 150px, 80px 80px;
-            animation: float-particles 20s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes float-particles {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-100px); }
-        }
-
-        .species-hero-scene {
-            position: relative;
-            min-height: 70vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            z-index: 10;
-        }
-
-        .species-hero-content { text-align: center; max-width: 800px; margin: 0 auto; }
-
-        .species-hero-title {
-            font-size: clamp(42px, 8vw, 80px);
-            font-weight: 800;
-            color: #fff;
-            text-shadow: 0 4px 40px rgba(0,0,0,0.4);
-            line-height: 1.1;
-            letter-spacing: -0.03em;
-            margin: 0 0 28px 0;
-        }
-
-        .species-hero-title span {
-            display: block;
-            background: linear-gradient(135deg, #7ec8e3 0%, #a8e6cf 50%, #7ec8e3 100%);
-            background-size: 200% 200%;
-            animation: gradientShift 7s ease-in-out infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .species-hero-tagline {
-            font-size: clamp(16px, 2.5vw, 22px);
-            color: rgba(255,255,255,0.85);
-            margin: 0 0 30px 0;
-            line-height: 1.6;
-        }
-
-        .species-hero-stats { display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; }
-        .species-stat { text-align: center; }
-        .species-stat-value {
-            font-size: clamp(36px, 6vw, 56px);
-            font-weight: 800;
-            color: #fff;
-            line-height: 1;
-            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
-        }
-        .species-stat-label {
-            font-size: 13px;
-            color: rgba(255,255,255,0.7);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-top: 8px;
-        }
-
-        .species-scroll-indicator {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255,255,255,0.7);
-            font-size: 12px;
-            font-weight: 500;
-            animation: bounce 2s ease-in-out infinite;
-            z-index: 20;
-            transition: opacity 0.3s ease;
-        }
-        .species-scroll-indicator.hidden { opacity: 0; pointer-events: none; }
-        .species-scroll-indicator svg { width: 24px; height: 24px; }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(10px); }
-        }
-
-        #spermWhaleScene {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 11;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        #spermWhaleScene canvas { width: 100% !important; height: 100% !important; }
-
-        @media (max-width: 768px) {
-            #species-hero { min-height: 110vh; }
-            .species-hero-stats { gap: 30px; }
-            .species-highlight { left: 5% !important; right: 5% !important; text-align: center !important; max-width: none; }
-            .highlight-left { top: 40%; }
-            .highlight-right { top: 58%; }
+            /* Month slider position - single source of truth (adjust these values) */
+            --slider-left: 8px;
+            --slider-bottom: 170px; /* Default for 900px - lower = closer to species bar */
         }
 
         /* ============================================================
-           MAP DESCRIPTION SECTION
+           CSS RESET & BASE
            ============================================================ */
-        .map-intro {
-            background: linear-gradient(180deg, #f8f9fa 0%, #fff 100%);
-            padding: 48px 24px 32px;
-            text-align: center;
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        .map-intro-inner {
-            width: min(100%, clamp(640px, 80vw, 1100px));
-            margin: 0 auto;
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #0f2d4a;
         }
 
-        .map-intro-title {
-            font-size: clamp(28px, 4vw, 36px);
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0 0 16px 0;
-            line-height: 1.2;
-        }
-
-        .map-intro-text {
+        #navbar {
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: var(--nav-height);
             display: flex;
-            flex-direction: column;
-            gap: 16px;
-            font-size: 16px;
-            line-height: 1.7;
-            color: #475569;
-            margin: 0 0 24px 0;
+            align-items: center;
         }
 
-        .map-intro-text p {
+        /* Navbar sizing tweaks to keep a single row */
+        #navbar .nav-container {
+            padding: 8px 14px;
+            gap: 12px;
+            flex-wrap: nowrap;
+            height: 100%;
+            width: 100%;
+            max-width: none;
             margin: 0;
         }
 
-        @media (max-width: 768px) {
-            .map-intro { padding: 32px 16px 24px; }
+        #navbar .nav-brand {
+            padding: 8px 0;
+            gap: 8px;
+            font-size: 18px;
+            margin-right: auto;
+        }
+
+        #navbar .nav-links {
+            gap: 6px;
+            flex-wrap: nowrap;
+        }
+
+        #navbar .nav-link {
+            padding: 8px 12px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        /* Hamburger toggle (shown on mobile) */
+        #navbar .nav-toggle {
+            display: none;
+            width: 38px;
+            height: 38px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.1);
+            color: #fff;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        #navbar .nav-toggle span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: currentColor;
+            border-radius: 4px;
+        }
+
+        /* Mobile nav behavior */
+        @media (max-width: 900px) {
+            #navbar .nav-container {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            #navbar .nav-links {
+                display: none;
+                position: absolute;
+                top: var(--nav-height);
+                left: 0;
+                right: 0;
+                padding: 12px 16px;
+                background: rgba(10, 35, 66, 0.96);
+                flex-direction: column;
+                gap: 8px;
+                box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+            }
+
+            #navbar.nav-open .nav-links {
+                display: flex;
+            }
+
+            #navbar .nav-toggle {
+                display: inline-flex;
+            }
+
+            #navbar .nav-links .nav-link {
+                width: 100%;
+                text-align: left;
+            }
         }
 
         /* ============================================================
-           PRESET BAR - Improved styling
+           LAYOUT: Fixed sidebar + map area
            ============================================================ */
-        .preset-bar {
-            background: linear-gradient(to bottom, #f8fafc, #fff);
-            border-bottom: 1px solid #e2e8f0;
-            padding: 16px 24px;
-        }
-
-        .preset-bar-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: flex-start;
-            gap: 28px;
-            flex-wrap: wrap;
-        }
-
-        .preset-bar-info {
-            min-width: 220px;
+        .sidebar {
+            position: fixed;
+            top: var(--nav-height);
+            left: 0;
+            width: 380px;
+            height: calc(100vh - var(--nav-height));
+            background: rgba(10, 35, 66, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 50;
             display: flex;
             flex-direction: column;
-            gap: 10px;
         }
 
-        .preset-bar-label {
-            font-size: 13px;
+        .map-wrapper {
+            position: fixed;
+            top: var(--nav-height);
+            left: 380px;
+            right: 0;
+            bottom: 0;
+            background: #0f2d4a;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f2d4a;
+        }
+
+        /* ============================================================
+           SIDEBAR HEADER
+           ============================================================ */
+        .sidebar-header {
+            padding: 32px 20px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 12px;
+            position: relative;
+        }
+
+        .sidebar-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
             font-weight: 600;
-            color: #64748b;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-description {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.5;
+        }
+
+        .sidebar-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-stat {
+            text-align: center;
+        }
+
+        .sidebar-stat-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a6db0;
+            line-height: 1;
+        }
+
+        .sidebar-stat-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 4px;
+        }
+
+        /* Map Tips Button & Tooltip */
+        .map-tips-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: rgba(78, 205, 196, 0.15);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 6px;
+            color: #4ecdc4;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-tips-btn:hover {
+            background: rgba(78, 205, 196, 0.25);
+            border-color: rgba(78, 205, 196, 0.5);
+        }
+
+        .map-tips-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .map-tips-tooltip {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 8px;
+            padding: 12px 14px;
+            background: rgba(10, 35, 66, 0.98);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 8px;
+            z-index: 10;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .map-tips-tooltip.show {
+            display: block;
+        }
+
+        .map-tips-tooltip ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .map-tips-tooltip li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .map-tips-tooltip li:last-child {
+            margin-bottom: 0;
+        }
+
+        .map-tips-tooltip li::before {
+            content: '\2022';
+            color: #4ecdc4;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+           SIDEBAR TABS
+           ============================================================ */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .sidebar-tab:hover {
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-tab.active {
+            color: #4ecdc4;
+        }
+
+        .sidebar-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: #4ecdc4;
+        }
+
+        /* ============================================================
+           SIDEBAR CONTENT
+           ============================================================ */
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .sidebar-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ============================================================
+           ALL SPECIES TOGGLE
+           ============================================================ */
+        .all-species-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        .all-species-label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        .preset-utilities {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+        /* ============================================================
+           TOGGLE SWITCH STYLES
+           ============================================================ */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
         }
 
-        .preset-chips {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            flex: 1;
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
 
-        .preset-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #334155;
+        .toggle-slider {
+            position: absolute;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            transition: 0.3s;
+            background: transparent;
+            border: 2px solid var(--species-color, #4ecdc4);
+            opacity: 0.5;
         }
 
-        .preset-chip:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transform: translateY(-1px);
+        .toggle-slider::before {
+            position: absolute;
+            content: '';
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background: var(--species-color, #4ecdc4);
+            transition: 0.3s;
+            border-radius: 50%;
         }
 
-        .preset-chip.active {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            border-color: #0284c7;
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--species-color, #4ecdc4);
+            border-color: var(--species-color, #4ecdc4);
+            opacity: 1;
         }
 
-        .preset-chip .chip-icon {
-            font-size: 18px;
-        }
-
-        .preset-chip .chip-text {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1px;
-        }
-
-        .preset-chip .chip-title {
-            font-weight: 600;
-            line-height: 1.2;
-        }
-
-        .preset-chip .chip-desc {
-            font-size: 11px;
-            font-weight: 400;
-            opacity: 0.7;
-            line-height: 1.2;
-        }
-
-        .preset-chip.active .chip-desc {
-            opacity: 0.85;
-        }
-
-        /* Utility buttons (All / Clear) */
-        .preset-chip.utility {
-            padding: 10px 14px;
-            background: #f1f5f9;
-        }
-
-        .preset-chip.utility .chip-text {
-            flex-direction: row;
-            gap: 0;
-        }
-
-        .preset-chip.utility .chip-desc {
-            display: none;
-        }
-
-        .preset-chip.utility:hover {
-            background: #e2e8f0;
-        }
-
-        .preset-chip.utility.active {
-            background: #64748b;
-            border-color: #64748b;
-        }
-
-        @media (max-width: 900px) {
-            .preset-bar { padding: 12px 16px; }
-            .preset-bar-inner { flex-direction: column; }
-            .preset-bar-info { width: 100%; }
-            .preset-utilities { width: 100%; }
-            .preset-chip { padding: 8px 12px; }
-            .preset-chip .chip-icon { font-size: 16px; }
-            .preset-chip .chip-title { font-size: 13px; }
-            .preset-chip .chip-desc { display: none; }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+            background: #fff;
         }
 
         /* ============================================================
-           MAP & LEGEND
+           WHALE SPECIES CARDS
            ============================================================ */
-        #map { position: relative; }
+        .species-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-        #legend {
-            position: absolute;
-            top: 16px; left: 16px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 16px;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-            min-width: 200px;
-            max-width: 280px;
-            z-index: 10;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        .species-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
-        .legend-title {
-            font-weight: 700;
-            font-size: 13px;
-            color: #333;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
+
+        .species-card:hover {
+            background: rgba(255, 255, 255, 0.08);
         }
-        .legend-row {
+
+        .species-card.expanded {
+            box-shadow: 0 0 25px var(--species-color, #4ecdc4);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .species-card-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 0;
+            padding: 12px 16px;
             cursor: pointer;
-            transition: opacity 0.2s;
-            border-bottom: 1px solid #f5f5f5;
+            gap: 12px;
         }
-        .legend-row:last-of-type { border-bottom: none; }
-        .legend-row:hover { opacity: 0.8; }
-        .legend-row input[type="checkbox"] {
-            width: 16px; height: 16px;
-            cursor: pointer;
-            accent-color: #2c7ab8;
+
+        .header-toggle {
             flex-shrink: 0;
         }
-        .legend-color { width: 28px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-        .legend-name { font-size: 13px; color: #333; flex: 1; font-weight: 500; }
-        .legend-note {
+
+        .header-toggle .toggle-switch {
+            width: 40px;
+            height: 22px;
+        }
+
+        .header-toggle .toggle-slider::before {
+            height: 14px;
+            width: 14px;
+        }
+
+        .header-toggle input:checked + .toggle-slider::before {
+            transform: translateX(18px);
+        }
+
+        .species-name-collapsed {
+            flex: 1;
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .species-card.expanded .species-name-collapsed {
+            display: none;
+        }
+
+        .species-expand-btn {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .species-expand-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .species-expand-btn svg {
+            width: 14px;
+            height: 14px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .species-expand-btn .icon-plus { display: block; }
+        .species-expand-btn .icon-minus { display: none; }
+        .species-card.expanded .species-expand-btn { display: none; }
+
+        .species-card-body {
+            display: none;
+            position: relative;
+        }
+
+        .species-card.expanded .species-card-body {
+            display: block;
+        }
+
+        .species-collapse-btn {
+            position: absolute;
+            top: -40px;
+            right: 16px;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .species-collapse-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .species-collapse-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .species-card-content {
+            padding: 0 16px 10px;
+            position: relative;
+        }
+
+        .species-image-area {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            height: 80px;
+            margin-bottom: -50px;
+            position: relative;
+            z-index: 0;
+            overflow: visible;
+            padding-top: 0;
+        }
+
+        .species-image {
+            max-width: 110%;
+            max-height: 280px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.5));
+            margin-top: -100px;
+        }
+
+        .species-image-placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .species-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+            padding-top: 40px;
+        }
+
+        .species-info-text {
+            flex: 1;
+        }
+
+        .species-name-expanded {
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .species-scientific {
             font-size: 11px;
-            color: #888;
-            margin-top: 12px;
-            padding-top: 8px;
-            border-top: 1px solid #eee;
-            line-height: 1.4;
+            font-style: italic;
+            color: #4ecdc4;
         }
 
-        /* Hide close button on desktop */
-        .legend-close {
-            display: none;
-        }
-
-        /* Top Control Buttons - hidden on desktop, visible on mobile */
-        .bottom-controls {
-            display: none;
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            flex-direction: row;
-            gap: 12px;
-            z-index: 10;
-        }
-
-        @media (max-width: 768px) {
-            .bottom-controls {
-                display: flex;
-            }
-        }
-
-        .bottom-control-btn {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 12px;
-            padding: 12px 20px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-            cursor: pointer;
-            font-size: 13px;
+        .species-info-btn {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 14px;
             font-weight: 600;
-            color: #333;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .bottom-control-btn:hover {
-            background: #fff;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .bottom-control-btn.active {
-            background: var(--primary, #0a4a7c);
-            color: white;
-        }
-
-        .bottom-control-btn svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        @media (max-width: 768px) {
-            .bottom-controls {
-                top: 12px;
-                right: 12px;
-                gap: 8px;
-            }
-
-            .bottom-control-btn {
-                padding: 10px 14px;
-                font-size: 11px;
-                border-radius: 10px;
-            }
-
-            .bottom-control-btn svg {
-                width: 16px;
-                height: 16px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .bottom-controls {
-                top: 10px;
-                right: 10px;
-                gap: 6px;
-            }
-
-            .bottom-control-btn {
-                padding: 8px 12px;
-                font-size: 10px;
-            }
-
-            .bottom-control-btn svg {
-                width: 14px;
-                height: 14px;
-            }
-        }
-
-        /* Hide old legend toggle on desktop - we use bottom buttons now */
-        .legend-toggle {
-            display: none !important;
-        }
-
-        /* Hide old animations toggle - we use bottom buttons now */
-        .animations-toggle {
-            display: none !important;
-        }
-
-        /* Show circular controls - no background box */
-        #controls {
-            display: block;
-        }
-
-        /* Legend - side panel on desktop */
-        .legend-close {
-            display: none;
-        }
-
-        .legend-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 99;
-        }
-
-        .legend-overlay.visible {
-            display: block;
-        }
-
-        /* Mobile: Legend becomes bottom sheet */
-        @media (max-width: 768px) {
-            #legend {
-                position: fixed !important;
-                top: auto !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                width: 100%;
-                max-width: none;
-                max-height: 50vh;
-                border-radius: 20px 20px 0 0;
-                padding: 20px;
-                overflow-y: auto;
-                background: rgba(255, 255, 255, 0.98);
-                z-index: 100;
-                transform: translateY(100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
-            }
-
-            #legend.mobile-visible {
-                transform: translateY(0);
-            }
-
-            #legend .legend-title {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .legend-close {
-                display: block;
-                background: none;
-                border: none;
-                font-size: 24px;
-                color: #666;
-                cursor: pointer;
-                padding: 4px 8px;
-                line-height: 1;
-            }
-        }
-
-        /* Animations panel - bottom sheet on mobile only */
-        @media (max-width: 768px) {
-            .settings-panel {
-                position: fixed !important;
-                top: auto !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                width: 100%;
-                z-index: 100;
-                transform: translateY(100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-
-            .settings-panel.mobile-visible {
-                transform: translateY(0);
-            }
-
-            .settings-toggle {
-                display: none !important;
-            }
-
-            .settings-dropdown {
-                position: relative !important;
-                top: auto !important;
-                right: auto !important;
-                width: 100% !important;
-                max-height: 50vh;
-                overflow-y: auto;
-                border-radius: 20px 20px 0 0 !important;
-                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15) !important;
-                opacity: 1 !important;
-                visibility: visible !important;
-            transform: none !important;
-        }
-
-        .settings-header {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-        }
-
-        .settings-close {
-            display: block !important;
-        }
-
-        .animations-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 99;
-        }
-
-        .animations-overlay.visible {
-            display: block;
-        }
-
-        /* Mobile Legend Toggle Button - DEPRECATED, using bottom controls */
-        .legend-toggle-old {
-            display: none;
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            z-index: 15;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 12px;
-            padding: 10px 14px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .legend-toggle:hover {
-            background: #fff;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .legend-toggle svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .legend-toggle .toggle-text {
-            display: inline;
-        }
-
-        .legend-toggle.active {
-            background: var(--primary, #0a4a7c);
-            color: white;
-        }
-
-        @media (max-width: 768px) {
-            .legend-toggle {
-                display: flex;
-            }
-
-            #legend {
-                position: fixed;
-                top: auto;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                width: 100%;
-                max-width: none;
-                max-height: 50vh;
-                border-radius: 20px 20px 0 0;
-                padding: 20px;
-                overflow-y: auto;
-                background: rgba(255, 255, 255, 0.98);
-                z-index: 100;
-                transform: translateY(100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
-            }
-
-            #legend.mobile-visible {
-                transform: translateY(0);
-            }
-
-            #legend .legend-title {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .legend-close {
-                display: block;
-                background: none;
-                border: none;
-                font-size: 24px;
-                color: #666;
-                cursor: pointer;
-                padding: 4px 8px;
-                line-height: 1;
-            }
-
-            /* Overlay when legend is open */
-            .legend-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.3);
-                z-index: 99;
-            }
-
-            .legend-overlay.visible {
-                display: block;
-            }
-        }
-
-        @media (max-width: 520px) {
-            .legend-toggle {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-
-            .legend-toggle .toggle-text {
-                display: none;
-            }
-
-            #legend {
-                max-height: 60vh;
-                padding: 16px;
-            }
-        }
-
-        /* Mobile Animations Toggle Button */
-        .animations-toggle {
-            display: none;
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            z-index: 15;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 12px;
-            padding: 10px 14px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .animations-toggle:hover {
-            background: #fff;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .animations-toggle svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .animations-toggle .toggle-text {
-            display: inline;
-        }
-
-        .animations-toggle.active {
-            background: var(--primary, #0a4a7c);
-            color: white;
-        }
-
-        /* Hide close button on desktop */
-        .settings-close {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .animations-toggle {
-                display: flex;
-            }
-
-            .settings-panel {
-                position: fixed !important;
-                top: auto !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                width: 100%;
-                z-index: 100;
-                transform: translateY(100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-
-            .settings-panel.mobile-visible {
-                transform: translateY(0);
-            }
-
-            .settings-toggle {
-                display: none !important;
-            }
-
-            .settings-dropdown {
-                position: relative !important;
-                top: auto !important;
-                right: auto !important;
-                width: 100% !important;
-                max-height: 50vh;
-                overflow-y: auto;
-                border-radius: 20px 20px 0 0 !important;
-                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15) !important;
-                opacity: 1 !important;
-                visibility: visible !important;
-                transform: none !important;
-            }
-
-            .settings-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .settings-close {
-                display: block;
-                background: none;
-                border: none;
-                font-size: 24px;
-                color: #666;
-                cursor: pointer;
-                padding: 4px 8px;
-                line-height: 1;
-            }
-
-            .settings-content {
-                padding: 12px 16px;
-            }
-
-            .setting-group {
-                margin-bottom: 12px;
-            }
-
-            .setting-label span {
-                font-size: 12px;
-            }
-
-            .setting-description {
-                font-size: 10px;
-            }
-
-            /* Animations overlay */
-            .animations-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.3);
-                z-index: 99;
-            }
-
-            .animations-overlay.visible {
-                display: block;
-            }
-        }
-
-        @media (max-width: 520px) {
-            .animations-toggle {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-
-            .animations-toggle .toggle-text {
-                display: none;
-            }
-
-            .settings-dropdown {
-                max-height: 60vh;
-            }
-
-            .setting-label span {
-                font-size: 11px;
-            }
-
-            .setting-value {
-                font-size: 10px;
-            }
-        }
-
-        /* Settings Panel */
-        .settings-panel {
-            position: absolute;
-            top: 16px; right: 16px;
-            z-index: 10;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        .settings-toggle {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            color: #333;
+            justify-content: center;
             transition: all 0.2s;
+            text-decoration: none;
         }
-        .settings-toggle:hover { background: #fff; box-shadow: 0 4px 28px rgba(0, 0, 0, 0.2); }
-        .settings-toggle svg { width: 18px; height: 18px; }
-        .settings-toggle .chevron { width: 14px; height: 14px; transition: transform 0.2s; }
-        .settings-panel.open .settings-toggle .chevron { transform: rotate(180deg); }
 
-        .settings-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            width: 280px;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s;
+        .species-info-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
-        .settings-panel.open .settings-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
-        .settings-header {
-            padding: 14px 16px;
+
+
+        /* ============================================================
+           ANIMATION TAB CONTENT
+           ============================================================ */
+        .animation-section {
+            margin-bottom: 24px;
+        }
+
+        .animation-section-title {
+            font-size: 11px;
             font-weight: 600;
-            font-size: 13px;
-            color: #333;
-            border-bottom: 1px solid #eee;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
         }
-        .settings-content { padding: 16px; }
-        .setting-group { margin-bottom: 16px; }
-        .setting-group:last-child { margin-bottom: 0; }
+
+        .setting-group {
+            margin-bottom: 16px;
+        }
+
         .setting-label {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #333;
         }
-        .setting-value { color: #2c7ab8; font-weight: 600; }
+
+        .setting-label span {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .setting-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4ecdc4;
+        }
+
         .setting-slider {
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: linear-gradient(to right, #2c7ab8 0%, #e0e0e0 0%);
+            background: rgba(255, 255, 255, 0.2);
             outline: none;
             cursor: pointer;
         }
+
         .setting-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: #fff;
-            border: 3px solid #2c7ab8;
+            background: #4ecdc4;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
-        .setting-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 3px 10px rgba(44, 122, 184, 0.3);
-        }
+
         .setting-slider::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: #fff;
-            border: 3px solid #2c7ab8;
+            background: #4ecdc4;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-        }
-        .setting-description { font-size: 11px; color: #888; margin-top: 6px; }
-        .setting-presets { display: flex; gap: 6px; margin-top: 10px; }
-        .setting-presets .preset-btn {
-            flex: 1;
-            padding: 6px 10px;
-            font-size: 11px;
-            text-align: center;
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .setting-presets .preset-btn:hover { background: #e2e8f0; }
-        .setting-presets .preset-btn.active { background: #2c7ab8; color: white; border-color: #2c7ab8; }
-        .settings-divider { height: 1px; background: #eee; margin: 16px 0; }
-        .reset-btn {
-            width: 100%;
-            padding: 10px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .reset-btn:hover { background: #f1f5f9; color: #475569; }
-
-        #monthBottom, .month-display { display: none; }
-
-        /* Circular controls - positioned top left, no background box */
-        #controls {
-            position: absolute !important;
-            top: 16px !important;
-            left: 16px !important;
-            bottom: auto !important;
-            right: auto !important;
-            z-index: 10 !important;
-            background: transparent !important;
-            box-shadow: none !important;
-        }
-
-        /* Circular control styling - matching density map */
-        .control-header {
-            font-size: 11px;
-            font-weight: 700;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .circular-selector {
-            position: relative;
-            width: 180px !important;
-            height: 180px !important;
-            margin: 0 auto;
-        }
-
-        .month-wheel {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .month-marker {
-            position: absolute;
-            width: 36px !important;
-            height: 36px !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            user-select: none;
-            z-index: 2;
-        }
-
-        .month-marker:hover {
-            background: rgba(44, 122, 184, 0.15);
-            color: #2c7ab8;
-            transform: scale(1.1);
-        }
-
-        .month-marker.active {
-            background: #2c7ab8;
-            color: white;
-            box-shadow: 0 2px 8px rgba(44, 122, 184, 0.4);
-            transform: scale(1.15);
-        }
-
-        .center-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90px !important;
-            height: 90px !important;
-            border-radius: 50%;
-            background: white;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 3;
-        }
-
-        .center-month {
-            font-size: 14px;
-            font-weight: 700;
-            color: #2c7ab8;
-            margin-bottom: 2px;
-        }
-
-        .center-hint {
-            font-size: 8px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .rotation-indicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 50%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent 0%, #2c7ab8 60%, #2c7ab8 100%);
-            transform-origin: left center;
-            z-index: 1;
-            pointer-events: none;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .rotation-indicator::after {
-            content: '';
-            position: absolute;
-            right: -4px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
-            background: #2c7ab8;
-            border-radius: 50%;
-            box-shadow: 0 0 6px rgba(44, 122, 184, 0.5);
-        }
-
-        .drag-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            cursor: grab;
-            z-index: 4;
-        }
-
-        .drag-ring:active {
-            cursor: grabbing;
-        }
-
-        .drag-ring::before {
-            content: '';
-            position: absolute;
-            inset: 6px;
-            border-radius: 50%;
-            border: 2px dashed rgba(44, 122, 184, 0.2);
-            pointer-events: none;
-        }
-
-        .play-controls {
-            display: flex;
-            justify-content: center;
-            margin-top: 14px;
-            gap: 6px;
-        }
-
-        .control-button {
-            padding: 8px 20px;
             border: none;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: #2c7ab8;
-            color: white;
         }
 
-        .control-button:hover {
-            background: #1e5a8a;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(44, 122, 184, 0.3);
+        .setting-description {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 6px;
         }
 
-        .control-button.playing {
-            background: #e74c3c;
-        }
-
-        .control-button.playing:hover {
-            background: #c0392b;
-        }
-
-        .nav-arrows {
+        .speed-presets {
             display: flex;
-            justify-content: center;
-            gap: 12px;
+            gap: 8px;
             margin-top: 10px;
         }
 
-        .nav-arrow {
-            width: 32px;
-            height: 32px;
-            border: none;
-            border-radius: 50%;
-            background: #f0f0f0;
+        .speed-preset-btn {
+            flex: 1;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .speed-preset-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .speed-preset-btn.active {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            color: #0a2342;
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 16px;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        /* ============================================================
+           PRESETS TAB CONTENT
+           ============================================================ */
+        .preset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .preset-card {
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .preset-card.active {
+            background: rgba(78, 205, 196, 0.15);
+            border-color: #4ecdc4;
+        }
+
+        .preset-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .preset-card-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .preset-utilities {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .preset-utility-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-utility-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ============================================================
+           MAP CONTROLS
+           ============================================================ */
+        .map-controls {
+            position: fixed;
+            right: 20px;
+            top: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 40;
+        }
+
+        .map-control-btn {
+            width: 44px;
+            height: 44px;
+            background: rgba(10, 35, 66, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
+        }
+
+        .map-control-btn:hover {
+            background: rgba(20, 50, 90, 0.95);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .map-control-btn.active {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            color: #0a2342;
+        }
+
+        .map-control-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Projection Toggle - centered in map area */
+        .projection-toggle {
+            position: fixed;
+            top: 100px;
+            /* Center in map area: sidebar(380) + half of remaining space */
+            left: calc(380px + (100vw - 380px) / 2);
+            transform: translateX(-50%);
+            display: flex;
+            background: rgba(10, 35, 66, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 40;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .projection-btn {
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .projection-btn:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .projection-btn.active {
+            background: #1a6db0;
+            color: #fff;
+        }
+
+        /* ============================================================
+           BASEMAP CONTROLS - TOP LEFT OF MAP
+           ============================================================ */
+        .basemap-panel {
+            position: fixed;
+            top: 100px;
+            left: calc(380px + 16px);
+            z-index: 40;
+        }
+
+        .basemap-control-group {
+            background: rgba(10, 35, 66, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 8px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .basemap-control-label {
+            font-size: 9px;
+            font-weight: 700;
             color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            text-align: center;
         }
 
-        .nav-arrow:hover {
-            background: #2c7ab8;
-            color: white;
+        .basemap-toggle {
+            display: flex;
+            gap: 4px;
         }
 
-        .nav-arrow svg {
+        .basemap-btn {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(26, 109, 176, 0.25);
+            font-size: 9px;
+            font-weight: 600;
+            color: #d9ecff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .basemap-btn:hover {
+            border-color: #4ecdc4;
+            background: rgba(26, 109, 176, 0.55);
+            color: #ffffff;
+        }
+
+        .basemap-btn.active {
+            border-color: #4ecdc4;
+            background: #1a6db0;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .basemap-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Mobile basemap select in settings panel */
+        .mobile-basemap-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-basemap-select {
+            width: 100%;
+            padding: 6px 16px 6px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24' fill='none' stroke='%23d9ecff' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            min-width: 70px;
+        }
+
+        .mobile-basemap-select:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.25);
+        }
+
+        .mobile-basemap-select option {
+            background: #0a2342;
+            color: #fff;
+        }
+
+        /* Month Slider */
+        /* Use :not(.controls-bottom-left) to match specificity of styles.css */
+        #controls:not(.controls-bottom-left) {
+            /* Override global #controls rules from styles.css that use !important */
+            position: absolute !important;
+            top: 630px !important;
+            right: 5px !important;
+            bottom: auto !important;
+            left: auto !important;
+            transform: none !important;
+            z-index: 1300 !important; /* Sit above nav and mobile layers */
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            backdrop-filter: none !important;
+            width: fit-content !important;
+        }
+
+        /* Month slider theming */
+        .month-wheel {
+            background: radial-gradient(circle at 30% 30%, rgba(78, 205, 196, 0.15), rgba(10, 35, 66, 0.85));
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .month-marker {
+            color: #d9ecff;
+        }
+
+        .month-marker:hover {
+            color: #4ecdc4;
+        }
+
+        .month-marker.active {
+            background: #1a6db0;
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+        }
+
+        .center-display {
+            background: rgba(10, 35, 66, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .center-month {
+            color: #d9ecff;
+        }
+
+        .center-play-icon {
+            color: #4ecdc4;
+        }
+
+        /* ============================================================
+           MOBILE FLOATING BUTTONS
+           ============================================================ */
+        .mobile-floating-btn {
+            display: none;
+            position: absolute;
+            top: 15px !important;
+            width: 44px;
+            height: 44px;
+            background: rgba(10, 35, 66, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            z-index: 1300;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .mobile-floating-btn:hover {
+            background: rgba(20, 50, 90, 0.95);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .mobile-floating-btn.active {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            color: #0a2342;
+        }
+
+        .mobile-floating-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .mobile-info-btn {
+            left: 12px;
+        }
+
+        .mobile-anim-btn {
+            right: 12px;
+        }
+
+        /* Mobile Floating Dropdown Panels */
+        .mobile-floating-panel {
+            display: none;
+            position: absolute;
+            top: 70px;
+            width: calc(100% - 24px);
+            max-width: 320px;
+            max-height: 60vh;
+            background: rgba(10, 35, 66, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 1250;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .mobile-floating-panel.open {
+            display: block;
+        }
+
+        .mobile-info-panel {
+            left: 12px;
+        }
+
+        .mobile-anim-panel {
+            right: 12px;
+        }
+
+        .mobile-panel-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-panel-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .mobile-panel-tips {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .mobile-panel-tips li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .mobile-panel-tips li::before {
+            content: '\2022';
+            color: #4ecdc4;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .mobile-anim-section {
+            margin-bottom: 20px;
+        }
+
+        .mobile-anim-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .mobile-anim-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
+
+        .mobile-anim-speed-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mobile-anim-speed-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mobile-anim-speed-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .mobile-anim-speed-btn.active {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            color: #0a2342;
+        }
+
+        .mobile-anim-slider-group {
+            margin-bottom: 16px;
+        }
+
+        .mobile-anim-slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .mobile-anim-slider-label .value {
+            color: #4ecdc4;
+            font-weight: 600;
+        }
+
+        .mobile-anim-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .mobile-anim-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
             width: 16px;
             height: 16px;
+            border-radius: 50%;
+            background: #4ecdc4;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
 
-        @media (max-width: 768px) {
-            .settings-panel { top: 10px; right: 10px; }
-            .settings-dropdown { width: 260px; }
-            #controls {
-                top: 12px !important;
-                left: 12px !important;
+        .mobile-anim-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #4ecdc4;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* ============================================================
+           MOBILE STYLES
+           ============================================================ */
+        .mobile-species-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 160px;
+            background: rgba(10, 35, 66, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 500;
+            padding: 12px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-species-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mobile-species-cards {
+            display: flex;
+            gap: 12px;
+            height: 100%;
+        }
+
+        .mobile-species-card {
+            flex-shrink: 0;
+            width: calc(50vw - 24px);
+            min-width: 160px;
+            max-width: 200px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            position: relative;
+        }
+
+        .mobile-species-card:hover,
+        .mobile-species-card.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .mobile-species-card .mobile-toggle {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+
+        .mobile-species-card .mobile-toggle .toggle-switch {
+            width: 36px;
+            height: 20px;
+        }
+
+        .mobile-species-card .mobile-toggle .toggle-slider::before {
+            height: 12px;
+            width: 12px;
+        }
+
+        .mobile-species-card .mobile-toggle input:checked + .toggle-slider::before {
+            transform: translateX(16px);
+        }
+
+        .mobile-species-card img {
+            width: 200% !important;
+            height: 135px !important;
+            object-fit: contain;
+            margin-top: -35px !important;
+            margin-bottom: -25px !important;
+        }
+
+        .mobile-species-card .species-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 13px !important;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .mobile-bottom-sheet {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 70vh;
+            background: rgba(10, 35, 66, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 20px 20px 0 0;
+            z-index: 60;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .mobile-bottom-sheet.open {
+            transform: translateY(0);
+        }
+
+        .mobile-sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+
+        .mobile-sheet-content {
+            padding: 0 20px 30px;
+        }
+
+        .mobile-sheet-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 55;
+        }
+
+        .mobile-sheet-overlay.visible {
+            display: block;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
             }
-            .circular-selector {
-                width: 140px !important;
-                height: 140px !important;
+
+            .map-wrapper {
+                left: 0 !important;
+                right: -10px !important;
+                top: var(--nav-height) !important;
+                bottom: 180px;
+                margin: 0 !important;
+                padding: 0 !important;
             }
-            .month-marker {
-                width: 28px !important;
-                height: 28px !important;
-                font-size: 8px;
+
+            #map {
+                left: 0 !important;
+                right: -10px !important;
+                top: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
-            .center-display {
-                width: 70px !important;
-                height: 70px !important;
+
+            .mobile-species-bar {
+                display: block;
+                height: 160px;
             }
-            .center-month {
-                font-size: 11px;
+
+            .mobile-bottom-sheet {
+                display: block;
             }
-            .center-hint {
-                font-size: 7px;
+
+            .mobile-floating-btn {
+                display: flex;
             }
-            .control-header {
+
+            .projection-toggle {
+                left: 50%;
+                top: var(--mobile-ctrl-top);
+            }
+
+            /* Hide desktop basemap panel on mobile */
+            .basemap-panel {
+                display: none;
+            }
+
+            /* Month slider - uses CSS variables for easy adjustment */
+            /* Use :not(.controls-bottom-left) to match specificity of styles.css */
+            #controls:not(.controls-bottom-left) {
+                position: absolute !important;
+                top: auto !important;
+                left: auto !important;
+                right: -10px !important;
+                bottom: var(--slider-bottom) !important;
+                transform: none !important;
+                z-index: 1300 !important;
+            }
+
+            .map-controls {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .projection-btn {
+                padding: 8px 12px;
                 font-size: 10px;
-                margin-bottom: 8px;
             }
-            .nav-arrows {
-                gap: 6px;
-                margin-top: 8px;
-            }
-            .nav-arrow {
-                width: 26px;
-                height: 26px;
-            }
-            .nav-arrow svg {
-                width: 12px;
-                height: 12px;
-            }
-            .play-controls {
-                margin-top: 10px;
-            }
-            .control-button {
-                padding: 6px 14px;
-                font-size: 10px;
-            }
-        }
 
-        @media (max-width: 480px) {
-            #controls {
-                top: 10px !important;
-                left: 10px !important;
+            .mobile-floating-btn {
+                top: var(--mobile-ctrl-top);
+                width: 40px;
+                height: 40px;
             }
-            .circular-selector {
-                width: 105px !important;
-                height: 105px !important;
-            }
-            .month-marker {
-                width: 22px !important;
-                height: 22px !important;
-                font-size: 7px;
-            }
-            .center-display {
-                width: 52px !important;
-                height: 52px !important;
-            }
-            .center-month {
-                font-size: 9px;
-            }
-            .center-hint {
-                font-size: 6px;
-            }
-            .control-header {
-                font-size: 9px;
-            }
-            .nav-arrows {
-                gap: 4px;
-                margin-top: 6px;
-            }
-            .nav-arrow {
-                width: 24px;
-                height: 24px;
-            }
-            .nav-arrow svg {
-                width: 12px;
-                height: 12px;
-            }
-            .play-controls {
-                margin-top: 8px;
-            }
-            .control-button {
-                padding: 5px 12px;
-                font-size: 10px;
-                border-radius: 14px;
-            }
-            .rotation-indicator {
-                display: none;
-            }
-        }
 
-        /* Very small screens */
-        @media (max-width: 360px) {
-            #controls {
-                top: 8px !important;
-                left: 8px !important;
-            }
-            .control-header {
-                display: none;
-            }
-            .circular-selector {
-                width: 90px !important;
-                height: 90px !important;
-            }
-            .month-marker {
-                width: 18px !important;
-                height: 18px !important;
-                font-size: 6px;
-            }
-            .center-display {
-                width: 44px !important;
-                height: 44px !important;
-            }
-            .center-month {
-                font-size: 8px;
-            }
-            .center-play-icon {
-                font-size: 8px;
-            }
-            .center-hint {
-                display: none;
-            }
-            .rotation-indicator {
-                display: none;
-            }
-            .nav-arrows {
-                gap: 2px;
-                margin-top: 4px;
-            }
-            .nav-arrow {
-                width: 22px !important;
-                height: 22px !important;
-            }
-            .play-controls {
-                margin-top: 6px;
-            }
-            .control-button {
-                padding: 4px 10px;
-                font-size: 9px;
-            }
-        }
-
-        /* Landscape mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            #controls {
-                top: 8px !important;
-                left: 8px !important;
-            }
-            .control-header {
-                display: none;
-            }
-            .circular-selector {
-                width: 85px !important;
-                height: 85px !important;
-            }
-            .month-marker {
-                width: 17px !important;
-                height: 17px !important;
-                font-size: 6px;
-            }
-            .center-display {
-                width: 42px !important;
-                height: 42px !important;
-            }
-            .center-month {
-                font-size: 8px;
-            }
-            .center-play-icon {
-                font-size: 8px;
-            }
-            .center-hint {
-                display: none;
-            }
-            .rotation-indicator {
-                display: none;
-            }
-            .nav-arrows {
-                margin-top: 4px;
-                gap: 2px;
-            }
-            .nav-arrow {
+            .mobile-floating-btn svg {
                 width: 20px;
                 height: 20px;
             }
-            .play-controls {
-                margin-top: 4px;
+
+            .mobile-floating-panel {
+                top: 70px;
             }
-            .control-button {
-                padding: 3px 8px;
-                font-size: 8px;
+
+            .map-wrapper {
+                left: 0 !important;
+                right: -10px !important;
+                bottom: 165px;
+            }
+
+            /* Smaller mobile species bar */
+            .mobile-species-bar {
+                height: 145px;
+                padding: 10px;
+            }
+
+            /* Slider position for 600px - direct override */
+            #controls:not(.controls-bottom-left) {
+                left: auto !important;
+                right: -15px !important;
+                bottom: 15px !important;
+            }
+
+            .mobile-species-card {
+                width: calc(50vw - 20px);
+                min-width: 140px;
+            }
+
+            /* Image size controlled by base .mobile-species-card img styles */
+
+            .mobile-species-card .species-name {
+                font-size: 11px;
             }
         }
 
+        @media (max-width: 400px) {
+            .map-wrapper {
+                left: 0 !important;
+                right: -10px !important;
+                bottom: 150px;
+            }
+
+            .mobile-species-bar {
+                height: 130px;
+            }
+
+            /* Slider position for 400px - direct override */
+            #controls:not(.controls-bottom-left) {
+                left: auto !important;
+                right: -10px !important;
+                bottom: 15px !important;
+            }
+
+            .mobile-species-card {
+                min-width: 150px;
+            }
+
+            /* Image size controlled by base .mobile-species-card img styles */
+
+            .mobile-floating-panel {
+                max-height: 50vh;
+            }
+        }
+
+        /* Hide mapbox logo and attribution */
+        .mapboxgl-ctrl-logo,
+        .mapboxgl-ctrl-attrib {
+            display: none !important;
+        }
+
+        /* Mapbox navigation controls styling */
+        .mapboxgl-ctrl-group {
+            background: rgba(10, 35, 66, 0.9) !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .mapboxgl-ctrl-group button {
+            background-color: transparent !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .mapboxgl-ctrl-group button + button {
+            border-top-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .mapboxgl-ctrl-icon {
+            filter: invert(1);
+        }
     </style>
 </head>
 <body>
+    <!-- Navbar -->
     <nav id="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-brand">
@@ -1443,6 +1621,11 @@
                 </span>
                 <span class="brand-text">Whale Watchers Atlas</span>
             </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="nav-links">
                 <a href="density-map.html" class="nav-link">Density Map</a>
                 <a href="species.html" class="nav-link active">Species Map</a>
@@ -1453,159 +1636,67 @@
         </div>
     </nav>
 
-    <section id="species-hero">
-        <div class="species-hero-scene">
-            <div class="species-hero-content">
-                <h1 class="species-hero-title">
-                    Track Every
-                    <span>Migration</span>
-                </h1>
-                <p class="species-hero-tagline">
-                    Explore species-specific movement patterns as whales travel 
-                    between feeding grounds and breeding waters
-                </p>
-                <div class="species-hero-stats">
-                    <div class="species-stat">
-                        <div class="species-stat-value">11</div>
-                        <div class="species-stat-label">Species Tracked</div>
-                    </div>
-                    <div class="species-stat">
-                        <div class="species-stat-value">12</div>
-                        <div class="species-stat-label">Months of Data</div>
-                    </div>
-                    <div class="species-stat">
-                        <div class="species-stat-value">∞</div>
-                        <div class="species-stat-label">Stories to Discover</div>
-                    </div>
+    <!-- Fixed Sidebar Panel -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-title">Species Migration Tracker</h1>
+            <!-- <div class="sidebar-stats">
+                <div class="sidebar-stat">
+                    <div class="sidebar-stat-value">11</div>
+                    <div class="sidebar-stat-label">Species</div>
+                </div>
+                <div class="sidebar-stat">
+                    <div class="sidebar-stat-value">30</div>
+                    <div class="sidebar-stat-label">Years of Data</div>
+                </div>
+            </div> -->
+            <p class="sidebar-description">Explore how whale species move across oceans throughout the year. Toggle species to see their migration patterns.<br><br>
+                The species-specific density maps are generated from local observations across the world, over the past 30 years. The up-to-date species observations 
+                can be found at the whale and location specific galleries.
+            </p>
+            <button class="map-tips-btn" id="mapTipsBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                Map Tips
+            </button>
+            <div class="map-tips-tooltip" id="mapTipsTooltip">
+                <ul>
+                    <li>Data resolution decreases as you zoom out - zoom in for more detail</li>
+                    <li>Use the Animation tab to adjust playback speed and animation style</li>
+                    <li>Try the Presets tab for curated migration journeys by ocean region</li>
+                    <li>Toggle multiple species to compare migration patterns</li>
+                    <li>Switch between Globe and Flat views for different perspectives</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" data-tab="species">Whale Species</button>
+            <button class="sidebar-tab" data-tab="animation">Animation</button>
+            <button class="sidebar-tab" data-tab="presets">Presets</button>
+        </div>
+
+        <div class="sidebar-content">
+            <!-- Species Tab -->
+            <div class="tab-panel active" id="tab-species">
+                <div class="all-species-toggle" style="--species-color: #4ecdc4;">
+                    <span class="all-species-label">All Species</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="allSpeciesToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="species-list" id="speciesList">
+                    <!-- Species cards generated by JavaScript -->
                 </div>
             </div>
-        </div>
 
-        <div class="species-scroll-indicator" id="speciesScrollIndicator">
-            <span>Scroll to explore</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 5v14M5 12l7 7 7-7"/>
-            </svg>
-        </div>
-
-        <div id="spermWhaleScene"></div>
-    </section>
-
-    <!-- Map Introduction Section -->
-    <section class="map-intro">
-        <div class="map-intro-inner">
-            <h2 class="map-intro-title">Explore Migration Patterns</h2>
-            <div class="map-intro-text">
-                <p>
-                    Use the interactive map below to visualize how different whale species share ocean habitats throughout the year.
-                </p>
-                <p>
-                    Toggle multiple species simultaneously to discover fascinating migration overlaps and seasonal patterns.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Preset Bar -->
-    <div class="preset-bar">
-        <div class="preset-bar-inner">
-            <div class="preset-bar-info">
-                <span class="preset-bar-label">Migration Presets</span>
-                <div class="preset-utilities">
-                    <button class="preset-chip utility" data-preset="clear">
-                        <span class="chip-text">
-                            <span class="chip-title">Clear</span>
-                        </span>
-                    </button>
-                    <button class="preset-chip utility" data-preset="all">
-                        <span class="chip-text">
-                            <span class="chip-title">All Species</span>
-                        </span>
-                    </button>
-                </div>
-            </div>
-            <div class="preset-chips">
-                <button class="preset-chip" data-preset="north_pacific">
-                    <span class="chip-text">
-                        <span class="chip-title">North Pacific Migration</span>
-                        <span class="chip-desc">Blue, Humpback, Gray</span>
-                    </span>
-                </button>
-                <button class="preset-chip" data-preset="north_atlantic">
-                    <span class="chip-text">
-                        <span class="chip-title">North Atlantic</span>
-                        <span class="chip-desc">Humpback, Fin, Right Whale</span>
-                    </span>
-                </button>
-                <button class="preset-chip" data-preset="arctic">
-                    <span class="chip-text">
-                        <span class="chip-title">North Arctic</span>
-                        <span class="chip-desc">Beluga, Orca (Northern)</span>
-                    </span>
-                </button>
-                <button class="preset-chip" data-preset="southern_ocean">
-                    <span class="chip-text">
-                        <span class="chip-title">Southern Ocean</span>
-                        <span class="chip-desc">Blue, Humpback, Orca</span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Map Container -->
-    <div id="map">
-        <!-- Bottom Control Buttons -->
-        <div class="bottom-controls">
-            <button class="bottom-control-btn" id="layerControlBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-                Species Layer Control
-            </button>
-            <button class="bottom-control-btn" id="animationControlBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="5 3 19 12 5 21 5 3"/>
-                </svg>
-                Animations
-            </button>
-        </div>
-
-        <!-- Legend Overlay -->
-        <div class="legend-overlay" id="legendOverlay"></div>
-
-        <div id="legend">
-            <div class="legend-title">
-                Species Layers
-                <button class="legend-close" id="legendClose">&times;</button>
-            </div>
-            <div id="legendSpecies"></div>
-            <div class="legend-note">
-                Click checkboxes to show/hide species.<br>
-                Brighter color = higher observation density.
-            </div>
-        </div>
-
-        <!-- Animations Overlay -->
-        <div class="animations-overlay" id="animationsOverlay"></div>
-
-        <div class="settings-panel" id="settingsPanel">
-            <button class="settings-toggle" id="settingsToggle">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-                </svg>
-                <span>Animation</span>
-                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6 6-6"/>
-                </svg>
-            </button>
-            <div class="settings-dropdown">
-                <div class="settings-header">
-                    Animation Settings
-                    <button class="settings-close" id="settingsClose">&times;</button>
-                </div>
-                <div class="settings-content">
+            <!-- Animation Tab -->
+            <div class="tab-panel" id="tab-animation">
+                <div class="animation-section">
+                    <div class="animation-section-title">Playback Controls</div>
                     <div class="setting-group">
                         <div class="setting-label">
                             <span>Transition Speed</span>
@@ -1613,525 +1704,1185 @@
                         </div>
                         <input type="range" class="setting-slider" id="speedSlider" min="200" max="3000" value="1000" step="100">
                         <div class="setting-description">Time to transition between months</div>
-                        <div class="setting-presets">
-                            <button class="preset-btn" data-speed="400">Fast</button>
-                            <button class="preset-btn active" data-speed="1000">Normal</button>
-                            <button class="preset-btn" data-speed="2000">Slow</button>
+                        <div class="speed-presets">
+                            <button class="speed-preset-btn" data-speed="400">Fast</button>
+                            <button class="speed-preset-btn active" data-speed="1000">Normal</button>
+                            <button class="speed-preset-btn" data-speed="2000">Slow</button>
                         </div>
                     </div>
-                    <div class="settings-divider"></div>
+                </div>
+
+                <div class="animation-section">
+                    <div class="animation-section-title">Heatmap Settings</div>
                     <div class="setting-group">
                         <div class="setting-label">
-                            <span>Heatmap Intensity</span>
+                            <span>Intensity</span>
                             <span class="setting-value" id="intensityValue">100%</span>
                         </div>
                         <input type="range" class="setting-slider" id="intensitySlider" min="20" max="200" value="100" step="10">
                         <div class="setting-description">Brightness of species density overlay</div>
                     </div>
-                    <div class="settings-divider"></div>
+
                     <div class="setting-group">
                         <div class="setting-label">
-                            <span>Heatmap Radius</span>
+                            <span>Radius</span>
                             <span class="setting-value" id="radiusValue">100%</span>
                         </div>
                         <input type="range" class="setting-slider" id="radiusSlider" min="50" max="200" value="100" step="10">
                         <div class="setting-description">Spread of each data point</div>
                     </div>
-                    <div class="settings-divider"></div>
-                    <button class="reset-btn" id="resetSettings">Reset to Defaults</button>
+                </div>
+
+                <button class="reset-btn" id="resetSettings">Reset to Defaults</button>
+            </div>
+
+            <!-- Presets Tab -->
+            <div class="tab-panel" id="tab-presets">
+                <div class="preset-utilities">
+                    <button class="preset-utility-btn" data-preset="clear">Clear All</button>
+                    <button class="preset-utility-btn" data-preset="all">All Species</button>
+                </div>
+                <div class="preset-list">
+                    <div class="preset-card" data-preset="north_pacific">
+                        <div class="preset-card-title">North Pacific Migration</div>
+                        <div class="preset-card-desc">Blue, Humpback, Gray Whales</div>
+                    </div>
+                    <div class="preset-card" data-preset="north_atlantic">
+                        <div class="preset-card-title">North Atlantic</div>
+                        <div class="preset-card-desc">Humpback, Fin, Right Whale, Minke, Sei</div>
+                    </div>
+                    <div class="preset-card" data-preset="arctic">
+                        <div class="preset-card-title">North Arctic</div>
+                        <div class="preset-card-desc">Beluga, Orca (Northern)</div>
+                    </div>
+                    <div class="preset-card" data-preset="southern_ocean">
+                        <div class="preset-card-title">Southern Ocean</div>
+                        <div class="preset-card-desc">Blue, Humpback, Orca, Southern Right</div>
+                    </div>
                 </div>
             </div>
         </div>
+    </aside>
 
+    <!-- Map Area -->
+    <div class="map-wrapper" id="mapWrapper">
+        <div id="map"></div>
+        <!-- Month Slider -->
         <div id="controls"></div>
-        <div id="monthBottom">January</div>
-        <div class="month-display"><span id="monthLabel">January</span></div>
+
+        <!-- Mobile Floating Info Button -->
+        <button class="mobile-floating-btn mobile-info-btn" id="mobileInfoBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+        </button>
+
+        <!-- Mobile Info Panel -->
+        <div class="mobile-floating-panel mobile-info-panel" id="mobileInfoPanel">
+            <div class="mobile-panel-title">Species Migration Tracker</div>
+            <p class="mobile-panel-desc">Explore how whale species move across oceans throughout the year. Toggle species to see their migration patterns.<br><br>
+                The species-specific density maps are generated from local observations across the world, over the past 30 years. The up-to-date species observations 
+                can be found at the whale and location specific galleries.</p>
+
+            <div class="mobile-anim-section">
+                <div class="mobile-anim-section-title">Map Navigation</div>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">Data resolution decreases as you zoom out - zoom in for more detail. Switch between Globe and Flat views for different perspectives.</p>
+            </div>
+
+            <div class="mobile-anim-section">
+                <div class="mobile-anim-section-title">Species Selection</div>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">Tap multiple species to compare migration patterns. Use the Animation settings to adjust playback speed.</p>
+            </div>
+
+            <div class="mobile-anim-section" style="margin-bottom: 0;">
+                <div class="mobile-anim-section-title">Raw Data</div>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">Visit the species detail page to view individual sighting data points on an interactive map.</p>
+            </div>
+        </div>
+
+        <!-- Mobile Floating Animation Button -->
+        <button class="mobile-floating-btn mobile-anim-btn" id="mobileAnimBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+        </button>
+
+        <!-- Mobile Animation Panel -->
+        <div class="mobile-floating-panel mobile-anim-panel" id="mobileAnimPanel">
+            <div class="mobile-panel-title">Animation Settings</div>
+
+            <div class="mobile-anim-section">
+                <div class="mobile-anim-section-title">Playback Speed</div>
+                <div class="mobile-anim-speed-btns">
+                    <button class="mobile-anim-speed-btn" data-speed="400">Fast</button>
+                    <button class="mobile-anim-speed-btn active" data-speed="1000">Normal</button>
+                    <button class="mobile-anim-speed-btn" data-speed="2000">Slow</button>
+                </div>
+            </div>
+
+            <div class="mobile-anim-section">
+                <div class="mobile-anim-section-title">Heatmap Settings</div>
+                <div class="mobile-anim-slider-group">
+                    <div class="mobile-anim-slider-label">
+                        <span>Intensity</span>
+                        <span class="value" id="mobileAnimIntensityVal">100%</span>
+                    </div>
+                    <input type="range" class="mobile-anim-slider" id="mobileAnimIntensitySlider" min="20" max="200" value="100" step="10">
+                </div>
+                <div class="mobile-anim-slider-group">
+                    <div class="mobile-anim-slider-label">
+                        <span>Radius</span>
+                        <span class="value" id="mobileAnimRadiusVal">100%</span>
+                    </div>
+                    <input type="range" class="mobile-anim-slider" id="mobileAnimRadiusSlider" min="50" max="200" value="100" step="10">
+                </div>
+            </div>
+
+            <div class="mobile-basemap-section">
+                <div class="mobile-anim-section-title">Basemap</div>
+                <select class="mobile-basemap-select" id="mobileBasemapSelect">
+                    <option value="satellite">Satellite</option>
+                    <option value="bathymetry">Ocean</option>
+                    <option value="custom" selected>Terrain</option>
+                </select>
+            </div>
+        </div>
     </div>
 
+    <!-- Projection Toggle -->
+    <div class="projection-toggle">
+        <button class="projection-btn active" data-projection="globe">Globe</button>
+        <button class="projection-btn" data-projection="mercator">Flat</button>
+    </div>
+
+    <!-- Basemap Panel - Top Left -->
+    <div class="basemap-panel">
+        <div class="basemap-control-group">
+            <div class="basemap-control-label">Basemap</div>
+            <div class="basemap-toggle">
+                <button class="basemap-btn" data-basemap="satellite" title="Satellite">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+                    </svg>
+                    Satellite
+                </button>
+                <button class="basemap-btn" data-basemap="bathymetry" title="Bathymetry">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M2 12c2-3 4-4 6-4s4 2 6 2 4-2 6-2 4 1 4 4"/>
+                        <path d="M2 16c2-2 4-3 6-3s4 1.5 6 1.5 4-1.5 6-1.5 4 1 4 3"/>
+                        <path d="M2 8c2-2 4-3 6-3s4 1 6 1 4-1 6-1"/>
+                    </svg>
+                    Ocean
+                </button>
+                <button class="basemap-btn active" data-basemap="custom" title="Custom Style">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    Terrain
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Controls -->
+    <div class="map-controls">
+        <button class="map-control-btn" id="fullscreenBtn" title="Toggle Fullscreen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Mobile Species Bar -->
+    <div class="mobile-species-bar">
+        <div class="mobile-species-cards" id="mobileSpeciesCards"></div>
+    </div>
+
+    <!-- Mobile Bottom Sheet -->
+    <div class="mobile-sheet-overlay" id="mobileSheetOverlay"></div>
+    <div class="mobile-bottom-sheet" id="mobileBottomSheet">
+        <div class="mobile-sheet-handle"></div>
+        <div class="mobile-sheet-content" id="mobileSheetContent"></div>
+    </div>
+
+    <!-- Scripts -->
     <script src="whale-species.js"></script>
     <script src="config.js"></script>
     <script src="circular-controls.js"></script>
-    <script src="species-map.js"></script>
 
-    <!-- Control Scripts -->
     <script>
-    (function() {
-        // Legend Panel Toggle
-        const layerControlBtn = document.getElementById('layerControlBtn');
-        const legend = document.getElementById('legend');
-        const legendOverlay = document.getElementById('legendOverlay');
-        const legendClose = document.getElementById('legendClose');
+    // ============================================================
+    // SPECIES MAP - Main Script
+    // ============================================================
 
-        function openLegend() {
-            legend.classList.add('mobile-visible');
-            legendOverlay.classList.add('visible');
-            layerControlBtn.classList.add('active');
+    // Get whale image by species ID
+    function getWhaleImage(speciesId) {
+        const imageMap = {
+            'blue_whale_heat': 'images/whales/assets/Blue_whale.png',
+            'humpback_whale_heat': 'images/whales/assets/Humpback_whale.png',
+            'sperm_whale_heat': 'images/whales/assets/Sperm_whale.png',
+            'beluga_heat': 'images/whales/assets/Beluga_whale.png',
+            'gray_whale_heat': 'images/whales/assets/Gray_whale.png',
+            'minke_heat': 'images/whales/assets/Minke_whale.png',
+            'north_atlantic_right_whale_heat': 'images/whales/assets/NorthAtlanticRight_whale.png',
+            'southern_right_whale_heat': 'images/whales/assets/SouthernRight_whale.png',
+            'fin_whale_heat': 'images/whales/assets/Fin_whale.png',
+            'sei_whale_heat': 'images/whales/assets/Sei_whale.png',
+            'orca_whale_heat': 'images/whales/assets/Orca_whale.png'
+        };
+        return imageMap[speciesId] || null;
+    }
+
+    function getWhaleData(commonName) {
+        return WHALE_SPECIES.find(w => w.commonName === commonName);
+    }
+
+    function setupNavToggle() {
+        const navbar = document.getElementById('navbar');
+        const toggle = document.getElementById('navToggle');
+        if (!navbar || !toggle) return;
+
+        toggle.addEventListener('click', () => {
+            navbar.classList.toggle('nav-open');
+        });
+
+        navbar.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => navbar.classList.remove('nav-open'));
+        });
+    }
+
+    // ============================================================
+    // MAP INITIALIZATION
+    // ============================================================
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+
+    // Basemap styles
+    const BASEMAP_STYLES = {
+        satellite: 'mapbox://styles/mapbox/satellite-v9',
+        custom: 'mapbox://styles/qtyree/cmkq3f00c003001qs2qib3wlr'
+    };
+
+    // Check if mobile
+    const isMobile = window.innerWidth <= 900;
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: BASEMAP_STYLES.custom, // Default to terrain
+        center: [-98, 39],
+        zoom: isMobile ? 2 : 2,
+        projection: 'globe'
+    });
+
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-left');
+
+    map.on('style.load', () => {
+        map.setFog({
+            color: 'rgb(10, 35, 66)',
+            'high-color': 'rgb(20, 50, 90)',
+            'horizon-blend': 0.1,
+            'space-color': 'rgb(5, 15, 30)',
+            'star-intensity': 0.3
+        });
+    });
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let monthA = 1, monthB = 2;
+    let phase = 0;
+    let isPlaying = false;
+    let animationId = null;
+    let lastTime = 0;
+    let morphDuration = 1000;
+    let intensityMultiplier = 1;
+    let radiusMultiplier = 1;
+    let circularControls = null;
+    let activePreset = null;
+    let allSpeciesOn = false;
+    let currentBasemap = 'custom';
+
+    // ============================================================
+    // BASEMAP SWITCHING
+    // ============================================================
+    function setBathymetryLayer(show) {
+        const layerId = 'bathymetry-layer';
+        if (show) {
+            if (!map.getSource('bathymetry-source')) {
+                map.addSource('bathymetry-source', {
+                    type: 'raster',
+                    tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}'],
+                    tileSize: 256
+                });
+            }
+            if (!map.getLayer(layerId)) {
+                const firstSymbolLayer = map.getStyle().layers.find(l => l.type === 'symbol');
+                map.addLayer({
+                    id: layerId,
+                    type: 'raster',
+                    source: 'bathymetry-source',
+                    paint: { 'raster-opacity': 0.85 }
+                }, firstSymbolLayer ? firstSymbolLayer.id : undefined);
+            } else {
+                map.setLayoutProperty(layerId, 'visibility', 'visible');
+            }
+        } else {
+            if (map.getLayer(layerId)) {
+                map.setLayoutProperty(layerId, 'visibility', 'none');
+            }
         }
+    }
 
-        function closeLegend() {
-            legend.classList.remove('mobile-visible');
-            legendOverlay.classList.remove('visible');
-            layerControlBtn.classList.remove('active');
-        }
+    function getVisibleSpecies() {
+        // Get currently visible species from checkbox states
+        const visible = [];
+        document.querySelectorAll('.species-toggle-checkbox').forEach(cb => {
+            if (cb.checked) visible.push(cb.dataset.species);
+        });
+        return visible;
+    }
 
-        if (layerControlBtn) {
-            layerControlBtn.addEventListener('click', function() {
-                if (legend.classList.contains('mobile-visible')) {
-                    closeLegend();
-                } else {
-                    openLegend();
-                }
-            });
-        }
-
-        if (legendOverlay) {
-            legendOverlay.addEventListener('click', closeLegend);
-        }
-
-        if (legendClose) {
-            legendClose.addEventListener('click', closeLegend);
-        }
-
-        // Animations Panel Toggle
-        const animationControlBtn = document.getElementById('animationControlBtn');
-        const settingsPanel = document.getElementById('settingsPanel');
-        const animationsOverlay = document.getElementById('animationsOverlay');
-        const settingsClose = document.getElementById('settingsClose');
-
-        function openAnimations() {
-            settingsPanel.classList.add('mobile-visible');
-            animationsOverlay.classList.add('visible');
-            animationControlBtn.classList.add('active');
-        }
-
-        function closeAnimations() {
-            settingsPanel.classList.remove('mobile-visible');
-            animationsOverlay.classList.remove('visible');
-            animationControlBtn.classList.remove('active');
-        }
-
-        if (animationControlBtn) {
-            animationControlBtn.addEventListener('click', function() {
-                if (settingsPanel.classList.contains('mobile-visible')) {
-                    closeAnimations();
-                } else {
-                    openAnimations();
-                }
-            });
-        }
-
-        if (animationsOverlay) {
-            animationsOverlay.addEventListener('click', closeAnimations);
-        }
-
-        if (settingsClose) {
-            settingsClose.addEventListener('click', closeAnimations);
-        }
-
-        // Close on escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (legend.classList.contains('mobile-visible')) {
-                    closeLegend();
-                }
-                if (settingsPanel.classList.contains('mobile-visible')) {
-                    closeAnimations();
-                }
+    function restoreSpeciesVisibility(visibleSpecies) {
+        // Restore visibility for all species based on saved state
+        SPECIES_CONFIG.forEach(species => {
+            const isVisible = visibleSpecies.includes(species.id);
+            if (map.getLayer(species.id)) {
+                map.setLayoutProperty(species.id, 'visibility', isVisible ? 'visible' : 'none');
             }
         });
-    })();
-    </script>
-    
-    <footer class="site-footer">
-        <div class="footer-content">
-            <p class="footer-attribution"><a href="about.html">Created by Tyree Spatial</a></p>
-        </div>
-    </footer>
-    
-    <!-- Three.js Sperm Whale Scene (intro animation, then hide) -->
-    <script>
-    (function() {
-        const hero = document.getElementById('species-hero');
-        const whaleContainer = document.getElementById('spermWhaleScene');
-        const scrollIndicator = document.getElementById('speciesScrollIndicator');
+        // Restore paint properties
+        applyIntensityAll();
+        applyRadiusAll();
+        setFilterAll();
+        setWeightAll(phase);
+    }
 
-        if (!hero || !whaleContainer) return;
+    function switchBasemap(basemap) {
+        if (basemap === currentBasemap) return;
 
-        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+        const prevBasemap = currentBasemap;
+        currentBasemap = basemap;
 
-        function waitForLoaded(scene) {
-            return new Promise((resolve) => {
-                const tick = () => {
-                    if (scene && scene.isLoaded) resolve();
-                    else requestAnimationFrame(tick);
-                };
-                tick();
+        // Save current visibility state before switching
+        const visibleSpecies = getVisibleSpecies();
+
+        if (basemap === 'bathymetry') {
+            if (prevBasemap === 'custom') {
+                map.setStyle(BASEMAP_STYLES.satellite);
+                map.once('style.load', () => {
+                    addSpeciesLayers();
+                    restoreSpeciesVisibility(visibleSpecies);
+                    setBathymetryLayer(true);
+                });
+            } else {
+                setBathymetryLayer(true);
+            }
+        } else if (basemap === 'satellite') {
+            if (prevBasemap === 'custom') {
+                map.setStyle(BASEMAP_STYLES.satellite);
+                map.once('style.load', () => {
+                    addSpeciesLayers();
+                    restoreSpeciesVisibility(visibleSpecies);
+                });
+            } else {
+                setBathymetryLayer(false);
+            }
+        } else if (basemap === 'custom') {
+            setBathymetryLayer(false);
+            map.setStyle(BASEMAP_STYLES.custom);
+            map.once('style.load', () => {
+                addSpeciesLayers();
+                restoreSpeciesVisibility(visibleSpecies);
             });
         }
+    }
 
-        async function playIntroOnly(scene) {
-            // Use configurable duration from scene
-            const INTRO_MS = scene.config.swimDuration
-
-            // Start at top
-            window.scrollTo(0, 0);
-
-            // Hide scroll indicator during intro
-            if (scrollIndicator) scrollIndicator.classList.add('hidden');
-
-            await waitForLoaded(scene);
-
-            // Show whale for intro
-            whaleContainer.style.display = '';
-            whaleContainer.style.transition = 'opacity 0.8s ease';
-            whaleContainer.style.opacity = 1;
-
-            const t0 = performance.now();
-
-            return new Promise((resolve) => {
-                const step = (now) => {
-                    const t = clamp((now - t0) / INTRO_MS, 0, 1);
-
-                    // easeInOutCubic
-                    const eased = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
-
-                    // Update whale position
-                    scene.setScrollProgress(eased);
-
-                    if (t < 1) requestAnimationFrame(step);
-                    else resolve();
-                };
-                requestAnimationFrame(step);
-            });
-        }
-
-        function initWhaleScene() {
-            if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined' || typeof SpermWhaleScene === 'undefined') {
-                setTimeout(initWhaleScene, 100);
-                return;
+    // ============================================================
+    // SPECIES LAYER MANAGEMENT
+    // ============================================================
+    function addSpeciesLayers() {
+        SPECIES_CONFIG.forEach(species => {
+            if (!map.getSource(species.sourceId)) {
+                map.addSource(species.sourceId, { type: 'vector', url: species.url });
             }
 
-            const whaleScene = new SpermWhaleScene(whaleContainer, 'models/Sperm_whale.glb');
+            const isHumpback = species.id.includes('humpback');
+            if (!map.getLayer(species.id)) {
+                map.addLayer({
+                    id: species.id,
+                    type: 'heatmap',
+                    source: species.sourceId,
+                    'source-layer': species.sourceLayer,
+                    maxzoom: 9,
+                    layout: { visibility: isHumpback ? 'visible' : 'none' },
+                    paint: { ...HEATMAP_PAINT_BASE, 'heatmap-color': species.color.heatmap }
+                });
+            }
+        });
+        setFilterAll();
+        setWeightAll(0);
+    }
 
-            // Play intro then fade out
-            playIntroOnly(whaleScene).then(() => {
-                // Fade out whale
-                whaleContainer.style.opacity = 0;
-                setTimeout(() => {
-                    whaleContainer.style.display = 'none';
-                    if (whaleScene.dispose) whaleScene.dispose();
-                }, 800);
+    function setFilterAll() {
+        SPECIES_CONFIG.forEach(species => {
+            if (map.getLayer(species.id)) {
+                map.setFilter(species.id, ['in', ['get', 'month'], ['literal', [monthA, monthB]]]);
+            }
+        });
+    }
 
-                // Show scroll indicator after animation
-                if (scrollIndicator) scrollIndicator.classList.remove('hidden');
-            });
-        }
+    function setWeightAll(phaseVal) {
+        const presetFilters = window.getActivePresetFilters ? window.getActivePresetFilters() : null;
 
-        initWhaleScene();
-    })();
-    </script>
-    <!-- Preset Handler with setFilter Ocean Filtering -->
-    <script>
-    (function() {
-        /*
-         * OCEAN FILTER LISTS
-         * Used to filter humpback and orca by region using map.setFilter()
-         */
-        const NORTH_PACIFIC_OCEANS = [
-            'North Pacific Ocean', 'Bering Sea', 'Gulf of Alaska', 'Sea of Okhotsk',
-            'Sea of Japan', 'Philippine Sea', 'East China Sea', 'Golfo de California',
-            'Monterey Bay', 'Prince William Sound', 'Cook Inlet', 'Bristol Bay',
-            'Salish Sea', 'Hecate Strait', 'Queen Charlotte Strait', 'Queen Charlotte Sound',
-            'San Francisco Bay', 'Coral Sea', 'Tasman Sea', 'Great Barrier Reef',
-            'Norton Sound', "Gulf of Anadyr'", 'Karaginskiy Gulf', 'Kronotskiy Gulf',
-            'Cordova Bay', 'Dixon Entrance', 'Columbia River', 'Korea Strait',
-            'La Pérouse Strait', 'Uchiura Bay', 'Golfo de Tehuantepec'
-        ];
-        
-        const NORTH_ATLANTIC_OCEANS = [
-            'North Atlantic Ocean', 'Gulf of Maine', 'Gulf of Saint Lawrence',
-            'Bay of Fundy', 'Labrador Sea', 'Davis Strait', 'Baffin Bay',
-            'Caribbean Sea', 'Gulf of Mexico', 'Sargasso Sea', 'Norwegian Sea',
-            'North Sea', 'Irish Sea', 'English Channel', 'Bay of Biscay',
-            'Mediterranean Sea', 'Baltic Sea', 'Greenland Sea', 'Denmark Strait',
-            'Barents Sea', 'Strait of Belle Isle', 'Strait of Gibraltar',
-            'Bristol Channel', 'Kattegat', 'Skagerrak', 'Gulf of Guinea',
-            'Ligurian Sea', 'Tyrrhenian Sea', 'Alboran Sea', 'Red Sea'
-        ];
-        
-        const NORTH_ARCTIC_OCEANS = [
-            'Arctic Ocean', 'Chukchi Sea', 'Bering Sea', 'Beaufort Sea',
-            'Baffin Bay', 'Davis Strait', 'Greenland Sea', 'Norwegian Sea',
-            'Barents Sea', 'Labrador Sea', 'Kangertittivaq', 'Eclipse Sound',
-            'Smith Sound', 'The North Western Passages', 'Vestfjorden',
-            'Trondheimsfjorden', 'Sognefjorden', 'Boknafjorden',
-            'North Pacific Ocean', 'Gulf of Alaska', 'Sea of Okhotsk',
-            'North Atlantic Ocean', 'Gulf of Maine', 'Gulf of Saint Lawrence',
-            'Bay of Fundy', 'North Sea', 'Irish Sea', 'Iceland Sea',
-            'Kara Sea', 'Laptev Sea', 'East Siberian Sea', 'Lincoln Sea',
-            'Prince William Sound', 'Cook Inlet', 'Bristol Bay',
-            'Salish Sea', 'Hecate Strait', 'Queen Charlotte Strait', 'Queen Charlotte Sound',
-            'Norton Sound', "Gulf of Anadyr'", 'Karaginskiy Gulf', 'Kronotskiy Gulf',
-            'Denmark Strait', 'Fram Strait'
-        ];
-        
-        const SOUTHERN_OCEANS = [
-            'Southern Ocean', 'South Atlantic Ocean', 'South Pacific Ocean',
-            'Drake Passage', 'Scotia Sea', 'Weddell Sea', 'Ross Sea',
-            'Bellingshausen Sea', 'Davis Sea', 'Amundsen Sea', 'Tasman Sea',
-            'Great Australian Bight', 'Indian Ocean', 'Mozambique Channel',
-            'Coral Sea', 'Arafura Sea', 'Bransfield Strait', 'Marguerite Bay',
-            'McMurdo Sound', 'Prydz Bay', 'Sulzberger Bay', 'Bass Strait',
-            'Gulf St. Vincent', 'Geographe Bay', 'Timor Sea', 'Gulf of Carpentaria',
-            'Solomon Sea', 'Celebes Sea', 'Ceram Sea', 'Bali Sea', 'Andaman Sea',
-            'Bay of Bengal', 'Golfo San Jorge', 'Golfo San Matías', 'Golfo Corcovado',
-            'Estrecho de Magellanes', 'Bay Inútil', 'Seno de Skyring'
-        ];
-        
-        /*
-         * PRESETS CONFIGURATION
-         * - species: names to match in legend checkboxes
-         * - filterLayers: which layer IDs need ocean filtering, with their ocean list
-         * - center/zoom: map view
-         */
-        const presets = {
-            north_pacific: {
-                species: ['Blue', 'Humpback', 'Gray'],
-                filterLayers: {
-                    'humpback': NORTH_PACIFIC_OCEANS
-                },
-                center: [-123, 38],
-                zoom: 6
-            },
-            
-            north_atlantic: {
-                species: ['Humpback', 'Fin', 'Minke', 'Sei', 'North Atlantic Right', 'Right'],
-                filterLayers: {
-                    'humpback': NORTH_ATLANTIC_OCEANS
-                },
-                center: [-45, 42],
-                zoom: 2
-            },
-            
-            arctic: {
-                species: ['Beluga', 'Orca'],
-                filterLayers: {
-                    'orca': NORTH_ARCTIC_OCEANS
-                },
-                center: [-80, 70],
-                zoom: 2
-            },
-            
-            southern_ocean: {
-                species: ['Blue', 'Fin', 'Humpback', 'Southern Right', 'Orca', 'Sei'],
-                filterLayers: {
-                    'humpback': SOUTHERN_OCEANS,
-                    'orca': SOUTHERN_OCEANS
-                },
-                center: [0, -55],
-                zoom: 2
-            },
-            
-            all: 'all',
-            clear: 'clear'
-        };
-        
-        let activePreset = null;
+        SPECIES_CONFIG.forEach(species => {
+            if (!map.getLayer(species.id)) return;
 
-        // Global function to get active preset ocean filters for animation compatibility
-        window.getActivePresetFilters = function() {
-            return activePreset ? activePreset.filterLayers : null;
-        };
-
-        function waitForMap(callback) {
-            const check = () => {
-                if (typeof map !== 'undefined' && map.isStyleLoaded && map.isStyleLoaded()) {
-                    callback();
-                } else if (typeof map !== 'undefined' && map.loaded && map.loaded()) {
-                    callback();
-                } else {
-                    setTimeout(check, 100);
-                }
-            };
-            check();
-        }
-        
-        // Get all heatmap layer IDs from the map
-        function getHeatmapLayers() {
-            const style = map.getStyle();
-            if (!style || !style.layers) return [];
-            // robust: use layer type, not a naming convention
-            return style.layers
-                .filter(l => l.type === 'heatmap' && l.id)
-                .map(l => l.id);
-        }
-
-        
-        // Check if a layer matches a filter key (e.g., 'humpback', 'orca')
-        function layerMatchesKey(layerId, key) {
-            return layerId.toLowerCase().includes(key.toLowerCase());
-        }
-        
-        // Apply ocean filter to specific layers using setFilter
-        // Apply ocean/location restriction via heatmap-weight (does NOT override month filters)
-        function applyOceanFilters(filterLayers) {
-            if (!filterLayers) return;
-
-            waitForMap(() => {
-                const heatmapLayers = getHeatmapLayers();
-
-                heatmapLayers.forEach(layerId => {
-                    let oceanList = null;
-
-                    for (const [key, oceans] of Object.entries(filterLayers)) {
-                        if (layerMatchesKey(layerId, key)) {
-                            oceanList = oceans;
-                            break;
-                        }
+            let oceanList = null;
+            if (presetFilters) {
+                for (const [key, oceans] of Object.entries(presetFilters)) {
+                    if (species.id.toLowerCase().includes(key.toLowerCase())) {
+                        oceanList = oceans;
+                        break;
                     }
+                }
+            }
 
-                    try {
-                        if (oceanList) {
-                            map.setPaintProperty(layerId, 'heatmap-weight', [
-                                'case',
-                                ['in', ['get', 'ocean'], ['literal', oceanList]],
-                                1,
-                                0
-                            ]);
+            const monthWeight = [
+                'case',
+                ['==', ['get', 'month'], monthA], 1 - phaseVal,
+                ['==', ['get', 'month'], monthB], phaseVal,
+                0
+            ];
+
+            const weightExpr = oceanList
+                ? ['case', ['in', ['get', 'ocean'], ['literal', oceanList]], monthWeight, 0]
+                : monthWeight;
+
+            map.setPaintProperty(species.id, 'heatmap-weight', weightExpr);
+        });
+    }
+
+    function applyIntensityAll() {
+        SPECIES_CONFIG.forEach(species => {
+            if (!map.getLayer(species.id)) return;
+            map.setPaintProperty(species.id, 'heatmap-intensity', [
+                'interpolate', ['linear'], ['zoom'],
+                0, 0.5 * intensityMultiplier,
+                5, 1.0 * intensityMultiplier,
+                8, 1.5 * intensityMultiplier
+            ]);
+        });
+    }
+
+    function applyRadiusAll() {
+        SPECIES_CONFIG.forEach(species => {
+            if (!map.getLayer(species.id)) return;
+            map.setPaintProperty(species.id, 'heatmap-radius', [
+                'interpolate', ['linear'], ['zoom'],
+                0, 2 * radiusMultiplier,
+                4, 12 * radiusMultiplier,
+                8, 24 * radiusMultiplier
+            ]);
+        });
+    }
+
+    function toggleSpeciesVisibility(speciesId, visible) {
+        if (map.getLayer(speciesId)) {
+            map.setLayoutProperty(speciesId, 'visibility', visible ? 'visible' : 'none');
+        }
+    }
+
+    // ============================================================
+    // ANIMATION
+    // ============================================================
+    function startAnimation() {
+        if (isPlaying) return;
+        isPlaying = true;
+        lastTime = performance.now();
+        animationId = requestAnimationFrame(stepAnimation);
+        if (circularControls) circularControls.setPlaying(true);
+    }
+
+    function stopAnimation() {
+        isPlaying = false;
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        if (circularControls) circularControls.setPlaying(false);
+    }
+
+    function stepAnimation(timestamp) {
+        if (!isPlaying) return;
+        const delta = timestamp - lastTime;
+        phase += delta / morphDuration;
+
+        if (phase >= 1) {
+            phase = 0;
+            monthA = monthB;
+            monthB = (monthB % 12) + 1;
+            setFilterAll();
+            if (circularControls) circularControls.externalSetMonth(monthA);
+        }
+
+        setWeightAll(phase);
+        lastTime = timestamp;
+        animationId = requestAnimationFrame(stepAnimation);
+    }
+
+    function setMonth(month) {
+        stopAnimation();
+        monthA = month;
+        monthB = (month % 12) + 1;
+        phase = 0;
+        setFilterAll();
+        setWeightAll(0);
+        if (circularControls) circularControls.externalSetMonth(month);
+    }
+
+    // ============================================================
+    // GENERATE SPECIES CARDS
+    // ============================================================
+    function generateSpeciesCards() {
+        const container = document.getElementById('speciesList');
+        const mobileContainer = document.getElementById('mobileSpeciesCards');
+        if (!container) return;
+
+        container.innerHTML = '';
+        if (mobileContainer) mobileContainer.innerHTML = '';
+
+        SPECIES_CONFIG.forEach(species => {
+            const whaleData = getWhaleData(species.name);
+            const image = getWhaleImage(species.id);
+            const baseColor = species.color.base || '#4ecdc4';
+            const isHumpback = species.id.includes('humpback');
+
+            // Desktop card
+            const card = document.createElement('div');
+            card.className = 'species-card';
+            card.dataset.speciesId = species.id;
+            card.style.setProperty('--species-color', baseColor);
+
+            card.innerHTML = `
+                <div class="species-card-header">
+                    <div class="header-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${isHumpback ? 'checked' : ''} data-species="${species.id}">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <span class="species-name-collapsed">${species.name}</span>
+                    <button class="species-expand-btn">
+                        <svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        <svg class="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="species-card-body">
+                    <button class="species-collapse-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14"/>
+                        </svg>
+                    </button>
+                    <div class="species-card-content">
+                        <div class="species-image-area">
+                            ${image ? `<img src="${image}" alt="${species.name}" class="species-image">` : '<span class="species-image-placeholder">Image coming soon</span>'}
+                        </div>
+                        <div class="species-info">
+                            <div class="species-info-text">
+                                <div class="species-name-expanded">${species.name}</div>
+                                <div class="species-scientific">${species.scientificName || ''}</div>
+                            </div>
+                            ${whaleData ? `<a href="whale-detail.html?id=${whaleData.id}" class="species-info-btn" title="More info">i</a>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(card);
+
+            // Event listeners
+            const header = card.querySelector('.species-card-header');
+            header.addEventListener('click', (e) => {
+                if (e.target.closest('.header-toggle') || e.target.closest('.species-expand-btn')) return;
+                card.classList.toggle('expanded');
+            });
+
+            card.querySelector('.species-expand-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                card.classList.toggle('expanded');
+            });
+
+            card.querySelector('.species-collapse-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                card.classList.remove('expanded');
+            });
+
+            const checkbox = card.querySelector('.header-toggle input[type="checkbox"]');
+            checkbox.addEventListener('change', (e) => {
+                e.stopPropagation();
+                toggleSpeciesVisibility(species.id, e.target.checked);
+                syncMobileCheckbox(species.id, e.target.checked);
+                updateAllSpeciesToggle();
+            });
+
+            // Mobile card
+            if (mobileContainer) {
+                const mobileCard = document.createElement('div');
+                mobileCard.className = 'mobile-species-card';
+                mobileCard.dataset.speciesId = species.id;
+                mobileCard.style.setProperty('--species-color', baseColor);
+                mobileCard.innerHTML = `
+                    <div class="mobile-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${isHumpback ? 'checked' : ''} data-species="${species.id}">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    ${image ? `<img src="${image}" alt="${species.name}">` : ''}
+                    <div class="species-name">${species.name}</div>
+                `;
+
+                mobileCard.querySelector('.mobile-toggle input').addEventListener('change', (e) => {
+                    e.stopPropagation();
+                    toggleSpeciesVisibility(species.id, e.target.checked);
+                    syncDesktopCheckbox(species.id, e.target.checked);
+                    updateAllSpeciesToggle();
+                });
+
+                mobileCard.addEventListener('click', (e) => {
+                    if (!e.target.closest('.mobile-toggle')) {
+                        const sheet = document.getElementById('mobileBottomSheet');
+                        // If sheet is open and showing this species, close it
+                        if (sheet.classList.contains('open') && sheet.dataset.speciesId === species.id) {
+                            closeMobileSheet();
                         } else {
-                            // IMPORTANT: don't touch filters; just restore weight
-                            map.setPaintProperty(layerId, 'heatmap-weight', 1);
+                            openMobileSheet(species);
                         }
-                    } catch (e) { console.warn('Failed setPaintProperty for', layerId, e); }
-                });
-            });
-        }
-
-        
-        // Clear all filters
-        // Only clear the ocean/location restriction (leave month filters alone)
-        function clearAllFilters() {
-            waitForMap(() => {
-                getHeatmapLayers().forEach(layerId => {
-                    try {
-                        map.setPaintProperty(layerId, 'heatmap-weight', 1);
-                    } catch (e) { console.warn('Failed setPaintProperty for', layerId, e); }
-                });
-            });
-        }
-
-        
-        // Apply a preset
-        function applyPreset(presetName) {
-            const preset = presets[presetName];
-            const chips = document.querySelectorAll('.preset-chip');
-
-            // Stop animation when changing presets
-            if (typeof stopAnimation === 'function' && typeof isPlaying !== 'undefined' && isPlaying) {
-                stopAnimation();
-            }
-
-            // Update active chip styling
-            chips.forEach(c => c.classList.remove('active'));
-            const activeChip = document.querySelector(`.preset-chip[data-preset="${presetName}"]`);
-            if (activeChip && presetName !== 'clear') {
-                activeChip.classList.add('active');
-            }
-
-            waitForMap(() => {
-                console.log('Heatmap layer IDs:', getHeatmapLayers());
-                const checkboxes = document.querySelectorAll('#legendSpecies input[type="checkbox"]');
-                
-                if (preset === 'all') {
-                    // Show all, clear filters
-                    activePreset = null;
-                    clearAllFilters();
-                    
-                    checkboxes.forEach(cb => {
-                        if (!cb.checked) {
-                            cb.checked = true;
-                            cb.dispatchEvent(new Event('change', { bubbles: true }));
-                        }
-                    });
-                    
-                    map.flyTo({ center: [0, 20], zoom: 1.5, duration: 1500 });
-                    
-                } else if (preset === 'clear') {
-                    // Clear all
-                    activePreset = null;
-                    clearAllFilters();
-                    
-                    checkboxes.forEach(cb => {
-                        if (cb.checked) {
-                            cb.checked = false;
-                            cb.dispatchEvent(new Event('change', { bubbles: true }));
-                        }
-                    });
-                    
-                } else if (typeof preset === 'object') {
-                    activePreset = preset;
-                    
-                    // Clear existing filters first
-                    clearAllFilters();
-                    
-                    // Enable/disable species checkboxes
-                    checkboxes.forEach(cb => {
-                        const label = cb.closest('.legend-row')?.querySelector('.legend-name')?.textContent?.trim() || '';
-                        const shouldBeChecked = preset.species.some(s => 
-                            label.toLowerCase().includes(s.toLowerCase())
-                        );
-                        
-                        if (cb.checked !== shouldBeChecked) {
-                            cb.checked = shouldBeChecked;
-                            cb.dispatchEvent(new Event('change', { bubbles: true }));
-                        }
-                    });
-                    
-                    // Apply ocean filters after a short delay (let layers enable)
-                    setTimeout(() => {
-                        applyOceanFilters(preset.filterLayers);
-                    }, 300);
-                    
-                    // Fly to region
-                    if (preset.center && preset.zoom) {
-                        map.flyTo({
-                            center: preset.center,
-                            zoom: preset.zoom,
-                            duration: 1500
-                        });
                     }
-                }
-                
-                // Scroll to map
-                document.getElementById('map')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+
+                mobileContainer.appendChild(mobileCard);
+            }
+        });
+    }
+
+    function syncMobileCheckbox(speciesId, checked) {
+        const cb = document.querySelector(`.mobile-species-card[data-species-id="${speciesId}"] input`);
+        if (cb) cb.checked = checked;
+    }
+
+    function syncDesktopCheckbox(speciesId, checked) {
+        const cb = document.querySelector(`.species-card[data-species-id="${speciesId}"] input`);
+        if (cb) cb.checked = checked;
+    }
+
+    function updateAllSpeciesToggle() {
+        const checkboxes = document.querySelectorAll('#speciesList input[type="checkbox"]');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        const toggle = document.getElementById('allSpeciesToggle');
+        if (toggle) toggle.checked = allChecked;
+        allSpeciesOn = allChecked;
+    }
+
+    // ============================================================
+    // MOBILE BOTTOM SHEET
+    // ============================================================
+    function openMobileSheet(species) {
+        const sheet = document.getElementById('mobileBottomSheet');
+        const overlay = document.getElementById('mobileSheetOverlay');
+        const content = document.getElementById('mobileSheetContent');
+        if (!sheet || !content) return;
+
+        const whaleData = getWhaleData(species.name);
+        const image = getWhaleImage(species.id);
+        const baseColor = species.color.base || '#4ecdc4';
+
+        content.innerHTML = `
+            <div style="position: relative; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+                <label class="toggle-switch" style="--species-color: ${baseColor}">
+                    <input type="checkbox" id="mobileSheetToggle-${species.id}">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span style="color: rgba(255,255,255,0.7); font-size: 12px;">Show on map</span>
+                ${whaleData ? `<a href="whale-detail.html?id=${whaleData.id}" style="position: absolute; right: 0; top: 0; width: 32px; height: 32px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; color: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none;">i</a>` : ''}
+            </div>
+            <div class="species-image-area" style="margin-bottom: 16px; min-height: 100px;">
+                ${image ? `<img src="${image}" alt="${species.name}" class="species-image">` : ''}
+            </div>
+            <div style="margin-bottom: 16px;">
+                <div class="species-name-expanded" style="border-left: 4px solid ${baseColor}; padding-left: 12px;">${species.name}</div>
+                <div class="species-scientific" style="padding-left: 16px;">${species.scientificName || ''}</div>
+            </div>
+            ${whaleData ? `<a href="whale-species-gallery.html#${whaleData.id}" style="display: block; text-align: center; margin-top: 20px; padding: 12px; background: rgba(78, 205, 196, 0.2); border-radius: 8px; color: #4ecdc4; text-decoration: none; font-weight: 600;">Learn More</a>` : ''}
+        `;
+
+        const toggle = document.getElementById(`mobileSheetToggle-${species.id}`);
+        if (toggle) {
+            toggle.checked = map.getLayoutProperty(species.id, 'visibility') !== 'none';
+            toggle.addEventListener('change', (e) => {
+                toggleSpeciesVisibility(species.id, e.target.checked);
+                syncDesktopCheckbox(species.id, e.target.checked);
+                syncMobileCheckbox(species.id, e.target.checked);
             });
         }
-        
-        // Initialize
-        function init() {
-            // Preset chip handlers
-            document.querySelectorAll('.preset-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    applyPreset(chip.dataset.preset);
+
+        sheet.dataset.speciesId = species.id;
+        sheet.classList.add('open');
+        overlay.classList.add('visible');
+    }
+
+    function closeMobileSheet() {
+        const sheet = document.getElementById('mobileBottomSheet');
+        if (sheet) {
+            sheet.classList.remove('open');
+            sheet.dataset.speciesId = '';
+        }
+        document.getElementById('mobileSheetOverlay')?.classList.remove('visible');
+    }
+
+    // ============================================================
+    // ALL SPECIES TOGGLE
+    // ============================================================
+    function setupAllSpeciesToggle() {
+        const toggle = document.getElementById('allSpeciesToggle');
+        if (!toggle) return;
+
+        toggle.addEventListener('change', (e) => {
+            allSpeciesOn = e.target.checked;
+            const checkboxes = document.querySelectorAll('#speciesList input[type="checkbox"]');
+
+            checkboxes.forEach(cb => {
+                cb.checked = allSpeciesOn;
+                toggleSpeciesVisibility(cb.dataset.species, allSpeciesOn);
+                syncMobileCheckbox(cb.dataset.species, allSpeciesOn);
+            });
+
+            setWeightAll(phase);
+        });
+    }
+
+    // ============================================================
+    // TABS
+    // ============================================================
+    function setupTabs() {
+        document.querySelectorAll('.sidebar-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById(`tab-${tab.dataset.tab}`)?.classList.add('active');
+            });
+        });
+    }
+
+    // ============================================================
+    // PROJECTION TOGGLE
+    // ============================================================
+    function setupProjectionToggle() {
+        document.querySelectorAll('.projection-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.projection-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                map.setProjection(btn.dataset.projection);
+            });
+        });
+    }
+
+    // ============================================================
+    // BASEMAP TOGGLE
+    // ============================================================
+    function setupBasemapToggle() {
+        const basemapBtns = document.querySelectorAll('.basemap-btn');
+        const mobileBasemapSelect = document.getElementById('mobileBasemapSelect');
+
+        basemapBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const basemap = btn.dataset.basemap;
+                basemapBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                switchBasemap(basemap);
+
+                // Sync mobile select
+                if (mobileBasemapSelect) {
+                    mobileBasemapSelect.value = basemap;
+                }
+            });
+        });
+
+        if (mobileBasemapSelect) {
+            mobileBasemapSelect.addEventListener('change', () => {
+                const basemap = mobileBasemapSelect.value;
+                switchBasemap(basemap);
+                basemapBtns.forEach(b => b.classList.toggle('active', b.dataset.basemap === basemap));
+            });
+        }
+    }
+
+    // ============================================================
+    // FULLSCREEN
+    // ============================================================
+    function setupFullscreen() {
+        const btn = document.getElementById('fullscreenBtn');
+        if (!btn) return;
+
+        btn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                btn.classList.add('active');
+            } else {
+                document.exitFullscreen();
+                btn.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            btn.classList.toggle('active', !!document.fullscreenElement);
+        });
+    }
+
+    // ============================================================
+    // ANIMATION SETTINGS
+    // ============================================================
+    function setupAnimationSettings() {
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        const speedPresets = document.querySelectorAll('.speed-preset-btn');
+
+        if (speedSlider) {
+            speedSlider.addEventListener('input', () => {
+                morphDuration = parseInt(speedSlider.value);
+                if (speedValue) speedValue.textContent = (morphDuration / 1000).toFixed(1) + 's';
+                speedPresets.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.speed) === morphDuration));
+            });
+        }
+
+        speedPresets.forEach(btn => {
+            btn.addEventListener('click', () => {
+                morphDuration = parseInt(btn.dataset.speed);
+                if (speedSlider) speedSlider.value = morphDuration;
+                if (speedValue) speedValue.textContent = (morphDuration / 1000).toFixed(1) + 's';
+                speedPresets.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        const intensitySlider = document.getElementById('intensitySlider');
+        const intensityValue = document.getElementById('intensityValue');
+        if (intensitySlider) {
+            intensitySlider.addEventListener('input', () => {
+                intensityMultiplier = parseInt(intensitySlider.value) / 100;
+                if (intensityValue) intensityValue.textContent = intensitySlider.value + '%';
+                applyIntensityAll();
+            });
+        }
+
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusValue = document.getElementById('radiusValue');
+        if (radiusSlider) {
+            radiusSlider.addEventListener('input', () => {
+                radiusMultiplier = parseInt(radiusSlider.value) / 100;
+                if (radiusValue) radiusValue.textContent = radiusSlider.value + '%';
+                applyRadiusAll();
+            });
+        }
+
+        const resetBtn = document.getElementById('resetSettings');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                morphDuration = 1000;
+                intensityMultiplier = 1;
+                radiusMultiplier = 1;
+                if (speedSlider) speedSlider.value = 1000;
+                if (speedValue) speedValue.textContent = '1.0s';
+                if (intensitySlider) intensitySlider.value = 100;
+                if (intensityValue) intensityValue.textContent = '100%';
+                if (radiusSlider) radiusSlider.value = 100;
+                if (radiusValue) radiusValue.textContent = '100%';
+                speedPresets.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.speed) === 1000));
+                applyIntensityAll();
+                applyRadiusAll();
+            });
+        }
+    }
+
+    // ============================================================
+    // PRESETS
+    // ============================================================
+    const NORTH_PACIFIC_OCEANS = ['North Pacific Ocean', 'Bering Sea', 'Gulf of Alaska', 'Sea of Okhotsk', 'Sea of Japan', 'Philippine Sea', 'East China Sea', 'Golfo de California', 'Monterey Bay', 'Prince William Sound', 'Cook Inlet', 'Bristol Bay', 'Salish Sea', 'Hecate Strait', 'Queen Charlotte Strait', 'Queen Charlotte Sound'];
+    const NORTH_ATLANTIC_OCEANS = ['North Atlantic Ocean', 'Gulf of Maine', 'Gulf of Saint Lawrence', 'Bay of Fundy', 'Labrador Sea', 'Davis Strait', 'Baffin Bay', 'Caribbean Sea', 'Gulf of Mexico', 'Norwegian Sea', 'North Sea'];
+    const NORTH_ARCTIC_OCEANS = ['Arctic Ocean', 'Chukchi Sea', 'Bering Sea', 'Beaufort Sea', 'Baffin Bay', 'Davis Strait', 'Greenland Sea', 'Norwegian Sea', 'Barents Sea', 'Labrador Sea'];
+    const SOUTHERN_OCEANS = ['Southern Ocean', 'South Atlantic Ocean', 'South Pacific Ocean', 'Drake Passage', 'Scotia Sea', 'Weddell Sea', 'Ross Sea', 'Tasman Sea', 'Great Australian Bight', 'Indian Ocean'];
+
+    const presets = {
+        north_pacific: { species: ['Blue', 'Humpback', 'Gray'], filterLayers: { 'humpback': NORTH_PACIFIC_OCEANS }, center: [-123, 38], zoom: 6 },
+        north_atlantic: { species: ['Humpback', 'Fin', 'Minke', 'Sei', 'North Atlantic Right', 'Right'], filterLayers: { 'humpback': NORTH_ATLANTIC_OCEANS }, center: [-45, 42], zoom: 2 },
+        arctic: { species: ['Beluga', 'Orca'], filterLayers: { 'orca': NORTH_ARCTIC_OCEANS }, center: [-80, 70], zoom: 2 },
+        southern_ocean: { species: ['Blue', 'Fin', 'Humpback', 'Southern Right', 'Orca', 'Sei'], filterLayers: { 'humpback': SOUTHERN_OCEANS, 'orca': SOUTHERN_OCEANS }, center: [0, -55], zoom: 2 }
+    };
+
+    window.getActivePresetFilters = () => activePreset ? activePreset.filterLayers : null;
+
+    function setupPresets() {
+        document.querySelectorAll('.preset-card').forEach(card => {
+            card.addEventListener('click', () => {
+                applyPreset(card.dataset.preset);
+                document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.preset-utility-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.preset === 'clear') clearAllSpecies();
+                else if (btn.dataset.preset === 'all') showAllSpecies();
+                document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+            });
+        });
+    }
+
+    function applyPreset(presetName) {
+        const preset = presets[presetName];
+        if (!preset) return;
+
+        stopAnimation();
+        activePreset = preset;
+        clearOceanFilters();
+
+        document.querySelectorAll('#speciesList input[type="checkbox"]').forEach(cb => {
+            const config = SPECIES_CONFIG.find(s => s.id === cb.dataset.species);
+            if (!config) return;
+            const shouldShow = preset.species.some(s => config.name.toLowerCase().includes(s.toLowerCase()));
+            cb.checked = shouldShow;
+            toggleSpeciesVisibility(cb.dataset.species, shouldShow);
+            syncMobileCheckbox(cb.dataset.species, shouldShow);
+        });
+
+        setTimeout(() => {
+            applyOceanFilters(preset.filterLayers);
+            setWeightAll(phase);
+        }, 300);
+
+        map.flyTo({ center: preset.center, zoom: preset.zoom, duration: 1500 });
+        updateAllSpeciesToggle();
+    }
+
+    function applyOceanFilters(filterLayers) {
+        if (!filterLayers) return;
+        SPECIES_CONFIG.forEach(species => {
+            if (!map.getLayer(species.id)) return;
+            let oceanList = null;
+            for (const [key, oceans] of Object.entries(filterLayers)) {
+                if (species.id.toLowerCase().includes(key.toLowerCase())) {
+                    oceanList = oceans;
+                    break;
+                }
+            }
+            if (oceanList) {
+                map.setPaintProperty(species.id, 'heatmap-weight', ['case', ['in', ['get', 'ocean'], ['literal', oceanList]], 1, 0]);
+            }
+        });
+    }
+
+    function clearOceanFilters() {
+        activePreset = null;
+        SPECIES_CONFIG.forEach(species => {
+            if (map.getLayer(species.id)) map.setPaintProperty(species.id, 'heatmap-weight', 1);
+        });
+    }
+
+    function showAllSpecies() {
+        activePreset = null;
+        clearOceanFilters();
+        document.querySelectorAll('#speciesList input[type="checkbox"]').forEach(cb => {
+            cb.checked = true;
+            toggleSpeciesVisibility(cb.dataset.species, true);
+            syncMobileCheckbox(cb.dataset.species, true);
+        });
+        document.getElementById('allSpeciesToggle').checked = true;
+        allSpeciesOn = true;
+        setWeightAll(phase);
+        map.flyTo({ center: [0, 20], zoom: 1.5, duration: 1500 });
+    }
+
+    function clearAllSpecies() {
+        activePreset = null;
+        clearOceanFilters();
+        document.querySelectorAll('#speciesList input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+            toggleSpeciesVisibility(cb.dataset.species, false);
+            syncMobileCheckbox(cb.dataset.species, false);
+        });
+        document.getElementById('allSpeciesToggle').checked = false;
+        allSpeciesOn = false;
+    }
+
+    // ============================================================
+    // MOBILE FLOATING BUTTONS
+    // ============================================================
+    function setupMobileControls() {
+        const mobileInfoBtn = document.getElementById('mobileInfoBtn');
+        const mobileInfoPanel = document.getElementById('mobileInfoPanel');
+        const mobileAnimBtn = document.getElementById('mobileAnimBtn');
+        const mobileAnimPanel = document.getElementById('mobileAnimPanel');
+
+        // Toggle info panel
+        if (mobileInfoBtn && mobileInfoPanel) {
+            mobileInfoBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileAnimPanel?.classList.remove('open');
+                mobileAnimBtn?.classList.remove('active');
+                mobileInfoPanel.classList.toggle('open');
+                mobileInfoBtn.classList.toggle('active', mobileInfoPanel.classList.contains('open'));
+            });
+        }
+
+        // Toggle animation panel
+        if (mobileAnimBtn && mobileAnimPanel) {
+            mobileAnimBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileInfoPanel?.classList.remove('open');
+                mobileInfoBtn?.classList.remove('active');
+                mobileAnimPanel.classList.toggle('open');
+                mobileAnimBtn.classList.toggle('active', mobileAnimPanel.classList.contains('open'));
+            });
+        }
+
+        // Close panels when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileInfoBtn?.contains(e.target) && !mobileInfoPanel?.contains(e.target)) {
+                mobileInfoPanel?.classList.remove('open');
+                mobileInfoBtn?.classList.remove('active');
+            }
+            if (!mobileAnimBtn?.contains(e.target) && !mobileAnimPanel?.contains(e.target)) {
+                mobileAnimPanel?.classList.remove('open');
+                mobileAnimBtn?.classList.remove('active');
+            }
+        });
+
+        // Mobile animation speed buttons
+        const mobileAnimSpeedBtns = document.querySelectorAll('.mobile-anim-speed-btn');
+        mobileAnimSpeedBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const speed = parseInt(btn.dataset.speed);
+                morphDuration = speed;
+
+                // Update mobile buttons
+                mobileAnimSpeedBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Sync with desktop
+                const desktopSlider = document.getElementById('speedSlider');
+                const desktopValue = document.getElementById('speedValue');
+                if (desktopSlider) desktopSlider.value = speed;
+                if (desktopValue) desktopValue.textContent = (speed / 1000).toFixed(1) + 's';
+                document.querySelectorAll('.speed-preset-btn').forEach(b => {
+                    b.classList.toggle('active', parseInt(b.dataset.speed) === speed);
                 });
             });
-            
-            // Re-apply filters when species are toggled
-            document.getElementById('legendSpecies')?.addEventListener('change', () => {
-                if (activePreset && activePreset.filterLayers) {
-                    setTimeout(() => {
-                        applyOceanFilters(activePreset.filterLayers);
-                    }, 100);
+        });
+
+        // Mobile animation intensity slider
+        const mobileAnimIntensitySlider = document.getElementById('mobileAnimIntensitySlider');
+        const mobileAnimIntensityVal = document.getElementById('mobileAnimIntensityVal');
+
+        if (mobileAnimIntensitySlider) {
+            mobileAnimIntensitySlider.addEventListener('input', () => {
+                intensityMultiplier = parseInt(mobileAnimIntensitySlider.value) / 100;
+                if (mobileAnimIntensityVal) mobileAnimIntensityVal.textContent = mobileAnimIntensitySlider.value + '%';
+                applyIntensityAll();
+
+                // Sync with desktop
+                const desktopSlider = document.getElementById('intensitySlider');
+                const desktopValue = document.getElementById('intensityValue');
+                if (desktopSlider) desktopSlider.value = mobileAnimIntensitySlider.value;
+                if (desktopValue) desktopValue.textContent = mobileAnimIntensitySlider.value + '%';
+            });
+        }
+
+        // Mobile animation radius slider
+        const mobileAnimRadiusSlider = document.getElementById('mobileAnimRadiusSlider');
+        const mobileAnimRadiusVal = document.getElementById('mobileAnimRadiusVal');
+
+        if (mobileAnimRadiusSlider) {
+            mobileAnimRadiusSlider.addEventListener('input', () => {
+                radiusMultiplier = parseInt(mobileAnimRadiusSlider.value) / 100;
+                if (mobileAnimRadiusVal) mobileAnimRadiusVal.textContent = mobileAnimRadiusSlider.value + '%';
+                applyRadiusAll();
+
+                // Sync with desktop
+                const desktopSlider = document.getElementById('radiusSlider');
+                const desktopValue = document.getElementById('radiusValue');
+                if (desktopSlider) desktopSlider.value = mobileAnimRadiusSlider.value;
+                if (desktopValue) desktopValue.textContent = mobileAnimRadiusSlider.value + '%';
+            });
+        }
+    }
+
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
+    setupNavToggle();
+    map.on('load', () => {
+        addSpeciesLayers();
+        generateSpeciesCards();
+
+        if (typeof CircularControls !== 'undefined') {
+            circularControls = new CircularControls({
+                container: '#controls',
+                onMonthChange: (month) => setMonth(month),
+                onPlayToggle: () => isPlaying ? stopAnimation() : startAnimation(),
+                getIsPlaying: () => isPlaying,
+                getCurrentMonth: () => monthA
+            });
+        }
+
+        setupTabs();
+        setupAllSpeciesToggle();
+        setupProjectionToggle();
+        setupBasemapToggle();
+        setupFullscreen();
+        setupAnimationSettings();
+        setupPresets();
+        setupMobileControls();
+
+        // Map Tips
+        const mapTipsBtn = document.getElementById('mapTipsBtn');
+        const mapTipsTooltip = document.getElementById('mapTipsTooltip');
+        if (mapTipsBtn && mapTipsTooltip) {
+            mapTipsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mapTipsTooltip.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (!mapTipsBtn.contains(e.target) && !mapTipsTooltip.contains(e.target)) {
+                    mapTipsTooltip.classList.remove('show');
                 }
             });
         }
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => setTimeout(init, 1500));
-        } else {
-            setTimeout(init, 1500);
-        }
-    })();
+
+        // Mobile sheet
+        document.getElementById('mobileSheetOverlay')?.addEventListener('click', closeMobileSheet);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMobileSheet();
+                mapTipsTooltip?.classList.remove('show');
+                // Close mobile floating panels
+                document.querySelectorAll('.mobile-floating-panel').forEach(p => p.classList.remove('open'));
+                document.querySelectorAll('.mobile-floating-btn').forEach(b => b.classList.remove('active'));
+            }
+        });
+
+        // Resize map after layout
+        setTimeout(() => map.resize(), 100);
+    });
     </script>
 </body>
 </html>

@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Species Tracking - Whale Watchers Atlas</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="description" content="Track individual whale species migration patterns with animated heatmaps.">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Three.js for whale animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+    <script src="sperm-whale-scene.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Hero Section */
+        #species-hero {
+            position: relative;
+            min-height: 120vh;
+            background: linear-gradient(180deg, 
+                #0a1628 0%, #0d2440 20%, #134e7a 45%,
+                #1a6eb0 65%, #2d8fd4 80%, #7ec8e3 92%, #f8f9fa 100%
+            );
+            overflow: hidden;
+        }
+
+        #species-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 2px, transparent 2px),
+                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 100px 100px, 150px 150px, 80px 80px;
+            animation: float-particles 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-particles {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
+        }
+
+        .species-hero-scene {
+            position: relative;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            z-index: 10;
+        }
+
+        .species-hero-content { text-align: center; max-width: 800px; margin: 0 auto; }
+
+        .species-hero-title {
+            font-size: clamp(42px, 8vw, 80px);
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 4px 40px rgba(0,0,0,0.4);
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin: 0 0 28px 0;
+        }
+
+        .species-hero-title span {
+            display: block;
+            background: linear-gradient(135deg, #7ec8e3 0%, #a8e6cf 50%, #7ec8e3 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 7s ease-in-out infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .species-hero-tagline {
+            font-size: clamp(16px, 2.5vw, 22px);
+            color: rgba(255,255,255,0.85);
+            margin: 0 0 30px 0;
+            line-height: 1.6;
+        }
+
+        .species-hero-stats { display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; }
+        .species-stat { text-align: center; }
+        .species-stat-value {
+            font-size: clamp(36px, 6vw, 56px);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .species-stat-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 8px;
+        }
+
+        .species-scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            font-weight: 500;
+            animation: bounce 2s ease-in-out infinite;
+            z-index: 20;
+            transition: opacity 0.3s ease;
+        }
+        .species-scroll-indicator.hidden { opacity: 0; pointer-events: none; }
+        .species-scroll-indicator svg { width: 24px; height: 24px; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        #spermWhaleScene {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 11;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #spermWhaleScene canvas { width: 100% !important; height: 100% !important; }
+
+        @media (max-width: 768px) {
+            #species-hero { min-height: 110vh; }
+            .species-hero-stats { gap: 30px; }
+            .species-highlight { left: 5% !important; right: 5% !important; text-align: center !important; max-width: none; }
+            .highlight-left { top: 40%; }
+            .highlight-right { top: 58%; }
+        }
+
+        /* ============================================================
+           MAP DESCRIPTION SECTION
+           ============================================================ */
+        .map-intro {
+            background: linear-gradient(180deg, #f8f9fa 0%, #fff 100%);
+            padding: 48px 24px 32px;
+            text-align: center;
+        }
+
+        .map-intro-inner {
+            width: min(100%, clamp(640px, 80vw, 1100px));
+            margin: 0 auto;
+        }
+
+        .map-intro-title {
+            font-size: clamp(28px, 4vw, 36px);
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 16px 0;
+            line-height: 1.2;
+        }
+
+        .map-intro-text {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #475569;
+            margin: 0 0 24px 0;
+        }
+
+        .map-intro-text p {
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .map-intro { padding: 32px 16px 24px; }
+        }
+
+        /* ============================================================
+           PRESET BAR - Improved styling
+           ============================================================ */
+        .preset-bar {
+            background: linear-gradient(to bottom, #f8fafc, #fff);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 24px;
+        }
+
+        .preset-bar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-start;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+
+        .preset-bar-info {
+            min-width: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .preset-bar-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .preset-utilities {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preset-chips {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .preset-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .preset-chip:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+
+        .preset-chip.active {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            border-color: #0284c7;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+        }
+
+        .preset-chip .chip-icon {
+            font-size: 18px;
+        }
+
+        .preset-chip .chip-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1px;
+        }
+
+        .preset-chip .chip-title {
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .preset-chip .chip-desc {
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.7;
+            line-height: 1.2;
+        }
+
+        .preset-chip.active .chip-desc {
+            opacity: 0.85;
+        }
+
+        /* Utility buttons (All / Clear) */
+        .preset-chip.utility {
+            padding: 10px 14px;
+            background: #f1f5f9;
+        }
+
+        .preset-chip.utility .chip-text {
+            flex-direction: row;
+            gap: 0;
+        }
+
+        .preset-chip.utility .chip-desc {
+            display: none;
+        }
+
+        .preset-chip.utility:hover {
+            background: #e2e8f0;
+        }
+
+        .preset-chip.utility.active {
+            background: #64748b;
+            border-color: #64748b;
+        }
+
+        @media (max-width: 900px) {
+            .preset-bar { padding: 12px 16px; }
+            .preset-bar-inner { flex-direction: column; }
+            .preset-bar-info { width: 100%; }
+            .preset-utilities { width: 100%; }
+            .preset-chip { padding: 8px 12px; }
+            .preset-chip .chip-icon { font-size: 16px; }
+            .preset-chip .chip-title { font-size: 13px; }
+            .preset-chip .chip-desc { display: none; }
+        }
+
+        /* ============================================================
+           MAP & LEGEND
+           ============================================================ */
+        #map { position: relative; }
+
+        #legend {
+            position: absolute;
+            top: 16px; left: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            max-width: 280px;
+            z-index: 10;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .legend-title {
+            font-weight: 700;
+            font-size: 13px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .legend-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .legend-row:last-of-type { border-bottom: none; }
+        .legend-row:hover { opacity: 0.8; }
+        .legend-row input[type="checkbox"] {
+            width: 16px; height: 16px;
+            cursor: pointer;
+            accent-color: #2c7ab8;
+            flex-shrink: 0;
+        }
+        .legend-color { width: 28px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+        .legend-name { font-size: 13px; color: #333; flex: 1; font-weight: 500; }
+        .legend-note {
+            font-size: 11px;
+            color: #888;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
+            line-height: 1.4;
+        }
+
+        /* Hide close button on desktop */
+        .legend-close {
+            display: none;
+        }
+
+        /* Top Control Buttons - hidden on desktop, visible on mobile */
+        .bottom-controls {
+            display: none;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            flex-direction: row;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-controls {
+                display: flex;
+            }
+        }
+
+        .bottom-control-btn {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .bottom-control-btn:hover {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .bottom-control-btn.active {
+            background: var(--primary, #0a4a7c);
+            color: white;
+        }
+
+        .bottom-control-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-controls {
+                top: 12px;
+                right: 12px;
+                gap: 8px;
+            }
+
+            .bottom-control-btn {
+                padding: 10px 14px;
+                font-size: 11px;
+                border-radius: 10px;
+            }
+
+            .bottom-control-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bottom-controls {
+                top: 10px;
+                right: 10px;
+                gap: 6px;
+            }
+
+            .bottom-control-btn {
+                padding: 8px 12px;
+                font-size: 10px;
+            }
+
+            .bottom-control-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        /* Hide old legend toggle on desktop - we use bottom buttons now */
+        .legend-toggle {
+            display: none !important;
+        }
+
+        /* Hide old animations toggle - we use bottom buttons now */
+        .animations-toggle {
+            display: none !important;
+        }
+
+        /* Show circular controls - no background box */
+        #controls {
+            display: block;
+        }
+
+        /* Legend - side panel on desktop */
+        .legend-close {
+            display: none;
+        }
+
+        .legend-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 99;
+        }
+
+        .legend-overlay.visible {
+            display: block;
+        }
+
+        /* Mobile: Legend becomes bottom sheet */
+        @media (max-width: 768px) {
+            #legend {
+                position: fixed !important;
+                top: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100%;
+                max-width: none;
+                max-height: 50vh;
+                border-radius: 20px 20px 0 0;
+                padding: 20px;
+                overflow-y: auto;
+                background: rgba(255, 255, 255, 0.98);
+                z-index: 100;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+            }
+
+            #legend.mobile-visible {
+                transform: translateY(0);
+            }
+
+            #legend .legend-title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .legend-close {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #666;
+                cursor: pointer;
+                padding: 4px 8px;
+                line-height: 1;
+            }
+        }
+
+        /* Animations panel - bottom sheet on mobile only */
+        @media (max-width: 768px) {
+            .settings-panel {
+                position: fixed !important;
+                top: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100%;
+                z-index: 100;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .settings-panel.mobile-visible {
+                transform: translateY(0);
+            }
+
+            .settings-toggle {
+                display: none !important;
+            }
+
+            .settings-dropdown {
+                position: relative !important;
+                top: auto !important;
+                right: auto !important;
+                width: 100% !important;
+                max-height: 50vh;
+                overflow-y: auto;
+                border-radius: 20px 20px 0 0 !important;
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15) !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            transform: none !important;
+        }
+
+        .settings-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+
+        .settings-close {
+            display: block !important;
+        }
+
+        .animations-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 99;
+        }
+
+        .animations-overlay.visible {
+            display: block;
+        }
+
+        /* Mobile Legend Toggle Button - DEPRECATED, using bottom controls */
+        .legend-toggle-old {
+            display: none;
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 15;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .legend-toggle:hover {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .legend-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .legend-toggle .toggle-text {
+            display: inline;
+        }
+
+        .legend-toggle.active {
+            background: var(--primary, #0a4a7c);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .legend-toggle {
+                display: flex;
+            }
+
+            #legend {
+                position: fixed;
+                top: auto;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                max-width: none;
+                max-height: 50vh;
+                border-radius: 20px 20px 0 0;
+                padding: 20px;
+                overflow-y: auto;
+                background: rgba(255, 255, 255, 0.98);
+                z-index: 100;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+            }
+
+            #legend.mobile-visible {
+                transform: translateY(0);
+            }
+
+            #legend .legend-title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .legend-close {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #666;
+                cursor: pointer;
+                padding: 4px 8px;
+                line-height: 1;
+            }
+
+            /* Overlay when legend is open */
+            .legend-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: 99;
+            }
+
+            .legend-overlay.visible {
+                display: block;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .legend-toggle {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .legend-toggle .toggle-text {
+                display: none;
+            }
+
+            #legend {
+                max-height: 60vh;
+                padding: 16px;
+            }
+        }
+
+        /* Mobile Animations Toggle Button */
+        .animations-toggle {
+            display: none;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 15;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .animations-toggle:hover {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .animations-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .animations-toggle .toggle-text {
+            display: inline;
+        }
+
+        .animations-toggle.active {
+            background: var(--primary, #0a4a7c);
+            color: white;
+        }
+
+        /* Hide close button on desktop */
+        .settings-close {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .animations-toggle {
+                display: flex;
+            }
+
+            .settings-panel {
+                position: fixed !important;
+                top: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100%;
+                z-index: 100;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .settings-panel.mobile-visible {
+                transform: translateY(0);
+            }
+
+            .settings-toggle {
+                display: none !important;
+            }
+
+            .settings-dropdown {
+                position: relative !important;
+                top: auto !important;
+                right: auto !important;
+                width: 100% !important;
+                max-height: 50vh;
+                overflow-y: auto;
+                border-radius: 20px 20px 0 0 !important;
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15) !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+            }
+
+            .settings-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .settings-close {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #666;
+                cursor: pointer;
+                padding: 4px 8px;
+                line-height: 1;
+            }
+
+            .settings-content {
+                padding: 12px 16px;
+            }
+
+            .setting-group {
+                margin-bottom: 12px;
+            }
+
+            .setting-label span {
+                font-size: 12px;
+            }
+
+            .setting-description {
+                font-size: 10px;
+            }
+
+            /* Animations overlay */
+            .animations-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: 99;
+            }
+
+            .animations-overlay.visible {
+                display: block;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .animations-toggle {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .animations-toggle .toggle-text {
+                display: none;
+            }
+
+            .settings-dropdown {
+                max-height: 60vh;
+            }
+
+            .setting-label span {
+                font-size: 11px;
+            }
+
+            .setting-value {
+                font-size: 10px;
+            }
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: absolute;
+            top: 16px; right: 16px;
+            z-index: 10;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .settings-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.2s;
+        }
+        .settings-toggle:hover { background: #fff; box-shadow: 0 4px 28px rgba(0, 0, 0, 0.2); }
+        .settings-toggle svg { width: 18px; height: 18px; }
+        .settings-toggle .chevron { width: 14px; height: 14px; transition: transform 0.2s; }
+        .settings-panel.open .settings-toggle .chevron { transform: rotate(180deg); }
+
+        .settings-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+        }
+        .settings-panel.open .settings-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+        .settings-header {
+            padding: 14px 16px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+        }
+        .settings-content { padding: 16px; }
+        .setting-group { margin-bottom: 16px; }
+        .setting-group:last-child { margin-bottom: 0; }
+        .setting-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #333;
+        }
+        .setting-value { color: #2c7ab8; font-weight: 600; }
+        .setting-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, #2c7ab8 0%, #e0e0e0 0%);
+            outline: none;
+            cursor: pointer;
+        }
+        .setting-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #2c7ab8;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .setting-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(44, 122, 184, 0.3);
+        }
+        .setting-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #2c7ab8;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        .setting-description { font-size: 11px; color: #888; margin-top: 6px; }
+        .setting-presets { display: flex; gap: 6px; margin-top: 10px; }
+        .setting-presets .preset-btn {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 11px;
+            text-align: center;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .setting-presets .preset-btn:hover { background: #e2e8f0; }
+        .setting-presets .preset-btn.active { background: #2c7ab8; color: white; border-color: #2c7ab8; }
+        .settings-divider { height: 1px; background: #eee; margin: 16px 0; }
+        .reset-btn {
+            width: 100%;
+            padding: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover { background: #f1f5f9; color: #475569; }
+
+        #monthBottom, .month-display { display: none; }
+
+        /* Circular controls - positioned top left, no background box */
+        #controls {
+            position: absolute !important;
+            top: 16px !important;
+            left: 16px !important;
+            bottom: auto !important;
+            right: auto !important;
+            z-index: 10 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* Circular control styling - matching density map */
+        .control-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .circular-selector {
+            position: relative;
+            width: 180px !important;
+            height: 180px !important;
+            margin: 0 auto;
+        }
+
+        .month-wheel {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .month-marker {
+            position: absolute;
+            width: 36px !important;
+            height: 36px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            user-select: none;
+            z-index: 2;
+        }
+
+        .month-marker:hover {
+            background: rgba(44, 122, 184, 0.15);
+            color: #2c7ab8;
+            transform: scale(1.1);
+        }
+
+        .month-marker.active {
+            background: #2c7ab8;
+            color: white;
+            box-shadow: 0 2px 8px rgba(44, 122, 184, 0.4);
+            transform: scale(1.15);
+        }
+
+        .center-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px !important;
+            height: 90px !important;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+        }
+
+        .center-month {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c7ab8;
+            margin-bottom: 2px;
+        }
+
+        .center-hint {
+            font-size: 8px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rotation-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #2c7ab8 60%, #2c7ab8 100%);
+            transform-origin: left center;
+            z-index: 1;
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .rotation-indicator::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #2c7ab8;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(44, 122, 184, 0.5);
+        }
+
+        .drag-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            cursor: grab;
+            z-index: 4;
+        }
+
+        .drag-ring:active {
+            cursor: grabbing;
+        }
+
+        .drag-ring::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border-radius: 50%;
+            border: 2px dashed rgba(44, 122, 184, 0.2);
+            pointer-events: none;
+        }
+
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 14px;
+            gap: 6px;
+        }
+
+        .control-button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #2c7ab8;
+            color: white;
+        }
+
+        .control-button:hover {
+            background: #1e5a8a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(44, 122, 184, 0.3);
+        }
+
+        .control-button.playing {
+            background: #e74c3c;
+        }
+
+        .control-button.playing:hover {
+            background: #c0392b;
+        }
+
+        .nav-arrows {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .nav-arrow {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #666;
+        }
+
+        .nav-arrow:hover {
+            background: #2c7ab8;
+            color: white;
+        }
+
+        .nav-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .settings-panel { top: 10px; right: 10px; }
+            .settings-dropdown { width: 260px; }
+            #controls {
+                top: 12px !important;
+                left: 12px !important;
+            }
+            .circular-selector {
+                width: 140px !important;
+                height: 140px !important;
+            }
+            .month-marker {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 8px;
+            }
+            .center-display {
+                width: 70px !important;
+                height: 70px !important;
+            }
+            .center-month {
+                font-size: 11px;
+            }
+            .center-hint {
+                font-size: 7px;
+            }
+            .control-header {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+            .nav-arrows {
+                gap: 6px;
+                margin-top: 8px;
+            }
+            .nav-arrow {
+                width: 26px;
+                height: 26px;
+            }
+            .nav-arrow svg {
+                width: 12px;
+                height: 12px;
+            }
+            .play-controls {
+                margin-top: 10px;
+            }
+            .control-button {
+                padding: 6px 14px;
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #controls {
+                top: 10px !important;
+                left: 10px !important;
+            }
+            .circular-selector {
+                width: 105px !important;
+                height: 105px !important;
+            }
+            .month-marker {
+                width: 22px !important;
+                height: 22px !important;
+                font-size: 7px;
+            }
+            .center-display {
+                width: 52px !important;
+                height: 52px !important;
+            }
+            .center-month {
+                font-size: 9px;
+            }
+            .center-hint {
+                font-size: 6px;
+            }
+            .control-header {
+                font-size: 9px;
+            }
+            .nav-arrows {
+                gap: 4px;
+                margin-top: 6px;
+            }
+            .nav-arrow {
+                width: 24px;
+                height: 24px;
+            }
+            .nav-arrow svg {
+                width: 12px;
+                height: 12px;
+            }
+            .play-controls {
+                margin-top: 8px;
+            }
+            .control-button {
+                padding: 5px 12px;
+                font-size: 10px;
+                border-radius: 14px;
+            }
+            .rotation-indicator {
+                display: none;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+            #controls {
+                top: 8px !important;
+                left: 8px !important;
+            }
+            .control-header {
+                display: none;
+            }
+            .circular-selector {
+                width: 90px !important;
+                height: 90px !important;
+            }
+            .month-marker {
+                width: 18px !important;
+                height: 18px !important;
+                font-size: 6px;
+            }
+            .center-display {
+                width: 44px !important;
+                height: 44px !important;
+            }
+            .center-month {
+                font-size: 8px;
+            }
+            .center-play-icon {
+                font-size: 8px;
+            }
+            .center-hint {
+                display: none;
+            }
+            .rotation-indicator {
+                display: none;
+            }
+            .nav-arrows {
+                gap: 2px;
+                margin-top: 4px;
+            }
+            .nav-arrow {
+                width: 22px !important;
+                height: 22px !important;
+            }
+            .play-controls {
+                margin-top: 6px;
+            }
+            .control-button {
+                padding: 4px 10px;
+                font-size: 9px;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #controls {
+                top: 8px !important;
+                left: 8px !important;
+            }
+            .control-header {
+                display: none;
+            }
+            .circular-selector {
+                width: 85px !important;
+                height: 85px !important;
+            }
+            .month-marker {
+                width: 17px !important;
+                height: 17px !important;
+                font-size: 6px;
+            }
+            .center-display {
+                width: 42px !important;
+                height: 42px !important;
+            }
+            .center-month {
+                font-size: 8px;
+            }
+            .center-play-icon {
+                font-size: 8px;
+            }
+            .center-hint {
+                display: none;
+            }
+            .rotation-indicator {
+                display: none;
+            }
+            .nav-arrows {
+                margin-top: 4px;
+                gap: 2px;
+            }
+            .nav-arrow {
+                width: 20px;
+                height: 20px;
+            }
+            .play-controls {
+                margin-top: 4px;
+            }
+            .control-button {
+                padding: 3px 8px;
+                font-size: 8px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <span class="whale-icon">
+                    <img src="favicon.ico" alt="Whale Icon" class="whale-icon-img">
+                </span>
+                <span class="brand-text">Whale Watchers Atlas</span>
+            </a>
+            <div class="nav-links">
+                <a href="density-map.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link active">Species Map</a>
+                <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
+                <a href="whale-locations-gallery.html" class="nav-link">Locations</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="species-hero">
+        <div class="species-hero-scene">
+            <div class="species-hero-content">
+                <h1 class="species-hero-title">
+                    Track Every
+                    <span>Migration</span>
+                </h1>
+                <p class="species-hero-tagline">
+                    Explore species-specific movement patterns as whales travel 
+                    between feeding grounds and breeding waters
+                </p>
+                <div class="species-hero-stats">
+                    <div class="species-stat">
+                        <div class="species-stat-value">11</div>
+                        <div class="species-stat-label">Species Tracked</div>
+                    </div>
+                    <div class="species-stat">
+                        <div class="species-stat-value">12</div>
+                        <div class="species-stat-label">Months of Data</div>
+                    </div>
+                    <div class="species-stat">
+                        <div class="species-stat-value">∞</div>
+                        <div class="species-stat-label">Stories to Discover</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="species-scroll-indicator" id="speciesScrollIndicator">
+            <span>Scroll to explore</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+        </div>
+
+        <div id="spermWhaleScene"></div>
+    </section>
+
+    <!-- Map Introduction Section -->
+    <section class="map-intro">
+        <div class="map-intro-inner">
+            <h2 class="map-intro-title">Explore Migration Patterns</h2>
+            <div class="map-intro-text">
+                <p>
+                    Use the interactive map below to visualize how different whale species share ocean habitats throughout the year.
+                </p>
+                <p>
+                    Toggle multiple species simultaneously to discover fascinating migration overlaps and seasonal patterns.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preset Bar -->
+    <div class="preset-bar">
+        <div class="preset-bar-inner">
+            <div class="preset-bar-info">
+                <span class="preset-bar-label">Migration Presets</span>
+                <div class="preset-utilities">
+                    <button class="preset-chip utility" data-preset="clear">
+                        <span class="chip-text">
+                            <span class="chip-title">Clear</span>
+                        </span>
+                    </button>
+                    <button class="preset-chip utility" data-preset="all">
+                        <span class="chip-text">
+                            <span class="chip-title">All Species</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="preset-chips">
+                <button class="preset-chip" data-preset="north_pacific">
+                    <span class="chip-text">
+                        <span class="chip-title">North Pacific Migration</span>
+                        <span class="chip-desc">Blue, Humpback, Gray</span>
+                    </span>
+                </button>
+                <button class="preset-chip" data-preset="north_atlantic">
+                    <span class="chip-text">
+                        <span class="chip-title">North Atlantic</span>
+                        <span class="chip-desc">Humpback, Fin, Right Whale</span>
+                    </span>
+                </button>
+                <button class="preset-chip" data-preset="arctic">
+                    <span class="chip-text">
+                        <span class="chip-title">North Arctic</span>
+                        <span class="chip-desc">Beluga, Orca (Northern)</span>
+                    </span>
+                </button>
+                <button class="preset-chip" data-preset="southern_ocean">
+                    <span class="chip-text">
+                        <span class="chip-title">Southern Ocean</span>
+                        <span class="chip-desc">Blue, Humpback, Orca</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map">
+        <!-- Bottom Control Buttons -->
+        <div class="bottom-controls">
+            <button class="bottom-control-btn" id="layerControlBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                Species Layer Control
+            </button>
+            <button class="bottom-control-btn" id="animationControlBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                Animations
+            </button>
+        </div>
+
+        <!-- Legend Overlay -->
+        <div class="legend-overlay" id="legendOverlay"></div>
+
+        <div id="legend">
+            <div class="legend-title">
+                Species Layers
+                <button class="legend-close" id="legendClose">&times;</button>
+            </div>
+            <div id="legendSpecies"></div>
+            <div class="legend-note">
+                Click checkboxes to show/hide species.<br>
+                Brighter color = higher observation density.
+            </div>
+        </div>
+
+        <!-- Animations Overlay -->
+        <div class="animations-overlay" id="animationsOverlay"></div>
+
+        <div class="settings-panel" id="settingsPanel">
+            <button class="settings-toggle" id="settingsToggle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+                </svg>
+                <span>Animation</span>
+                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </button>
+            <div class="settings-dropdown">
+                <div class="settings-header">
+                    Animation Settings
+                    <button class="settings-close" id="settingsClose">&times;</button>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Transition Speed</span>
+                            <span class="setting-value" id="speedValue">1.0s</span>
+                        </div>
+                        <input type="range" class="setting-slider" id="speedSlider" min="200" max="3000" value="1000" step="100">
+                        <div class="setting-description">Time to transition between months</div>
+                        <div class="setting-presets">
+                            <button class="preset-btn" data-speed="400">Fast</button>
+                            <button class="preset-btn active" data-speed="1000">Normal</button>
+                            <button class="preset-btn" data-speed="2000">Slow</button>
+                        </div>
+                    </div>
+                    <div class="settings-divider"></div>
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Heatmap Intensity</span>
+                            <span class="setting-value" id="intensityValue">100%</span>
+                        </div>
+                        <input type="range" class="setting-slider" id="intensitySlider" min="20" max="200" value="100" step="10">
+                        <div class="setting-description">Brightness of species density overlay</div>
+                    </div>
+                    <div class="settings-divider"></div>
+                    <div class="setting-group">
+                        <div class="setting-label">
+                            <span>Heatmap Radius</span>
+                            <span class="setting-value" id="radiusValue">100%</span>
+                        </div>
+                        <input type="range" class="setting-slider" id="radiusSlider" min="50" max="200" value="100" step="10">
+                        <div class="setting-description">Spread of each data point</div>
+                    </div>
+                    <div class="settings-divider"></div>
+                    <button class="reset-btn" id="resetSettings">Reset to Defaults</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="controls"></div>
+        <div id="monthBottom">January</div>
+        <div class="month-display"><span id="monthLabel">January</span></div>
+    </div>
+
+    <script src="whale-species.js"></script>
+    <script src="config.js"></script>
+    <script src="circular-controls.js"></script>
+    <script src="species-map.js"></script>
+
+    <!-- Control Scripts -->
+    <script>
+    (function() {
+        // Legend Panel Toggle
+        const layerControlBtn = document.getElementById('layerControlBtn');
+        const legend = document.getElementById('legend');
+        const legendOverlay = document.getElementById('legendOverlay');
+        const legendClose = document.getElementById('legendClose');
+
+        function openLegend() {
+            legend.classList.add('mobile-visible');
+            legendOverlay.classList.add('visible');
+            layerControlBtn.classList.add('active');
+        }
+
+        function closeLegend() {
+            legend.classList.remove('mobile-visible');
+            legendOverlay.classList.remove('visible');
+            layerControlBtn.classList.remove('active');
+        }
+
+        if (layerControlBtn) {
+            layerControlBtn.addEventListener('click', function() {
+                if (legend.classList.contains('mobile-visible')) {
+                    closeLegend();
+                } else {
+                    openLegend();
+                }
+            });
+        }
+
+        if (legendOverlay) {
+            legendOverlay.addEventListener('click', closeLegend);
+        }
+
+        if (legendClose) {
+            legendClose.addEventListener('click', closeLegend);
+        }
+
+        // Animations Panel Toggle
+        const animationControlBtn = document.getElementById('animationControlBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const animationsOverlay = document.getElementById('animationsOverlay');
+        const settingsClose = document.getElementById('settingsClose');
+
+        function openAnimations() {
+            settingsPanel.classList.add('mobile-visible');
+            animationsOverlay.classList.add('visible');
+            animationControlBtn.classList.add('active');
+        }
+
+        function closeAnimations() {
+            settingsPanel.classList.remove('mobile-visible');
+            animationsOverlay.classList.remove('visible');
+            animationControlBtn.classList.remove('active');
+        }
+
+        if (animationControlBtn) {
+            animationControlBtn.addEventListener('click', function() {
+                if (settingsPanel.classList.contains('mobile-visible')) {
+                    closeAnimations();
+                } else {
+                    openAnimations();
+                }
+            });
+        }
+
+        if (animationsOverlay) {
+            animationsOverlay.addEventListener('click', closeAnimations);
+        }
+
+        if (settingsClose) {
+            settingsClose.addEventListener('click', closeAnimations);
+        }
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (legend.classList.contains('mobile-visible')) {
+                    closeLegend();
+                }
+                if (settingsPanel.classList.contains('mobile-visible')) {
+                    closeAnimations();
+                }
+            }
+        });
+    })();
+    </script>
+    
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p class="footer-attribution"><a href="about.html">Created by Tyree Spatial</a></p>
+        </div>
+    </footer>
+    
+    <!-- Three.js Sperm Whale Scene (intro animation, then hide) -->
+    <script>
+    (function() {
+        const hero = document.getElementById('species-hero');
+        const whaleContainer = document.getElementById('spermWhaleScene');
+        const scrollIndicator = document.getElementById('speciesScrollIndicator');
+
+        if (!hero || !whaleContainer) return;
+
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+        function waitForLoaded(scene) {
+            return new Promise((resolve) => {
+                const tick = () => {
+                    if (scene && scene.isLoaded) resolve();
+                    else requestAnimationFrame(tick);
+                };
+                tick();
+            });
+        }
+
+        async function playIntroOnly(scene) {
+            // Use configurable duration from scene
+            const INTRO_MS = scene.config.swimDuration
+
+            // Start at top
+            window.scrollTo(0, 0);
+
+            // Hide scroll indicator during intro
+            if (scrollIndicator) scrollIndicator.classList.add('hidden');
+
+            await waitForLoaded(scene);
+
+            // Show whale for intro
+            whaleContainer.style.display = '';
+            whaleContainer.style.transition = 'opacity 0.8s ease';
+            whaleContainer.style.opacity = 1;
+
+            const t0 = performance.now();
+
+            return new Promise((resolve) => {
+                const step = (now) => {
+                    const t = clamp((now - t0) / INTRO_MS, 0, 1);
+
+                    // easeInOutCubic
+                    const eased = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+
+                    // Update whale position
+                    scene.setScrollProgress(eased);
+
+                    if (t < 1) requestAnimationFrame(step);
+                    else resolve();
+                };
+                requestAnimationFrame(step);
+            });
+        }
+
+        function initWhaleScene() {
+            if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined' || typeof SpermWhaleScene === 'undefined') {
+                setTimeout(initWhaleScene, 100);
+                return;
+            }
+
+            const whaleScene = new SpermWhaleScene(whaleContainer, 'models/Sperm_whale.glb');
+
+            // Play intro then fade out
+            playIntroOnly(whaleScene).then(() => {
+                // Fade out whale
+                whaleContainer.style.opacity = 0;
+                setTimeout(() => {
+                    whaleContainer.style.display = 'none';
+                    if (whaleScene.dispose) whaleScene.dispose();
+                }, 800);
+
+                // Show scroll indicator after animation
+                if (scrollIndicator) scrollIndicator.classList.remove('hidden');
+            });
+        }
+
+        initWhaleScene();
+    })();
+    </script>
+    <!-- Preset Handler with setFilter Ocean Filtering -->
+    <script>
+    (function() {
+        /*
+         * OCEAN FILTER LISTS
+         * Used to filter humpback and orca by region using map.setFilter()
+         */
+        const NORTH_PACIFIC_OCEANS = [
+            'North Pacific Ocean', 'Bering Sea', 'Gulf of Alaska', 'Sea of Okhotsk',
+            'Sea of Japan', 'Philippine Sea', 'East China Sea', 'Golfo de California',
+            'Monterey Bay', 'Prince William Sound', 'Cook Inlet', 'Bristol Bay',
+            'Salish Sea', 'Hecate Strait', 'Queen Charlotte Strait', 'Queen Charlotte Sound',
+            'San Francisco Bay', 'Coral Sea', 'Tasman Sea', 'Great Barrier Reef',
+            'Norton Sound', "Gulf of Anadyr'", 'Karaginskiy Gulf', 'Kronotskiy Gulf',
+            'Cordova Bay', 'Dixon Entrance', 'Columbia River', 'Korea Strait',
+            'La Pérouse Strait', 'Uchiura Bay', 'Golfo de Tehuantepec'
+        ];
+        
+        const NORTH_ATLANTIC_OCEANS = [
+            'North Atlantic Ocean', 'Gulf of Maine', 'Gulf of Saint Lawrence',
+            'Bay of Fundy', 'Labrador Sea', 'Davis Strait', 'Baffin Bay',
+            'Caribbean Sea', 'Gulf of Mexico', 'Sargasso Sea', 'Norwegian Sea',
+            'North Sea', 'Irish Sea', 'English Channel', 'Bay of Biscay',
+            'Mediterranean Sea', 'Baltic Sea', 'Greenland Sea', 'Denmark Strait',
+            'Barents Sea', 'Strait of Belle Isle', 'Strait of Gibraltar',
+            'Bristol Channel', 'Kattegat', 'Skagerrak', 'Gulf of Guinea',
+            'Ligurian Sea', 'Tyrrhenian Sea', 'Alboran Sea', 'Red Sea'
+        ];
+        
+        const NORTH_ARCTIC_OCEANS = [
+            'Arctic Ocean', 'Chukchi Sea', 'Bering Sea', 'Beaufort Sea',
+            'Baffin Bay', 'Davis Strait', 'Greenland Sea', 'Norwegian Sea',
+            'Barents Sea', 'Labrador Sea', 'Kangertittivaq', 'Eclipse Sound',
+            'Smith Sound', 'The North Western Passages', 'Vestfjorden',
+            'Trondheimsfjorden', 'Sognefjorden', 'Boknafjorden',
+            'North Pacific Ocean', 'Gulf of Alaska', 'Sea of Okhotsk',
+            'North Atlantic Ocean', 'Gulf of Maine', 'Gulf of Saint Lawrence',
+            'Bay of Fundy', 'North Sea', 'Irish Sea', 'Iceland Sea',
+            'Kara Sea', 'Laptev Sea', 'East Siberian Sea', 'Lincoln Sea',
+            'Prince William Sound', 'Cook Inlet', 'Bristol Bay',
+            'Salish Sea', 'Hecate Strait', 'Queen Charlotte Strait', 'Queen Charlotte Sound',
+            'Norton Sound', "Gulf of Anadyr'", 'Karaginskiy Gulf', 'Kronotskiy Gulf',
+            'Denmark Strait', 'Fram Strait'
+        ];
+        
+        const SOUTHERN_OCEANS = [
+            'Southern Ocean', 'South Atlantic Ocean', 'South Pacific Ocean',
+            'Drake Passage', 'Scotia Sea', 'Weddell Sea', 'Ross Sea',
+            'Bellingshausen Sea', 'Davis Sea', 'Amundsen Sea', 'Tasman Sea',
+            'Great Australian Bight', 'Indian Ocean', 'Mozambique Channel',
+            'Coral Sea', 'Arafura Sea', 'Bransfield Strait', 'Marguerite Bay',
+            'McMurdo Sound', 'Prydz Bay', 'Sulzberger Bay', 'Bass Strait',
+            'Gulf St. Vincent', 'Geographe Bay', 'Timor Sea', 'Gulf of Carpentaria',
+            'Solomon Sea', 'Celebes Sea', 'Ceram Sea', 'Bali Sea', 'Andaman Sea',
+            'Bay of Bengal', 'Golfo San Jorge', 'Golfo San Matías', 'Golfo Corcovado',
+            'Estrecho de Magellanes', 'Bay Inútil', 'Seno de Skyring'
+        ];
+        
+        /*
+         * PRESETS CONFIGURATION
+         * - species: names to match in legend checkboxes
+         * - filterLayers: which layer IDs need ocean filtering, with their ocean list
+         * - center/zoom: map view
+         */
+        const presets = {
+            north_pacific: {
+                species: ['Blue', 'Humpback', 'Gray'],
+                filterLayers: {
+                    'humpback': NORTH_PACIFIC_OCEANS
+                },
+                center: [-123, 38],
+                zoom: 6
+            },
+            
+            north_atlantic: {
+                species: ['Humpback', 'Fin', 'Minke', 'Sei', 'North Atlantic Right', 'Right'],
+                filterLayers: {
+                    'humpback': NORTH_ATLANTIC_OCEANS
+                },
+                center: [-45, 42],
+                zoom: 2
+            },
+            
+            arctic: {
+                species: ['Beluga', 'Orca'],
+                filterLayers: {
+                    'orca': NORTH_ARCTIC_OCEANS
+                },
+                center: [-80, 70],
+                zoom: 2
+            },
+            
+            southern_ocean: {
+                species: ['Blue', 'Fin', 'Humpback', 'Southern Right', 'Orca', 'Sei'],
+                filterLayers: {
+                    'humpback': SOUTHERN_OCEANS,
+                    'orca': SOUTHERN_OCEANS
+                },
+                center: [0, -55],
+                zoom: 2
+            },
+            
+            all: 'all',
+            clear: 'clear'
+        };
+        
+        let activePreset = null;
+
+        // Global function to get active preset ocean filters for animation compatibility
+        window.getActivePresetFilters = function() {
+            return activePreset ? activePreset.filterLayers : null;
+        };
+
+        function waitForMap(callback) {
+            const check = () => {
+                if (typeof map !== 'undefined' && map.isStyleLoaded && map.isStyleLoaded()) {
+                    callback();
+                } else if (typeof map !== 'undefined' && map.loaded && map.loaded()) {
+                    callback();
+                } else {
+                    setTimeout(check, 100);
+                }
+            };
+            check();
+        }
+        
+        // Get all heatmap layer IDs from the map
+        function getHeatmapLayers() {
+            const style = map.getStyle();
+            if (!style || !style.layers) return [];
+            // robust: use layer type, not a naming convention
+            return style.layers
+                .filter(l => l.type === 'heatmap' && l.id)
+                .map(l => l.id);
+        }
+
+        
+        // Check if a layer matches a filter key (e.g., 'humpback', 'orca')
+        function layerMatchesKey(layerId, key) {
+            return layerId.toLowerCase().includes(key.toLowerCase());
+        }
+        
+        // Apply ocean filter to specific layers using setFilter
+        // Apply ocean/location restriction via heatmap-weight (does NOT override month filters)
+        function applyOceanFilters(filterLayers) {
+            if (!filterLayers) return;
+
+            waitForMap(() => {
+                const heatmapLayers = getHeatmapLayers();
+
+                heatmapLayers.forEach(layerId => {
+                    let oceanList = null;
+
+                    for (const [key, oceans] of Object.entries(filterLayers)) {
+                        if (layerMatchesKey(layerId, key)) {
+                            oceanList = oceans;
+                            break;
+                        }
+                    }
+
+                    try {
+                        if (oceanList) {
+                            map.setPaintProperty(layerId, 'heatmap-weight', [
+                                'case',
+                                ['in', ['get', 'ocean'], ['literal', oceanList]],
+                                1,
+                                0
+                            ]);
+                        } else {
+                            // IMPORTANT: don't touch filters; just restore weight
+                            map.setPaintProperty(layerId, 'heatmap-weight', 1);
+                        }
+                    } catch (e) { console.warn('Failed setPaintProperty for', layerId, e); }
+                });
+            });
+        }
+
+        
+        // Clear all filters
+        // Only clear the ocean/location restriction (leave month filters alone)
+        function clearAllFilters() {
+            waitForMap(() => {
+                getHeatmapLayers().forEach(layerId => {
+                    try {
+                        map.setPaintProperty(layerId, 'heatmap-weight', 1);
+                    } catch (e) { console.warn('Failed setPaintProperty for', layerId, e); }
+                });
+            });
+        }
+
+        
+        // Apply a preset
+        function applyPreset(presetName) {
+            const preset = presets[presetName];
+            const chips = document.querySelectorAll('.preset-chip');
+
+            // Stop animation when changing presets
+            if (typeof stopAnimation === 'function' && typeof isPlaying !== 'undefined' && isPlaying) {
+                stopAnimation();
+            }
+
+            // Update active chip styling
+            chips.forEach(c => c.classList.remove('active'));
+            const activeChip = document.querySelector(`.preset-chip[data-preset="${presetName}"]`);
+            if (activeChip && presetName !== 'clear') {
+                activeChip.classList.add('active');
+            }
+
+            waitForMap(() => {
+                console.log('Heatmap layer IDs:', getHeatmapLayers());
+                const checkboxes = document.querySelectorAll('#legendSpecies input[type="checkbox"]');
+                
+                if (preset === 'all') {
+                    // Show all, clear filters
+                    activePreset = null;
+                    clearAllFilters();
+                    
+                    checkboxes.forEach(cb => {
+                        if (!cb.checked) {
+                            cb.checked = true;
+                            cb.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                    
+                    map.flyTo({ center: [0, 20], zoom: 1.5, duration: 1500 });
+                    
+                } else if (preset === 'clear') {
+                    // Clear all
+                    activePreset = null;
+                    clearAllFilters();
+                    
+                    checkboxes.forEach(cb => {
+                        if (cb.checked) {
+                            cb.checked = false;
+                            cb.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                    
+                } else if (typeof preset === 'object') {
+                    activePreset = preset;
+                    
+                    // Clear existing filters first
+                    clearAllFilters();
+                    
+                    // Enable/disable species checkboxes
+                    checkboxes.forEach(cb => {
+                        const label = cb.closest('.legend-row')?.querySelector('.legend-name')?.textContent?.trim() || '';
+                        const shouldBeChecked = preset.species.some(s => 
+                            label.toLowerCase().includes(s.toLowerCase())
+                        );
+                        
+                        if (cb.checked !== shouldBeChecked) {
+                            cb.checked = shouldBeChecked;
+                            cb.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                    
+                    // Apply ocean filters after a short delay (let layers enable)
+                    setTimeout(() => {
+                        applyOceanFilters(preset.filterLayers);
+                    }, 300);
+                    
+                    // Fly to region
+                    if (preset.center && preset.zoom) {
+                        map.flyTo({
+                            center: preset.center,
+                            zoom: preset.zoom,
+                            duration: 1500
+                        });
+                    }
+                }
+                
+                // Scroll to map
+                document.getElementById('map')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+        
+        // Initialize
+        function init() {
+            // Preset chip handlers
+            document.querySelectorAll('.preset-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    applyPreset(chip.dataset.preset);
+                });
+            });
+            
+            // Re-apply filters when species are toggled
+            document.getElementById('legendSpecies')?.addEventListener('change', () => {
+                if (activePreset && activePreset.filterLayers) {
+                    setTimeout(() => {
+                        applyOceanFilters(activePreset.filterLayers);
+                    }, 100);
+                }
+            });
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => setTimeout(init, 1500));
+        } else {
+            setTimeout(init, 1500);
+        }
+    })();
+    </script>
+</body>
+</html>

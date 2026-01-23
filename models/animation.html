@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tyree Spatial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg,
+                #0a1628 0%,
+                #0d2440 20%,
+                #134e7a 40%,
+                #1a6eb0 55%,
+                #2d8fd4 70%,
+                #5bb5e3 85%,
+                #7ecce8 100%
+            );
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .scene-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Animated floating particles */
+        .scene-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 2px, transparent 2px),
+                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 1px, transparent 1px),
+                radial-gradient(circle at 60% 20%, rgba(255,255,255,0.1) 1.5px, transparent 1.5px);
+            background-size: 100px 100px, 150px 150px, 80px 80px, 120px 120px;
+            animation: float-particles 20s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes float-particles {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
+        }
+
+        /* 3D Whale viewer */
+        model-viewer {
+            width: 100vw;
+            height: 100vh;
+            background: transparent;
+            opacity: 1;
+            transition: opacity 1.5s ease-out;
+            --progress-bar-color: transparent;
+            --progress-bar-height: 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Logo container - centered, revealed via opacity */
+        .logo-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            opacity: 0;
+        }
+        
+        .logo-container img {
+            width: 200px;
+            height: 200px;
+            filter: drop-shadow(0 0 30px rgba(255,255,255,0.3));
+        }
+
+        /* Loading state */
+        .loading-text {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            z-index: 10;
+        }
+
+        /* Editor Control Panel */
+        .editor-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            max-height: calc(100vh - 40px);
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            z-index: 300;
+            overflow: hidden;
+            font-size: 13px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .panel-header h3 {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .panel-toggle {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px 8px;
+            transition: color 0.2s;
+        }
+
+        .panel-toggle:hover {
+            color: white;
+        }
+
+        .panel-content {
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .panel-content.collapsed {
+            display: none;
+        }
+
+        .control-section {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .section-header h4 {
+            color: rgba(255,255,255,0.9);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0;
+        }
+
+        .section-toggle {
+            color: rgba(255,255,255,0.4);
+            font-size: 10px;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .control-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            width: 70px;
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+        }
+
+        .control-slider {
+            flex: 1;
+            margin: 0 10px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .control-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #4a9eff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .control-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .control-value {
+            width: 50px;
+            text-align: right;
+            color: rgba(255,255,255,0.8);
+            font-size: 11px;
+            font-family: monospace;
+        }
+
+        .control-input {
+            width: 60px;
+            padding: 4px 8px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: #4a9eff;
+        }
+
+        /* Animation timeline */
+        .timeline-container {
+            margin-top: 8px;
+        }
+
+        .timeline-track {
+            position: relative;
+            height: 24px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .timeline-clip {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            background: rgba(74, 158, 255, 0.4);
+            border-left: 2px solid #4a9eff;
+            border-right: 2px solid #4a9eff;
+        }
+
+        .timeline-playhead {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: #fff;
+            pointer-events: none;
+        }
+
+        .timeline-scrubber {
+            width: 100%;
+            margin: 0;
+        }
+
+        .clip-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .clip-input-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .clip-input-group label {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+        }
+
+        /* Preset management */
+        .preset-section {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        .preset-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .preset-name-input {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .preset-name-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .preset-btn {
+            padding: 8px 14px;
+            background: #4a9eff;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .preset-btn:hover {
+            background: #3a8eef;
+        }
+
+        .preset-btn.danger {
+            background: rgba(255, 100, 100, 0.3);
+        }
+
+        .preset-btn.danger:hover {
+            background: rgba(255, 100, 100, 0.5);
+        }
+
+        .preset-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .preset-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .preset-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .preset-item.active {
+            background: rgba(74, 158, 255, 0.2);
+            border: 1px solid rgba(74, 158, 255, 0.4);
+        }
+
+        .preset-item-name {
+            color: white;
+            font-size: 12px;
+        }
+
+        .preset-item-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .preset-item-btn {
+            padding: 4px 8px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 4px;
+            color: rgba(255,255,255,0.7);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-item-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .preset-item-btn.delete:hover {
+            background: rgba(255, 100, 100, 0.3);
+        }
+
+        /* Playback controls */
+        .playback-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .playback-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .playback-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .playback-btn.active {
+            background: #4a9eff;
+            border-color: #4a9eff;
+        }
+
+        /* Empty state */
+        .empty-presets {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255,255,255,0.4);
+            font-size: 12px;
+        }
+
+        /* Transition Timeline */
+        .transition-timeline {
+            position: relative;
+            padding: 10px 0;
+        }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 0 50px 0 60px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .timeline-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .track-label {
+            width: 50px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            flex-shrink: 0;
+        }
+
+        .track-bar {
+            flex: 1;
+            height: 24px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .track-fill {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .whale-fill {
+            background: linear-gradient(90deg, rgba(100,180,255,0.6) 0%, rgba(100,180,255,0) 100%);
+            left: 0;
+        }
+
+        .logo-fill {
+            background: linear-gradient(90deg, rgba(255,180,100,0) 0%, rgba(255,180,100,0.6) 100%);
+            right: 0;
+        }
+
+        .track-marker {
+            position: absolute;
+            top: -2px;
+            width: 4px;
+            height: 28px;
+            border-radius: 2px;
+            cursor: ew-resize;
+            z-index: 10;
+        }
+
+        .whale-marker {
+            background: #64b4ff;
+            box-shadow: 0 0 8px rgba(100,180,255,0.8);
+        }
+
+        .logo-marker {
+            background: #ffb464;
+            box-shadow: 0 0 8px rgba(255,180,100,0.8);
+        }
+
+        .track-marker:hover {
+            transform: scaleX(1.5);
+        }
+
+        .track-range {
+            position: absolute;
+            top: 4px;
+            height: 16px;
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+        .whale-in-range {
+            background: rgba(100, 255, 150, 0.4);
+        }
+
+        .whale-out-range {
+            background: rgba(100, 180, 255, 0.4);
+        }
+
+        .logo-range {
+            background: rgba(255, 180, 100, 0.4);
+        }
+
+        .start-marker {
+            border-radius: 2px 0 0 2px;
+        }
+
+        .end-marker {
+            border-radius: 0 2px 2px 0;
+        }
+
+        .timeline-playhead-container {
+            position: absolute;
+            top: 28px;
+            left: 60px;
+            right: 10px;
+            height: 60px;
+            pointer-events: none;
+        }
+
+        .timeline-playhead-line {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: white;
+            left: 0;
+        }
+
+        .timing-inputs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+
+        .timing-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .timing-group label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            width: 55px;
+        }
+
+        .timing-group span {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Master Scrubber */
+        .master-scrubber {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .scrubber-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(74, 158, 255, 0.6) 0%, rgba(74, 158, 255, 0.3) 100%);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .scrubber-handle {
+            position: absolute;
+            top: -4px;
+            width: 12px;
+            height: 32px;
+            background: #fff;
+            border-radius: 4px;
+            cursor: ew-resize;
+            z-index: 20;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            transform: translateX(-50%);
+        }
+
+        .scrubber-handle:hover {
+            background: #4a9eff;
+        }
+
+        .scrubber-handle.dragging {
+            background: #4a9eff;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene-container">
+        <!-- 3D Whale -->
+        <model-viewer
+            id="whale"
+            src="humpback_whale.glb"
+            camera-controls="false"
+            autoplay
+            shadow-intensity="0"
+            exposure="1.2"
+            camera-orbit="20deg 85deg 15m"
+            min-camera-orbit="auto auto 0.5m"
+            max-camera-orbit="auto auto 100m"
+            field-of-view="40deg"
+            interaction-prompt="none"
+            disable-zoom
+            disable-pan
+            disable-tap>
+        </model-viewer>
+
+        <!-- Logo reveal -->
+        <div class="logo-container" id="logoContainer">
+            <img id="logoImg" src="../favicon-192.png" alt="Logo">
+        </div>
+        
+        <div class="loading-text" id="loadingText">Loading...</div>
+
+        <!-- Editor Control Panel -->
+        <div class="editor-panel" id="editorPanel">
+            <div class="panel-header">
+                <h3>Animation Editor</h3>
+                <button class="panel-toggle" id="panelToggle">−</button>
+            </div>
+            <div class="panel-content" id="panelContent">
+                <!-- Camera Controls -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h4>Camera Position</h4>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Orbit</span>
+                        <input type="range" class="control-slider" id="orbitSlider" min="-180" max="180" value="20">
+                        <span class="control-value" id="orbitValue">20°</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Pitch</span>
+                        <input type="range" class="control-slider" id="pitchSlider" min="0" max="180" value="85">
+                        <span class="control-value" id="pitchValue">85°</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Distance</span>
+                        <input type="range" class="control-slider" id="distanceSlider" min="0.5" max="100" step="0.5" value="15">
+                        <span class="control-value" id="distanceValue">15m</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">FOV</span>
+                        <input type="range" class="control-slider" id="fovSlider" min="10" max="90" value="40">
+                        <span class="control-value" id="fovValue">40°</span>
+                    </div>
+                </div>
+
+                <!-- Model Offset -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h4>Model Offset</h4>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">X</span>
+                        <input type="range" class="control-slider" id="offsetXSlider" min="-5" max="5" step="0.1" value="0">
+                        <span class="control-value" id="offsetXValue">0m</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Y</span>
+                        <input type="range" class="control-slider" id="offsetYSlider" min="-20" max="20" step="0.1" value="0">
+                        <span class="control-value" id="offsetYValue">0m</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Z</span>
+                        <input type="range" class="control-slider" id="offsetZSlider" min="-5" max="5" step="0.1" value="0">
+                        <span class="control-value" id="offsetZValue">0m</span>
+                    </div>
+                </div>
+
+                <!-- Model Rotation -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h4>Model Rotation</h4>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Yaw</span>
+                        <input type="range" class="control-slider" id="rotYawSlider" min="-180" max="180" value="0">
+                        <span class="control-value" id="rotYawValue">0°</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Pitch</span>
+                        <input type="range" class="control-slider" id="rotPitchSlider" min="-180" max="180" value="0">
+                        <span class="control-value" id="rotPitchValue">0°</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Roll</span>
+                        <input type="range" class="control-slider" id="rotRollSlider" min="-180" max="180" value="0">
+                        <span class="control-value" id="rotRollValue">0°</span>
+                    </div>
+                </div>
+
+                <!-- Animation Clipping -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h4>Animation Clip</h4>
+                    </div>
+                    <div class="timeline-container">
+                        <div class="timeline-track" id="timelineTrack">
+                            <div class="timeline-clip" id="timelineClip"></div>
+                            <div class="timeline-playhead" id="timelinePlayhead"></div>
+                        </div>
+                        <div class="clip-inputs">
+                            <div class="clip-input-group">
+                                <label>Start:</label>
+                                <input type="number" class="control-input" id="clipStartInput" min="0" step="0.1" value="0">
+                            </div>
+                            <div class="clip-input-group">
+                                <label>End:</label>
+                                <input type="number" class="control-input" id="clipEndInput" min="0" step="0.1" value="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transition Timeline -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h4>Transition Timeline</h4>
+                    </div>
+                    <!-- Total Duration -->
+                    <div class="control-row">
+                        <span class="control-label">Duration</span>
+                        <input type="range" class="control-slider" id="totalDurationSlider" min="1" max="20" step="0.5" value="6">
+                        <span class="control-value" id="totalDurationValue">6.0s</span>
+                    </div>
+                    <div class="transition-timeline" id="transitionTimeline">
+                        <!-- Timeline labels -->
+                        <div class="timeline-labels">
+                            <span class="timeline-label-start">0s</span>
+                            <span class="timeline-label-end" id="timelineLabelEnd">6.0s</span>
+                        </div>
+                        <!-- Whale IN track (fade in) -->
+                        <div class="timeline-row">
+                            <span class="track-label">Whale In</span>
+                            <div class="track-bar" id="whaleInTrack">
+                                <div class="track-range whale-in-range" id="whaleInRange"></div>
+                                <div class="track-marker whale-marker start-marker" id="whaleInStartMarker"></div>
+                                <div class="track-marker whale-marker end-marker" id="whaleInEndMarker"></div>
+                            </div>
+                        </div>
+                        <!-- Whale OUT track (fade out) -->
+                        <div class="timeline-row">
+                            <span class="track-label">Whale Out</span>
+                            <div class="track-bar" id="whaleOutTrack">
+                                <div class="track-range whale-out-range" id="whaleOutRange"></div>
+                                <div class="track-marker whale-marker start-marker" id="whaleOutStartMarker"></div>
+                                <div class="track-marker whale-marker end-marker" id="whaleOutEndMarker"></div>
+                            </div>
+                        </div>
+                        <!-- Logo track with start/end markers -->
+                        <div class="timeline-row">
+                            <span class="track-label">Logo</span>
+                            <div class="track-bar" id="logoTrack">
+                                <div class="track-range logo-range" id="logoRange"></div>
+                                <div class="track-marker logo-marker start-marker" id="logoStartMarker"></div>
+                                <div class="track-marker logo-marker end-marker" id="logoEndMarker"></div>
+                            </div>
+                        </div>
+                        <!-- Master Scrubber -->
+                        <div class="timeline-row" style="margin-top: 8px;">
+                            <span class="track-label">Time</span>
+                            <div class="track-bar master-scrubber" id="masterScrubber">
+                                <div class="scrubber-progress" id="scrubberProgress"></div>
+                                <div class="scrubber-handle" id="scrubberHandle"></div>
+                            </div>
+                            <span class="control-value" id="scrubberTimeValue" style="width: 45px;">0.0s</span>
+                        </div>
+                    </div>
+                    <!-- Timing inputs -->
+                    <div class="timing-inputs" style="margin-top: 10px;">
+                        <div class="timing-group">
+                            <label>Whale In</label>
+                            <input type="number" class="control-input" id="whaleInStartTime" step="0.1" value="0">
+                        </div>
+                        <div class="timing-group">
+                            <label>End</label>
+                            <input type="number" class="control-input" id="whaleInEndTime" step="0.1" value="1.5">
+                        </div>
+                    </div>
+                    <div class="timing-inputs">
+                        <div class="timing-group">
+                            <label>Whale Out</label>
+                            <input type="number" class="control-input" id="whaleOutStartTime" step="0.1" value="4.0">
+                        </div>
+                        <div class="timing-group">
+                            <label>End</label>
+                            <input type="number" class="control-input" id="whaleOutEndTime" step="0.1" value="5.5">
+                        </div>
+                    </div>
+                    <div class="timing-inputs">
+                        <div class="timing-group">
+                            <label>Logo Start</label>
+                            <input type="number" class="control-input" id="logoStartTime" step="0.1" value="3.0">
+                        </div>
+                        <div class="timing-group">
+                            <label>End</label>
+                            <input type="number" class="control-input" id="logoEndTime" step="0.1" value="5.0">
+                        </div>
+                    </div>
+                    <!-- Playback Controls -->
+                    <div class="playback-controls" style="margin-top: 12px;">
+                        <button class="playback-btn" id="playPauseBtn">▶</button>
+                        <button class="playback-btn" id="stopBtn">⬛</button>
+                        <button class="playback-btn" id="loopBtn">🔁</button>
+                        <button class="playback-btn" id="resetTransitionBtn">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Logo Controls -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h4>Logo Position</h4>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Show</span>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="logoVisibleCheck" checked style="width: 18px; height: 18px; cursor: pointer;">
+                            <span class="control-value" style="width: auto;">Visible</span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">X Position</span>
+                        <input type="range" class="control-slider" id="logoPosXSlider" min="0" max="100" value="50">
+                        <span class="control-value" id="logoPosXValue">50%</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Y Position</span>
+                        <input type="range" class="control-slider" id="logoPosYSlider" min="0" max="100" value="50">
+                        <span class="control-value" id="logoPosYValue">50%</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Size</span>
+                        <input type="range" class="control-slider" id="logoSizeSlider" min="50" max="500" value="200">
+                        <span class="control-value" id="logoSizeValue">200px</span>
+                    </div>
+                    <div class="playback-controls">
+                        <button class="playback-btn" id="hideLogoBtn">Show/Hide</button>
+                    </div>
+                </div>
+
+                <!-- Presets -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h4>Presets</h4>
+                    </div>
+                    <div class="preset-controls">
+                        <input type="text" class="preset-name-input" id="presetNameInput" placeholder="Preset name...">
+                        <button class="preset-btn" id="savePresetBtn">Save</button>
+                    </div>
+                    <div class="preset-list" id="presetList">
+                        <div class="empty-presets" id="emptyPresets">No saved presets</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const whale = document.getElementById('whale');
+        const logoContainer = document.getElementById('logoContainer');
+        const loadingText = document.getElementById('loadingText');
+
+        // Event listeners
+        whale.addEventListener('load', () => {
+            console.log('Model loaded');
+            console.log('Available animations:', whale.availableAnimations);
+            loadingText.style.display = 'none';
+
+            // Set animation
+            const animations = whale.availableAnimations;
+            const breatheAnim = animations.find(a => a.toLowerCase().includes('breathe')) || animations[0];
+            if (breatheAnim) {
+                whale.animationName = breatheAnim;
+            }
+            whale.pause(); // Start paused, user controls playback
+        });
+
+        whale.addEventListener('error', (e) => {
+            loadingText.textContent = 'Error loading model';
+            console.error('Model load error:', e);
+        });
+
+        // ============================================
+        // EDITOR CONTROLS
+        // ============================================
+
+        // Panel toggle
+        const panelToggle = document.getElementById('panelToggle');
+        const panelContent = document.getElementById('panelContent');
+
+        panelToggle.addEventListener('click', () => {
+            panelContent.classList.toggle('collapsed');
+            panelToggle.textContent = panelContent.classList.contains('collapsed') ? '+' : '−';
+        });
+
+        // Disable auto-animation when editor is in use
+        let editorMode = false;
+
+        function enableEditorMode() {
+            editorMode = true;
+        }
+
+        // Camera controls
+        const orbitSlider = document.getElementById('orbitSlider');
+        const pitchSlider = document.getElementById('pitchSlider');
+        const distanceSlider = document.getElementById('distanceSlider');
+        const fovSlider = document.getElementById('fovSlider');
+        const orbitValue = document.getElementById('orbitValue');
+        const pitchValue = document.getElementById('pitchValue');
+        const distanceValue = document.getElementById('distanceValue');
+        const fovValue = document.getElementById('fovValue');
+
+        function updateCamera() {
+            enableEditorMode();
+            const orbit = orbitSlider.value;
+            const pitch = pitchSlider.value;
+            const distance = distanceSlider.value;
+            whale.cameraOrbit = `${orbit}deg ${pitch}deg ${distance}m`;
+            orbitValue.textContent = `${orbit}°`;
+            pitchValue.textContent = `${pitch}°`;
+            distanceValue.textContent = `${distance}m`;
+        }
+
+        function updateFOV() {
+            enableEditorMode();
+            const fov = fovSlider.value;
+            whale.fieldOfView = `${fov}deg`;
+            fovValue.textContent = `${fov}°`;
+        }
+
+        orbitSlider.addEventListener('input', updateCamera);
+        pitchSlider.addEventListener('input', updateCamera);
+        distanceSlider.addEventListener('input', updateCamera);
+        fovSlider.addEventListener('input', updateFOV);
+
+        // Model offset controls
+        const offsetXSlider = document.getElementById('offsetXSlider');
+        const offsetYSlider = document.getElementById('offsetYSlider');
+        const offsetZSlider = document.getElementById('offsetZSlider');
+        const offsetXValue = document.getElementById('offsetXValue');
+        const offsetYValue = document.getElementById('offsetYValue');
+        const offsetZValue = document.getElementById('offsetZValue');
+
+        function updateOffset() {
+            enableEditorMode();
+            const x = offsetXSlider.value;
+            const y = offsetYSlider.value;
+            const z = offsetZSlider.value;
+            whale.cameraTarget = `${x}m ${y}m ${z}m`;
+            offsetXValue.textContent = `${x}m`;
+            offsetYValue.textContent = `${y}m`;
+            offsetZValue.textContent = `${z}m`;
+        }
+
+        offsetXSlider.addEventListener('input', updateOffset);
+        offsetYSlider.addEventListener('input', updateOffset);
+        offsetZSlider.addEventListener('input', updateOffset);
+
+        // Model rotation controls
+        const rotYawSlider = document.getElementById('rotYawSlider');
+        const rotPitchSlider = document.getElementById('rotPitchSlider');
+        const rotRollSlider = document.getElementById('rotRollSlider');
+        const rotYawValue = document.getElementById('rotYawValue');
+        const rotPitchValue = document.getElementById('rotPitchValue');
+        const rotRollValue = document.getElementById('rotRollValue');
+
+        function updateRotation() {
+            enableEditorMode();
+            const yaw = rotYawSlider.value;
+            const pitch = rotPitchSlider.value;
+            const roll = rotRollSlider.value;
+            whale.orientation = `${yaw}deg ${pitch}deg ${roll}deg`;
+            rotYawValue.textContent = `${yaw}°`;
+            rotPitchValue.textContent = `${pitch}°`;
+            rotRollValue.textContent = `${roll}°`;
+        }
+
+        rotYawSlider.addEventListener('input', updateRotation);
+        rotPitchSlider.addEventListener('input', updateRotation);
+        rotRollSlider.addEventListener('input', updateRotation);
+
+        // Animation clipping controls
+        const clipStartInput = document.getElementById('clipStartInput');
+        const clipEndInput = document.getElementById('clipEndInput');
+        const timelineClip = document.getElementById('timelineClip');
+        const timelinePlayhead = document.getElementById('timelinePlayhead');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const loopBtn = document.getElementById('loopBtn');
+
+        let animationDuration = 10;
+        let clipStart = 0;
+        let clipEnd = 10;
+        let isPlaying = false;
+        let isLooping = false;
+
+        function updateTimelineClip() {
+            const startPercent = (clipStart / animationDuration) * 100;
+            const endPercent = (clipEnd / animationDuration) * 100;
+            timelineClip.style.left = `${startPercent}%`;
+            timelineClip.style.width = `${endPercent - startPercent}%`;
+        }
+
+        function updatePlayhead() {
+            if (!whale.duration) return;
+            const currentTime = whale.currentTime || 0;
+            const percent = (currentTime / animationDuration) * 100;
+            timelinePlayhead.style.left = `${percent}%`;
+        }
+
+        // Initialize animation duration when model loads
+        whale.addEventListener('load', () => {
+            // Wait a bit for animation data to be available
+            setTimeout(() => {
+                if (whale.duration) {
+                    animationDuration = whale.duration;
+                    clipEndInput.value = animationDuration.toFixed(1);
+                    clipEndInput.max = animationDuration;
+                    clipStartInput.max = animationDuration;
+                    clipEnd = animationDuration;
+                    updateTimelineClip();
+                }
+            }, 500);
+        });
+
+        clipStartInput.addEventListener('change', () => {
+            clipStart = Math.max(0, Math.min(parseFloat(clipStartInput.value) || 0, clipEnd - 0.1));
+            clipStartInput.value = clipStart.toFixed(1);
+            updateTimelineClip();
+        });
+
+        clipEndInput.addEventListener('change', () => {
+            clipEnd = Math.max(clipStart + 0.1, Math.min(parseFloat(clipEndInput.value) || animationDuration, animationDuration));
+            clipEndInput.value = clipEnd.toFixed(1);
+            updateTimelineClip();
+        });
+
+        loopBtn.addEventListener('click', () => {
+            isLooping = !isLooping;
+            loopBtn.classList.toggle('active', isLooping);
+        });
+
+        // Update playhead periodically
+        setInterval(updatePlayhead, 100);
+
+        // ============================================
+        // TRANSITION TIMELINE CONTROLS
+        // ============================================
+
+        const totalDurationSlider = document.getElementById('totalDurationSlider');
+        const totalDurationValue = document.getElementById('totalDurationValue');
+        const timelineLabelEnd = document.getElementById('timelineLabelEnd');
+        // Whale In track
+        const whaleInTrack = document.getElementById('whaleInTrack');
+        const whaleInRange = document.getElementById('whaleInRange');
+        const whaleInStartMarker = document.getElementById('whaleInStartMarker');
+        const whaleInEndMarker = document.getElementById('whaleInEndMarker');
+        // Whale Out track
+        const whaleOutTrack = document.getElementById('whaleOutTrack');
+        const whaleOutRange = document.getElementById('whaleOutRange');
+        const whaleOutStartMarker = document.getElementById('whaleOutStartMarker');
+        const whaleOutEndMarker = document.getElementById('whaleOutEndMarker');
+        // Logo track
+        const logoTrack = document.getElementById('logoTrack');
+        const logoRange = document.getElementById('logoRange');
+        const logoStartMarker = document.getElementById('logoStartMarker');
+        const logoEndMarker = document.getElementById('logoEndMarker');
+        // Timing inputs
+        const whaleInStartTimeInput = document.getElementById('whaleInStartTime');
+        const whaleInEndTimeInput = document.getElementById('whaleInEndTime');
+        const whaleOutStartTimeInput = document.getElementById('whaleOutStartTime');
+        const whaleOutEndTimeInput = document.getElementById('whaleOutEndTime');
+        const logoStartTimeInput = document.getElementById('logoStartTime');
+        const logoEndTimeInput = document.getElementById('logoEndTime');
+        const resetTransitionBtn = document.getElementById('resetTransitionBtn');
+        const masterScrubber = document.getElementById('masterScrubber');
+        const scrubberProgress = document.getElementById('scrubberProgress');
+        const scrubberHandle = document.getElementById('scrubberHandle');
+        const scrubberTimeValue = document.getElementById('scrubberTimeValue');
+
+        // Timeline state
+        let totalDuration = 6.0;
+        let currentTime = 0;
+        let whaleInStart = 0;
+        let whaleInEnd = 1.5;
+        let whaleOutStart = 4.0;
+        let whaleOutEnd = 5.5;
+        let logoStart = 4.5;
+        let logoEnd = 6.0;
+        let isScrubbing = false;
+        let playbackInterval = null;
+
+        // Update total duration
+        totalDurationSlider.addEventListener('input', () => {
+            totalDuration = parseFloat(totalDurationSlider.value);
+            totalDurationValue.textContent = `${totalDuration.toFixed(1)}s`;
+            timelineLabelEnd.textContent = `${totalDuration.toFixed(1)}s`;
+            updateTimelineVisuals();
+        });
+
+        function updateTimelineVisuals() {
+            // Whale In range
+            const whaleInStartPct = (whaleInStart / totalDuration) * 100;
+            const whaleInEndPct = (whaleInEnd / totalDuration) * 100;
+            whaleInRange.style.left = `${whaleInStartPct}%`;
+            whaleInRange.style.width = `${whaleInEndPct - whaleInStartPct}%`;
+            whaleInStartMarker.style.left = `calc(${whaleInStartPct}% - 2px)`;
+            whaleInEndMarker.style.left = `calc(${whaleInEndPct}% - 2px)`;
+
+            // Whale Out range
+            const whaleOutStartPct = (whaleOutStart / totalDuration) * 100;
+            const whaleOutEndPct = (whaleOutEnd / totalDuration) * 100;
+            whaleOutRange.style.left = `${whaleOutStartPct}%`;
+            whaleOutRange.style.width = `${whaleOutEndPct - whaleOutStartPct}%`;
+            whaleOutStartMarker.style.left = `calc(${whaleOutStartPct}% - 2px)`;
+            whaleOutEndMarker.style.left = `calc(${whaleOutEndPct}% - 2px)`;
+
+            // Logo range
+            const logoStartPct = (logoStart / totalDuration) * 100;
+            const logoEndPct = (logoEnd / totalDuration) * 100;
+            logoRange.style.left = `${logoStartPct}%`;
+            logoRange.style.width = `${logoEndPct - logoStartPct}%`;
+            logoStartMarker.style.left = `calc(${logoStartPct}% - 2px)`;
+            logoEndMarker.style.left = `calc(${logoEndPct}% - 2px)`;
+
+            // Update inputs
+            whaleInStartTimeInput.value = whaleInStart.toFixed(1);
+            whaleInEndTimeInput.value = whaleInEnd.toFixed(1);
+            whaleOutStartTimeInput.value = whaleOutStart.toFixed(1);
+            whaleOutEndTimeInput.value = whaleOutEnd.toFixed(1);
+            logoStartTimeInput.value = logoStart.toFixed(1);
+            logoEndTimeInput.value = logoEnd.toFixed(1);
+        }
+
+        function updateScrubberVisuals() {
+            const percent = (currentTime / totalDuration) * 100;
+            scrubberProgress.style.width = `${percent}%`;
+            scrubberHandle.style.left = `${percent}%`;
+            scrubberTimeValue.textContent = `${currentTime.toFixed(1)}s`;
+        }
+
+        // Apply dissolve effects based on current time
+        function applyEffects() {
+            // Calculate whale opacity based on fade-in AND fade-out phases
+            let whaleOpacity = 1;
+
+            // Phase 1: Whale fade IN (starts invisible, fades to visible)
+            if (currentTime < whaleInStart) {
+                // Before fade-in starts: invisible
+                whaleOpacity = 0;
+            } else if (currentTime >= whaleInStart && currentTime < whaleInEnd) {
+                // During fade-in: gradually becoming visible
+                const progress = (currentTime - whaleInStart) / (whaleInEnd - whaleInStart);
+                whaleOpacity = progress;
+            } else if (currentTime >= whaleInEnd && currentTime < whaleOutStart) {
+                // Between fade-in and fade-out: fully visible
+                whaleOpacity = 1;
+            } else if (currentTime >= whaleOutStart && currentTime < whaleOutEnd) {
+                // During fade-out: gradually becoming invisible
+                const progress = (currentTime - whaleOutStart) / (whaleOutEnd - whaleOutStart);
+                whaleOpacity = 1 - progress;
+            } else if (currentTime >= whaleOutEnd) {
+                // After fade-out: invisible
+                whaleOpacity = 0;
+            }
+
+            whale.style.opacity = whaleOpacity.toString();
+
+            // Logo reveal - starts at logoStart, ends at logoEnd
+            if (currentTime < logoStart) {
+                // Fully hidden
+                logoContainer.style.opacity = '0';
+            } else if (currentTime >= logoEnd) {
+                // Fully visible
+                logoContainer.style.opacity = '1';
+            } else {
+                // Revealing - smooth opacity fade in
+                const progress = (currentTime - logoStart) / (logoEnd - logoStart);
+                logoContainer.style.opacity = progress.toString();
+            }
+        }
+
+        function setCurrentTime(time) {
+            currentTime = Math.max(0, Math.min(time, totalDuration));
+            updateScrubberVisuals();
+            applyEffects();
+
+            // Also update the whale animation position proportionally
+            if (whale.duration) {
+                const animProgress = currentTime / totalDuration;
+                whale.currentTime = clipStart + (clipEnd - clipStart) * animProgress;
+            }
+        }
+
+        // Dragging markers
+        let draggingMarker = null;
+
+        function startMarkerDrag(e, markerType) {
+            e.preventDefault();
+            e.stopPropagation();
+            draggingMarker = markerType;
+            document.addEventListener('mousemove', onMarkerDrag);
+            document.addEventListener('mouseup', stopMarkerDrag);
+        }
+
+        function onMarkerDrag(e) {
+            if (!draggingMarker) return;
+
+            // Determine which track to use based on marker type
+            let track;
+            if (draggingMarker.startsWith('whaleIn')) {
+                track = whaleInTrack;
+            } else if (draggingMarker.startsWith('whaleOut')) {
+                track = whaleOutTrack;
+            } else {
+                track = logoTrack;
+            }
+
+            const rect = track.getBoundingClientRect();
+            const percent = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+            const time = (percent / 100) * totalDuration;
+
+            if (draggingMarker === 'whaleInStart') {
+                whaleInStart = Math.min(time, whaleInEnd - 0.1);
+            } else if (draggingMarker === 'whaleInEnd') {
+                whaleInEnd = Math.max(time, whaleInStart + 0.1);
+            } else if (draggingMarker === 'whaleOutStart') {
+                whaleOutStart = Math.min(time, whaleOutEnd - 0.1);
+            } else if (draggingMarker === 'whaleOutEnd') {
+                whaleOutEnd = Math.max(time, whaleOutStart + 0.1);
+            } else if (draggingMarker === 'logoStart') {
+                logoStart = Math.min(time, logoEnd - 0.1);
+            } else if (draggingMarker === 'logoEnd') {
+                logoEnd = Math.max(time, logoStart + 0.1);
+            }
+            updateTimelineVisuals();
+            applyEffects();
+        }
+
+        function stopMarkerDrag() {
+            draggingMarker = null;
+            document.removeEventListener('mousemove', onMarkerDrag);
+            document.removeEventListener('mouseup', stopMarkerDrag);
+        }
+
+        // Whale In marker drag events
+        whaleInStartMarker.addEventListener('mousedown', (e) => startMarkerDrag(e, 'whaleInStart'));
+        whaleInEndMarker.addEventListener('mousedown', (e) => startMarkerDrag(e, 'whaleInEnd'));
+        // Whale Out marker drag events
+        whaleOutStartMarker.addEventListener('mousedown', (e) => startMarkerDrag(e, 'whaleOutStart'));
+        whaleOutEndMarker.addEventListener('mousedown', (e) => startMarkerDrag(e, 'whaleOutEnd'));
+        // Logo marker drag events
+        logoStartMarker.addEventListener('mousedown', (e) => startMarkerDrag(e, 'logoStart'));
+        logoEndMarker.addEventListener('mousedown', (e) => startMarkerDrag(e, 'logoEnd'));
+
+        // Input handlers for Whale In
+        whaleInStartTimeInput.addEventListener('change', () => {
+            whaleInStart = Math.max(0, Math.min(parseFloat(whaleInStartTimeInput.value) || 0, whaleInEnd - 0.1));
+            updateTimelineVisuals();
+            applyEffects();
+        });
+
+        whaleInEndTimeInput.addEventListener('change', () => {
+            whaleInEnd = Math.max(whaleInStart + 0.1, Math.min(parseFloat(whaleInEndTimeInput.value) || totalDuration, totalDuration));
+            updateTimelineVisuals();
+            applyEffects();
+        });
+
+        // Input handlers for Whale Out
+        whaleOutStartTimeInput.addEventListener('change', () => {
+            whaleOutStart = Math.max(0, Math.min(parseFloat(whaleOutStartTimeInput.value) || 0, whaleOutEnd - 0.1));
+            updateTimelineVisuals();
+            applyEffects();
+        });
+
+        whaleOutEndTimeInput.addEventListener('change', () => {
+            whaleOutEnd = Math.max(whaleOutStart + 0.1, Math.min(parseFloat(whaleOutEndTimeInput.value) || totalDuration, totalDuration));
+            updateTimelineVisuals();
+            applyEffects();
+        });
+
+        // Input handlers for Logo
+        logoStartTimeInput.addEventListener('change', () => {
+            logoStart = Math.max(0, Math.min(parseFloat(logoStartTimeInput.value) || 0, logoEnd - 0.1));
+            updateTimelineVisuals();
+            applyEffects();
+        });
+
+        logoEndTimeInput.addEventListener('change', () => {
+            logoEnd = Math.max(logoStart + 0.1, Math.min(parseFloat(logoEndTimeInput.value) || totalDuration, totalDuration));
+            updateTimelineVisuals();
+            applyEffects();
+        });
+
+        // Scrubber controls
+        function scrubToPosition(clientX) {
+            const rect = masterScrubber.getBoundingClientRect();
+            const percent = Math.min(100, Math.max(0, ((clientX - rect.left) / rect.width) * 100));
+            setCurrentTime((percent / 100) * totalDuration);
+        }
+
+        function startScrubbing(e) {
+            e.preventDefault();
+            isScrubbing = true;
+            scrubberHandle.classList.add('dragging');
+            if (playbackInterval) {
+                clearInterval(playbackInterval);
+                playbackInterval = null;
+            }
+            scrubToPosition(e.clientX);
+            document.addEventListener('mousemove', onScrub);
+            document.addEventListener('mouseup', stopScrubbing);
+        }
+
+        function onScrub(e) {
+            if (!isScrubbing) return;
+            scrubToPosition(e.clientX);
+        }
+
+        function stopScrubbing() {
+            isScrubbing = false;
+            scrubberHandle.classList.remove('dragging');
+            document.removeEventListener('mousemove', onScrub);
+            document.removeEventListener('mouseup', stopScrubbing);
+            if (isPlaying) {
+                startPlayback();
+            }
+        }
+
+        scrubberHandle.addEventListener('mousedown', startScrubbing);
+        masterScrubber.addEventListener('click', (e) => {
+            if (e.target === scrubberHandle) return;
+            scrubToPosition(e.clientX);
+        });
+
+        // Playback controls
+        function startPlayback() {
+            if (playbackInterval) clearInterval(playbackInterval);
+            whale.play();
+            const startTimestamp = Date.now();
+            const startTime = currentTime;
+            playbackInterval = setInterval(() => {
+                const elapsed = (Date.now() - startTimestamp) / 1000;
+                const newTime = startTime + elapsed;
+                if (newTime >= totalDuration) {
+                    if (isLooping) {
+                        setCurrentTime(0);
+                        startPlayback();
+                    } else {
+                        setCurrentTime(totalDuration);
+                        stopPlayback();
+                    }
+                } else {
+                    setCurrentTime(newTime);
+                }
+            }, 16);
+        }
+
+        function stopPlayback() {
+            if (playbackInterval) {
+                clearInterval(playbackInterval);
+                playbackInterval = null;
+            }
+            whale.pause();
+            isPlaying = false;
+            playPauseBtn.textContent = '▶';
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            enableEditorMode();
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                if (currentTime >= totalDuration) {
+                    setCurrentTime(0);
+                }
+                playPauseBtn.textContent = '⏸';
+                startPlayback();
+            } else {
+                stopPlayback();
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            enableEditorMode();
+            stopPlayback();
+            setCurrentTime(0);
+        });
+
+        resetTransitionBtn.addEventListener('click', () => {
+            enableEditorMode();
+            stopPlayback();
+            setCurrentTime(0);
+        });
+
+        // Initialize
+        updateTimelineVisuals();
+        updateScrubberVisuals();
+        applyEffects();
+
+        // ============================================
+        // LOGO CONTROLS
+        // ============================================
+
+        const logoImg = document.getElementById('logoImg');
+        const logoVisibleCheck = document.getElementById('logoVisibleCheck');
+        const logoPosXSlider = document.getElementById('logoPosXSlider');
+        const logoPosYSlider = document.getElementById('logoPosYSlider');
+        const logoSizeSlider = document.getElementById('logoSizeSlider');
+        const logoPosXValue = document.getElementById('logoPosXValue');
+        const logoPosYValue = document.getElementById('logoPosYValue');
+        const logoSizeValue = document.getElementById('logoSizeValue');
+        const hideLogoBtn = document.getElementById('hideLogoBtn');
+
+        let logoSettings = {
+            visible: true,
+            posX: 50,
+            posY: 50,
+            size: 200
+        };
+
+        function updateLogoPosition() {
+            enableEditorMode();
+            logoSettings.posX = parseFloat(logoPosXSlider.value);
+            logoSettings.posY = parseFloat(logoPosYSlider.value);
+            logoPosXValue.textContent = `${logoSettings.posX}%`;
+            logoPosYValue.textContent = `${logoSettings.posY}%`;
+            logoContainer.style.left = `${logoSettings.posX}%`;
+            logoContainer.style.top = `${logoSettings.posY}%`;
+        }
+
+        function updateLogoSize() {
+            enableEditorMode();
+            logoSettings.size = parseFloat(logoSizeSlider.value);
+            logoSizeValue.textContent = `${logoSettings.size}px`;
+            logoImg.style.width = `${logoSettings.size}px`;
+            logoImg.style.height = `${logoSettings.size}px`;
+        }
+
+        function updateLogoVisibility() {
+            logoSettings.visible = logoVisibleCheck.checked;
+        }
+
+        logoPosXSlider.addEventListener('input', updateLogoPosition);
+        logoPosYSlider.addEventListener('input', updateLogoPosition);
+        logoSizeSlider.addEventListener('input', updateLogoSize);
+        logoVisibleCheck.addEventListener('change', updateLogoVisibility);
+
+        hideLogoBtn.addEventListener('click', () => {
+            enableEditorMode();
+            // Toggle logo visibility
+            if (logoContainer.classList.contains('visible')) {
+                logoContainer.classList.remove('visible');
+                whale.classList.remove('fade-out');
+            } else {
+                logoContainer.classList.add('visible');
+            }
+        });
+
+        // ============================================
+        // PRESET MANAGEMENT
+        // ============================================
+
+        const presetNameInput = document.getElementById('presetNameInput');
+        const savePresetBtn = document.getElementById('savePresetBtn');
+        const presetList = document.getElementById('presetList');
+        const emptyPresets = document.getElementById('emptyPresets');
+
+        const PRESETS_KEY = 'whale-animation-presets';
+
+        function getCurrentSettings() {
+            return {
+                camera: {
+                    orbit: parseFloat(orbitSlider.value),
+                    pitch: parseFloat(pitchSlider.value),
+                    distance: parseFloat(distanceSlider.value),
+                    fov: parseFloat(fovSlider.value)
+                },
+                offset: {
+                    x: parseFloat(offsetXSlider.value),
+                    y: parseFloat(offsetYSlider.value),
+                    z: parseFloat(offsetZSlider.value)
+                },
+                rotation: {
+                    yaw: parseFloat(rotYawSlider.value),
+                    pitch: parseFloat(rotPitchSlider.value),
+                    roll: parseFloat(rotRollSlider.value)
+                },
+                clip: {
+                    start: clipStart,
+                    end: clipEnd
+                },
+                logo: {
+                    visible: logoSettings.visible,
+                    posX: logoSettings.posX,
+                    posY: logoSettings.posY,
+                    size: logoSettings.size
+                },
+                transition: {
+                    totalDuration: totalDuration,
+                    whaleInStart: whaleInStart,
+                    whaleInEnd: whaleInEnd,
+                    whaleOutStart: whaleOutStart,
+                    whaleOutEnd: whaleOutEnd,
+                    logoStart: logoStart,
+                    logoEnd: logoEnd
+                }
+            };
+        }
+
+        function applySettings(settings) {
+            enableEditorMode();
+
+            // Camera
+            orbitSlider.value = settings.camera.orbit;
+            pitchSlider.value = settings.camera.pitch;
+            distanceSlider.value = settings.camera.distance;
+            fovSlider.value = settings.camera.fov;
+            updateCamera();
+            updateFOV();
+
+            // Offset
+            offsetXSlider.value = settings.offset.x;
+            offsetYSlider.value = settings.offset.y;
+            offsetZSlider.value = settings.offset.z;
+            updateOffset();
+
+            // Rotation
+            rotYawSlider.value = settings.rotation.yaw;
+            rotPitchSlider.value = settings.rotation.pitch;
+            rotRollSlider.value = settings.rotation.roll;
+            updateRotation();
+
+            // Clip
+            clipStart = settings.clip.start;
+            clipEnd = settings.clip.end;
+            clipStartInput.value = clipStart.toFixed(1);
+            clipEndInput.value = clipEnd.toFixed(1);
+            updateTimelineClip();
+
+            // Logo (if present in preset)
+            if (settings.logo) {
+                logoVisibleCheck.checked = settings.logo.visible;
+                logoPosXSlider.value = settings.logo.posX;
+                logoPosYSlider.value = settings.logo.posY;
+                logoSizeSlider.value = settings.logo.size;
+                logoSettings = { ...settings.logo };
+                updateLogoPosition();
+                updateLogoSize();
+            }
+
+            // Transition (if present in preset)
+            if (settings.transition) {
+                totalDuration = settings.transition.totalDuration || 6.0;
+                whaleInStart = settings.transition.whaleInStart || 0;
+                whaleInEnd = settings.transition.whaleInEnd || 1.5;
+                whaleOutStart = settings.transition.whaleOutStart || 4.0;
+                whaleOutEnd = settings.transition.whaleOutEnd || 5.5;
+                logoStart = settings.transition.logoStart || 4.5;
+                logoEnd = settings.transition.logoEnd || 6.0;
+                totalDurationSlider.value = totalDuration;
+                totalDurationValue.textContent = `${totalDuration.toFixed(1)}s`;
+                timelineLabelEnd.textContent = `${totalDuration.toFixed(1)}s`;
+                updateTimelineVisuals();
+                applyEffects();
+            }
+
+            // Move to clip start
+            whale.currentTime = clipStart;
+            updatePlayhead();
+        }
+
+        function loadPresets() {
+            try {
+                return JSON.parse(localStorage.getItem(PRESETS_KEY)) || [];
+            } catch {
+                return [];
+            }
+        }
+
+        function savePresets(presets) {
+            localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+        }
+
+        function renderPresetList() {
+            const presets = loadPresets();
+
+            if (presets.length === 0) {
+                emptyPresets.style.display = 'block';
+                presetList.innerHTML = '';
+                presetList.appendChild(emptyPresets);
+                return;
+            }
+
+            emptyPresets.style.display = 'none';
+            presetList.innerHTML = '';
+
+            presets.forEach((preset, index) => {
+                const item = document.createElement('div');
+                item.className = 'preset-item';
+                item.innerHTML = `
+                    <span class="preset-item-name">${preset.name}</span>
+                    <div class="preset-item-actions">
+                        <button class="preset-item-btn load-btn">Load</button>
+                        <button class="preset-item-btn delete delete-btn">×</button>
+                    </div>
+                `;
+
+                item.querySelector('.load-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    applySettings(preset.settings);
+                    document.querySelectorAll('.preset-item').forEach(el => el.classList.remove('active'));
+                    item.classList.add('active');
+                });
+
+                item.querySelector('.delete-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const presets = loadPresets();
+                    presets.splice(index, 1);
+                    savePresets(presets);
+                    renderPresetList();
+                });
+
+                item.addEventListener('click', () => {
+                    applySettings(preset.settings);
+                    document.querySelectorAll('.preset-item').forEach(el => el.classList.remove('active'));
+                    item.classList.add('active');
+                });
+
+                presetList.appendChild(item);
+            });
+        }
+
+        savePresetBtn.addEventListener('click', () => {
+            const name = presetNameInput.value.trim() || `Preset ${loadPresets().length + 1}`;
+            const presets = loadPresets();
+
+            presets.push({
+                name: name,
+                settings: getCurrentSettings(),
+                createdAt: Date.now()
+            });
+
+            savePresets(presets);
+            presetNameInput.value = '';
+            renderPresetList();
+        });
+
+        // Initialize preset list
+        renderPresetList();
+    </script>
+</body>
+</html>

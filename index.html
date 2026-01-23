@@ -1864,7 +1864,10 @@
         // Intro autoplay (0 -> 1)
         // ---------------------------
         async function playIntro(whaleScene) {
-            const INTRO_MS = 5000;     // duration of the intro (ms)
+            // Slower animation on mobile (8s vs 5s on desktop)
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                || window.innerWidth < 768;
+            const INTRO_MS = isMobile ? 8000 : 5000;
             const CLIP_START = 0.0;   // fraction of clip
             const CLIP_END   = 0.37;   // fraction of clip
 

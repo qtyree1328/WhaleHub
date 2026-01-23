@@ -36,7 +36,7 @@
             padding: 0;
             overflow: hidden;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: #0f2d4a;
+            background: #0a1628;
         }
 
         #navbar {
@@ -112,7 +112,7 @@
             left: 0;
             width: var(--sidebar-width);
             height: calc(100vh - var(--nav-height));
-            background: rgba(10, 35, 66, 0.95);
+            background: rgba(10, 22, 40, 0.98);
             backdrop-filter: blur(10px);
             z-index: 50;
             display: flex;
@@ -128,17 +128,30 @@
             bottom: 0;
             height: calc(100vh - var(--nav-height));
             min-height: calc(100vh - var(--nav-height));
-            background: #0f2d4a;
+            background: #0a1628;
         }
 
         #map {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            min-height: 100%;
-            background: #0f2d4a;
+            right: 0;
+            bottom: 0;
+            width: 100% !important;
+            height: 100% !important;
+            background: #0a1628;
+        }
+
+        /* Force Mapbox canvas to fill container */
+        #map.mapboxgl-map {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .mapboxgl-canvas-container,
+        .mapboxgl-canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
         /* ============================================================
@@ -715,8 +728,8 @@
 
         .circular-selector {
             position: relative;
-            width: 180px !important;
-            height: 180px !important;
+            width: 140px !important;
+            height: 140px !important;
             margin: 0 auto;
         }
 
@@ -731,12 +744,12 @@
 
         .month-marker {
             position: absolute;
-            width: 36px !important;
-            height: 36px !important;
+            width: 28px !important;
+            height: 28px !important;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.7);
             cursor: pointer;
@@ -764,8 +777,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90px !important;
-            height: 90px !important;
+            width: 70px !important;
+            height: 70px !important;
             border-radius: 50%;
             background: rgba(10, 35, 66, 0.95);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
@@ -777,7 +790,7 @@
         }
 
         .center-month {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 700;
             color: #4ecdc4;
             margin-bottom: 2px;
@@ -2090,9 +2103,289 @@
                 font-size: 9px;
             }
         }
+
+        /* ============================================================
+           LOADING ANIMATION OVERLAY
+           ============================================================ */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 900;
+            background: #0f2d4a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-overlay video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Desktop: smaller centered video */
+        @media (min-width: 768px) {
+            .loading-overlay video {
+                max-width: 50%;
+                max-height: 60%;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .loading-overlay video {
+                max-width: 40%;
+                max-height: 50%;
+            }
+        }
+
+        /* ============================================================
+           WELCOME MODAL - Map Usage Instructions
+           ============================================================ */
+        .welcome-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 800;
+            background: rgba(10, 22, 40, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+
+        .welcome-modal.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .welcome-content {
+            background: linear-gradient(135deg, #0f2d4a 0%, #1a4a6e 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .welcome-header h2 {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .welcome-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .welcome-tips {
+            margin-bottom: 24px;
+        }
+
+        .welcome-tip {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .welcome-tip:last-child {
+            border-bottom: none;
+        }
+
+        .tip-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(78, 205, 196, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+
+        .tip-text {
+            flex: 1;
+        }
+
+        .tip-text h4 {
+            color: #4ecdc4;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .tip-text p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .welcome-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .welcome-btn {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a8a0 100%);
+            color: #0a1628;
+            border: none;
+            padding: 14px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .welcome-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(78, 205, 196, 0.3);
+        }
+
+        .welcome-btn:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .welcome-loading {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .welcome-loading.ready {
+            color: #4ecdc4;
+        }
+
+        .loading-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #4ecdc4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .welcome-loading.ready .loading-spinner {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .welcome-content {
+                padding: 24px 20px;
+                margin: 16px;
+            }
+
+            .welcome-header h2 {
+                font-size: 20px;
+            }
+
+            .tip-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body class="page-enter">
+    <!-- Loading Animation Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <video id="loadingVideo" autoplay muted playsinline>
+            <source src="models/animation_video.webm" type="video/webm">
+        </video>
+    </div>
+
+    <!-- Welcome Modal - Map Usage Instructions -->
+    <div class="welcome-modal" id="welcomeModal">
+        <div class="welcome-content">
+            <div class="welcome-header">
+                <h2>Whale Density Map</h2>
+                <p>Explore global whale population density patterns</p>
+            </div>
+            <div class="welcome-tips">
+                <div class="welcome-tip">
+                    <div class="tip-icon">🗺️</div>
+                    <div class="tip-text">
+                        <h4>Density Visualization</h4>
+                        <p>Colors indicate whale population density - brighter areas show higher concentrations.</p>
+                    </div>
+                </div>
+                <div class="welcome-tip">
+                    <div class="tip-icon">📅</div>
+                    <div class="tip-text">
+                        <h4>Monthly Animation</h4>
+                        <p>Use the circular dial to view different months or press play to animate through the year.</p>
+                    </div>
+                </div>
+                <div class="welcome-tip">
+                    <div class="tip-icon">🌍</div>
+                    <div class="tip-text">
+                        <h4>Navigate the Globe</h4>
+                        <p>Click and drag to rotate. Scroll or pinch to zoom. Double-click to zoom in on an area.</p>
+                    </div>
+                </div>
+                <div class="welcome-tip">
+                    <div class="tip-icon">⚙️</div>
+                    <div class="tip-text">
+                        <h4>Customize View</h4>
+                        <p>Adjust intensity, radius, and switch between globe and flat map projections.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="welcome-footer">
+                <button class="welcome-btn" id="welcomeBtn" disabled>Loading map...</button>
+                <div class="welcome-loading" id="welcomeLoading">
+                    <div class="loading-spinner"></div>
+                    <span>Preparing map data...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation Bar -->
     <nav id="navbar">
         <div class="nav-container">
@@ -3676,6 +3969,109 @@
         // Run on load and resize
         handleMobileLayout();
         window.addEventListener('resize', handleMobileLayout);
+
+        // ============================================================
+        // LOADING ANIMATION & WELCOME MODAL HANDLER
+        // ============================================================
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingVideo = document.getElementById('loadingVideo');
+        const welcomeModal = document.getElementById('welcomeModal');
+        const welcomeBtn = document.getElementById('welcomeBtn');
+        const welcomeLoading = document.getElementById('welcomeLoading');
+
+        let mapIsReady = false;
+        let videoEnded = false;
+
+        function updateWelcomeButton() {
+            if (welcomeBtn && welcomeLoading) {
+                if (mapIsReady) {
+                    welcomeBtn.disabled = false;
+                    welcomeBtn.textContent = 'Explore the Map';
+                    welcomeLoading.classList.add('ready');
+                    welcomeLoading.querySelector('span').textContent = 'Map ready!';
+                } else {
+                    welcomeBtn.disabled = true;
+                    welcomeBtn.textContent = 'Loading map...';
+                    welcomeLoading.classList.remove('ready');
+                    welcomeLoading.querySelector('span').textContent = 'Preparing map data...';
+                }
+            }
+        }
+
+        function dismissWelcome() {
+            if (welcomeModal) {
+                welcomeModal.classList.add('hidden');
+            }
+        }
+
+        // Mark map as ready when fully loaded
+        map.on('idle', function onFirstIdle() {
+            mapIsReady = true;
+            updateWelcomeButton();
+            map.off('idle', onFirstIdle);
+        });
+
+        if (loadingVideo && loadingOverlay) {
+            // Hide loading overlay when video ends (welcome modal takes over)
+            loadingVideo.addEventListener('ended', () => {
+                videoEnded = true;
+                loadingOverlay.classList.add('hidden');
+                updateWelcomeButton();
+            });
+
+            // Fallback: hide after video duration + buffer
+            loadingVideo.addEventListener('loadedmetadata', () => {
+                const duration = loadingVideo.duration * 1000 + 500;
+                setTimeout(() => {
+                    if (!videoEnded) {
+                        videoEnded = true;
+                        loadingOverlay.classList.add('hidden');
+                        updateWelcomeButton();
+                    }
+                }, duration);
+            });
+
+            // If video fails to load, hide overlay after 3 seconds
+            loadingVideo.addEventListener('error', () => {
+                setTimeout(() => {
+                    videoEnded = true;
+                    loadingOverlay.classList.add('hidden');
+                    updateWelcomeButton();
+                }, 3000);
+            });
+
+            // Skip animation on click/tap
+            loadingOverlay.addEventListener('click', () => {
+                videoEnded = true;
+                loadingOverlay.classList.add('hidden');
+                updateWelcomeButton();
+            });
+        }
+
+        // Welcome modal button
+        if (welcomeBtn) {
+            welcomeBtn.addEventListener('click', () => {
+                if (mapIsReady) {
+                    dismissWelcome();
+                }
+            });
+        }
+
+        // Allow clicking outside content to dismiss (if map is ready)
+        if (welcomeModal) {
+            welcomeModal.addEventListener('click', (e) => {
+                if (e.target === welcomeModal && mapIsReady) {
+                    dismissWelcome();
+                }
+            });
+        }
+
+        // Escape key to dismiss welcome modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mapIsReady && welcomeModal && !welcomeModal.classList.contains('hidden')) {
+                dismissWelcome();
+            }
+        });
     </script>
 </body>
 </html>

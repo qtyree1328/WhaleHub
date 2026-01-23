@@ -20,20 +20,30 @@ class WhaleScene {
         this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
             || window.innerWidth < 768;
 
-        // Configuration
+        // Configuration - tighter path on mobile so whale stays visible longer
         this.config = {
             // Whale path control points (start, middle, end)
-            startPos: { x: -10, y: -1.2, z: 0 },
-            midPos: { x: 3, y: -4, z: 0 },
-            endPos: { x: 10, y: -6, z: 0 },
+            startPos: this.isMobile
+                ? { x: -4, y: -0.8, z: 0 }
+                : { x: -10, y: -1.2, z: 0 },
+            midPos: this.isMobile
+                ? { x: 1, y: -2.5, z: 0 }
+                : { x: 3, y: -4, z: 0 },
+            endPos: this.isMobile
+                ? { x: 4, y: -3.5, z: 0 }
+                : { x: 10, y: -6, z: 0 },
 
-            // Whale rotation (in radians)
-            startRotation: { x: 0, y: Math.PI * 0.3, z: 0.05 },
-            endRotation: { x: 0, y: -Math.PI * 0.3, z: -0.05 },
+            // Whale rotation (in radians) - less rotation on mobile
+            startRotation: this.isMobile
+                ? { x: 0, y: Math.PI * 0.2, z: 0.03 }
+                : { x: 0, y: Math.PI * 0.3, z: 0.05 },
+            endRotation: this.isMobile
+                ? { x: 0, y: -Math.PI * 0.2, z: -0.03 }
+                : { x: 0, y: -Math.PI * 0.3, z: -0.05 },
 
-            // Whale scale
-            startScale: 0.2,
-            endScale: 0.7,
+            // Whale scale - slightly larger on mobile for visibility
+            startScale: this.isMobile ? 0.25 : 0.2,
+            endScale: this.isMobile ? 0.6 : 0.7,
 
             // Camera
             cameraZ: 14,

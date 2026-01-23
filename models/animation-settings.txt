@@ -1,0 +1,52 @@
+{
+  "camera": {
+    "orbit": 11,
+    "pitch": 83,
+    "distance": 40.5,
+    "fov": 45
+  },
+  "offset": {
+    "x": 1.7,
+    "y": 8.5,
+    "z": 0.5
+  },
+  "rotation": {
+    "yaw": 3,
+    "pitch": -11,
+    "roll": 24
+  },
+  "clip": {
+    "start": 5,
+    "end": 10
+  },
+  "logo": {
+    "visible": true,
+    "posX": 50,
+    "posY": 50,
+    "size": 264
+  },
+  "transition": {
+    "totalDuration": 4.5,
+    "whaleInStart": 0,
+    "whaleInEnd": 0.3,
+    "whaleOutStart": 1.369463087248322,
+    "whaleOutEnd": 3.1520134228187926,
+    "logoStart": 2.5936241610738255,
+    "logoEnd": 4.2
+  },
+  "ring": {
+    "visible": true,
+    "size": 400,
+    "armLength": 400,
+    "stroke": 1,
+    "opacity": 62,
+    "spinning": true,
+    "pulsing": false
+  },
+  "movement": {
+    "enabled": true,
+    "startX": 29,
+    "endX": 62,
+    "easing": "easeInOut"
+  }
+}

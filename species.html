@@ -1885,7 +1885,7 @@
 <body>
     <!-- Loading Animation Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
-        <video id="loadingVideo" autoplay muted playsinline>
+        <video id="loadingVideo" autoplay muted playsinline webkit-playsinline preload="auto">
             <source src="models/animation_video.webm" type="video/webm">
         </video>
     </div>
@@ -3176,21 +3176,30 @@
     });
 
     if (loadingVideo && loadingOverlay) {
-        // Force play on mobile devices
+        // Force play on mobile devices - keep trying, don't give up
         const playVideo = () => {
-            loadingVideo.play().catch(() => {
-                // If autoplay fails, skip the video
-                videoEnded = true;
-                loadingOverlay.classList.add('hidden');
-                updateWelcomeButton();
-            });
+            const playPromise = loadingVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Silently fail - we'll try again on user interaction
+                });
+            }
         };
 
         // Try to play immediately
         playVideo();
 
-        // Also try on first user interaction (for strict mobile browsers)
-        document.addEventListener('touchstart', playVideo, { once: true });
+        // Try again when video is ready
+        loadingVideo.addEventListener('canplaythrough', playVideo, { once: true });
+
+        // Try on any user interaction (required on iOS)
+        const tryPlayOnInteraction = () => {
+            playVideo();
+            document.removeEventListener('touchstart', tryPlayOnInteraction);
+            document.removeEventListener('click', tryPlayOnInteraction);
+        };
+        document.addEventListener('touchstart', tryPlayOnInteraction);
+        document.addEventListener('click', tryPlayOnInteraction);
 
         // Hide loading overlay when video ends (welcome modal takes over)
         loadingVideo.addEventListener('ended', () => {

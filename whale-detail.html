@@ -680,6 +680,11 @@
                 </span>
                 <span class="brand-text">Whale Watchers Atlas</span>
             </a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="nav-links">
                 <a href="density-map.html" class="nav-link">Density Map</a>
                 <a href="species.html" class="nav-link">Species Map</a>
@@ -1299,6 +1304,18 @@
 
         // Start when DOM is ready
         document.addEventListener('DOMContentLoaded', initPage);
+
+        // Mobile nav toggle
+        const navbar = document.getElementById('navbar');
+        const navToggle = navbar ? navbar.querySelector('.nav-toggle') : null;
+        if (navToggle && navbar) {
+            navToggle.addEventListener('click', () => {
+                navbar.classList.toggle('nav-open');
+            });
+            navbar.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => navbar.classList.remove('nav-open'));
+            });
+        }
     </script>
 
     <footer class="site-footer">

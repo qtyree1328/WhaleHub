@@ -1645,6 +1645,15 @@
             max-height: 100%;
             object-fit: contain;
             transform: scale(1.1);
+            pointer-events: none;
+        }
+
+        .loading-overlay {
+            pointer-events: none;
+        }
+
+        .loading-overlay:not(.hidden) {
+            pointer-events: auto;
         }
 
         /* Desktop: smaller centered video */
@@ -1827,21 +1836,48 @@
 
         /* Mobile adjustments */
         @media (max-width: 600px) {
+            .welcome-modal {
+                align-items: flex-start;
+                padding-top: 15vh;
+            }
+
             .welcome-content {
-                padding: 20px;
+                padding: 16px;
                 margin: 12px;
-                max-width: 360px;
-                max-height: 72vh;
+                max-width: 320px;
+                max-height: 60vh;
             }
 
             .welcome-header h2 {
-                font-size: 20px;
+                font-size: 18px;
+            }
+
+            .welcome-header p {
+                font-size: 12px;
             }
 
             .tip-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 16px;
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
+
+            .tip-text h4 {
+                font-size: 12px;
+            }
+
+            .tip-text p {
+                font-size: 11px;
+            }
+
+            .welcome-btn {
+                padding: 12px 24px;
+                font-size: 13px;
+            }
+
+            .welcome-tip {
+                padding: 8px 0;
+                gap: 10px;
             }
         }
     </style>
@@ -3140,6 +3176,22 @@
     });
 
     if (loadingVideo && loadingOverlay) {
+        // Force play on mobile devices
+        const playVideo = () => {
+            loadingVideo.play().catch(() => {
+                // If autoplay fails, skip the video
+                videoEnded = true;
+                loadingOverlay.classList.add('hidden');
+                updateWelcomeButton();
+            });
+        };
+
+        // Try to play immediately
+        playVideo();
+
+        // Also try on first user interaction (for strict mobile browsers)
+        document.addEventListener('touchstart', playVideo, { once: true });
+
         // Hide loading overlay when video ends (welcome modal takes over)
         loadingVideo.addEventListener('ended', () => {
             videoEnded = true;

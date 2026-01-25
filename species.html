@@ -1645,15 +1645,6 @@
             max-height: 100%;
             object-fit: contain;
             transform: scale(1.1);
-            pointer-events: none;
-        }
-
-        .loading-overlay {
-            pointer-events: none;
-        }
-
-        .loading-overlay:not(.hidden) {
-            pointer-events: auto;
         }
 
         /* Desktop: smaller centered video */
@@ -1885,7 +1876,7 @@
 <body>
     <!-- Loading Animation Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
-        <video id="loadingVideo" autoplay muted playsinline webkit-playsinline preload="auto">
+        <video id="loadingVideo" autoplay muted playsinline>
             <source src="models/animation_video.webm" type="video/webm">
         </video>
     </div>
@@ -3176,31 +3167,6 @@
     });
 
     if (loadingVideo && loadingOverlay) {
-        // Force play on mobile devices - keep trying, don't give up
-        const playVideo = () => {
-            const playPromise = loadingVideo.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(() => {
-                    // Silently fail - we'll try again on user interaction
-                });
-            }
-        };
-
-        // Try to play immediately
-        playVideo();
-
-        // Try again when video is ready
-        loadingVideo.addEventListener('canplaythrough', playVideo, { once: true });
-
-        // Try on any user interaction (required on iOS)
-        const tryPlayOnInteraction = () => {
-            playVideo();
-            document.removeEventListener('touchstart', tryPlayOnInteraction);
-            document.removeEventListener('click', tryPlayOnInteraction);
-        };
-        document.addEventListener('touchstart', tryPlayOnInteraction);
-        document.addEventListener('click', tryPlayOnInteraction);
-
         // Hide loading overlay when video ends (welcome modal takes over)
         loadingVideo.addEventListener('ended', () => {
             videoEnded = true;

@@ -37,8 +37,10 @@
   "ring": {
     "visible": true,
     "size": 400,
-    "armLength": 400,
-    "stroke": 1,
+    "armLength": 1200,
+    "stroke": 2,
+    "dashLength": 12,
+    "dashGap": 6,
     "opacity": 62,
     "spinning": true,
     "pulsing": false

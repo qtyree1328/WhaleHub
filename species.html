@@ -2,12 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Species Tracking - Whale Watchers Atlas</title>
+    <title>Where to See Blue Whales, Humpbacks & Orcas - Species Tracking | Whale Watchers Atlas</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <meta name="description" content="Track individual whale species migration patterns with animated heatmaps.">
+    <meta name="description" content="Track where to see blue whales, humpback whales, orcas, and gray whales. Live migration maps show the best places to view whales by species and season in California, Hawaii, Alaska, and worldwide.">
+    <meta name="keywords" content="see blue whales, where are blue whales, humpback whale watching, orca watching, gray whale migration, whale species locations, best place to view whales, whale tracking, whale migration patterns">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://whalewatchersatlas.com/species.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://whalewatchersatlas.com/species.html">
+    <meta property="og:title" content="Where to See Blue Whales, Humpbacks & Orcas - Live Tracking">
+    <meta property="og:description" content="Track whale species migration patterns. Find the best places to view blue whales, humpbacks, and orcas by season.">
+    <meta property="og:image" content="https://whalewatchersatlas.com/images/whale-species-og.jpg">
+    <meta property="og:site_name" content="Whale Watchers Atlas">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://whalewatchersatlas.com/species.html">
+    <meta name="twitter:title" content="Where to See Blue Whales, Humpbacks & Orcas - Live Tracking">
+    <meta name="twitter:description" content="Track whale species migration patterns. Find the best places to view whales by species and season.">
+    <meta name="twitter:image" content="https://whalewatchersatlas.com/images/whale-species-og.jpg">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Whale Species Tracker - Whale Watchers Atlas",
+        "description": "Track blue whales, humpback whales, orcas, and other whale species. Interactive maps showing migration patterns and the best places to view each species.",
+        "url": "https://whalewatchersatlas.com/species.html",
+        "applicationCategory": "TravelApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Whale Watchers Atlas"
+        }
+    }
+    </script>
+
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
     <link rel="stylesheet" href="styles.css">
@@ -1616,21 +1657,17 @@
         }
 
         /* ============================================================
-           LOADING ANIMATION OVERLAY
+           LOADING ANIMATION OVERLAY (Full-screen video transition)
            ============================================================ */
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             z-index: 900;
-            background: #0e2c4b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: transparent;
+            overflow: hidden;
             transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
         }
 
@@ -1641,25 +1678,13 @@
         }
 
         .loading-overlay video {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            transform: scale(1.1);
-        }
-
-        /* Desktop: smaller centered video */
-        @media (min-width: 768px) {
-            .loading-overlay video {
-                max-width: 50%;
-                max-height: 60%;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .loading-overlay video {
-                max-width: 40%;
-                max-height: 50%;
-            }
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
         }
 
         /* ============================================================
@@ -1876,8 +1901,9 @@
 <body>
     <!-- Loading Animation Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
-        <video id="loadingVideo" autoplay muted playsinline>
-            <source src="models/animation_video.webm" type="video/webm">
+        <video id="loadingVideo" autoplay muted playsinline disablePictureInPicture>
+            <source src="models/animated_whale.mp4" type="video/mp4">
+            <source src="models/animated_whale.webm" type="video/webm">
         </video>
     </div>
 

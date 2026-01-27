@@ -10,13 +10,50 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a1628;
+            background: linear-gradient(180deg,
+                #0a1628 0%,
+                #0c1f38 15%,
+                #0e2a4a 30%,
+                #10355c 45%,
+                #134270 60%,
+                #164f82 75%,
+                #1a5c94 90%,
+                #1e68a4 100%
+            );
             min-height: 100vh;
             overflow: hidden;
         }
 
         body.green-screen {
             background: #00FF00;
+        }
+
+        /* Floating particles like index.html */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 2px, transparent 2px),
+                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 1px, transparent 1px),
+                radial-gradient(circle at 60% 20%, rgba(255,255,255,0.1) 1.5px, transparent 1.5px);
+            background-size: 100px 100px, 150px 150px, 80px 80px, 120px 120px;
+            animation: float-particles 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body.green-screen::before {
+            display: none;
+        }
+
+        @keyframes float-particles {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
         }
 
         .scene-container {
@@ -28,6 +65,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1;
+            transform-origin: center center;
         }
 
         /* Ring with arms design */
@@ -769,9 +808,10 @@
         </div>
         
         <div class="loading-text" id="loadingText">Loading...</div>
+    </div>
 
-        <!-- Editor Control Panel -->
-        <div class="editor-panel" id="editorPanel">
+    <!-- Editor Control Panel (outside scene-container so it doesn't zoom) -->
+    <div class="editor-panel" id="editorPanel">
             <div class="panel-header">
                 <h3>Animation Editor</h3>
                 <button class="panel-toggle" id="panelToggle">−</button>
@@ -802,6 +842,29 @@
                         <input type="range" class="control-slider" id="fovSlider" min="10" max="90" value="40">
                         <span class="control-value" id="fovValue">40°</span>
                     </div>
+                </div>
+
+                <!-- Scene Zoom (for full-screen recording) -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h4>Scene Zoom (Recording)</h4>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Zoom</span>
+                        <input type="range" class="control-slider" id="sceneZoomSlider" min="30" max="100" value="100">
+                        <span class="control-value" id="sceneZoomValue">100%</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">X Position</span>
+                        <input type="range" class="control-slider" id="sceneXSlider" min="-100" max="100" value="0">
+                        <span class="control-value" id="sceneXValue">0%</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Y Position</span>
+                        <input type="range" class="control-slider" id="sceneYSlider" min="-100" max="100" value="0">
+                        <span class="control-value" id="sceneYValue">0%</span>
+                    </div>
+                    <p style="font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 8px;">Reduce zoom to see full animation, then position it for recording</p>
                 </div>
 
                 <!-- Model Offset -->
@@ -1047,18 +1110,28 @@
                     </div>
                     <div class="control-row">
                         <span class="control-label">Ring Size</span>
-                        <input type="range" class="control-slider" id="ringSizeSlider" min="50" max="400" value="100">
+                        <input type="range" class="control-slider" id="ringSizeSlider" min="50" max="800" value="100">
                         <span class="control-value" id="ringSizeValue">100px</span>
                     </div>
                     <div class="control-row">
                         <span class="control-label">Arm Length</span>
-                        <input type="range" class="control-slider" id="armLengthSlider" min="0" max="400" value="150">
+                        <input type="range" class="control-slider" id="armLengthSlider" min="0" max="2000" value="150">
                         <span class="control-value" id="armLengthValue">150px</span>
                     </div>
                     <div class="control-row">
                         <span class="control-label">Stroke</span>
-                        <input type="range" class="control-slider" id="ringStrokeSlider" min="1" max="10" value="2">
+                        <input type="range" class="control-slider" id="ringStrokeSlider" min="1" max="20" value="2">
                         <span class="control-value" id="ringStrokeValue">2px</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Dash Length</span>
+                        <input type="range" class="control-slider" id="dashLengthSlider" min="1" max="50" value="12">
+                        <span class="control-value" id="dashLengthValue">12px</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Dash Gap</span>
+                        <input type="range" class="control-slider" id="dashGapSlider" min="1" max="50" value="6">
+                        <span class="control-value" id="dashGapValue">6px</span>
                     </div>
                     <div class="control-row">
                         <span class="control-label">Opacity</span>
@@ -1086,8 +1159,7 @@
                 </div>
             </div>
         </div>
-    </div>
-    
+
     <script>
         const whale = document.getElementById('whale');
         const logoContainer = document.getElementById('logoContainer');
@@ -1781,6 +1853,10 @@
         const armLengthValue = document.getElementById('armLengthValue');
         const ringStrokeSlider = document.getElementById('ringStrokeSlider');
         const ringStrokeValue = document.getElementById('ringStrokeValue');
+        const dashLengthSlider = document.getElementById('dashLengthSlider');
+        const dashLengthValue = document.getElementById('dashLengthValue');
+        const dashGapSlider = document.getElementById('dashGapSlider');
+        const dashGapValue = document.getElementById('dashGapValue');
         const ringOpacitySlider = document.getElementById('ringOpacitySlider');
         const ringOpacityValue = document.getElementById('ringOpacityValue');
         const ringSpinBtn = document.getElementById('ringSpinBtn');
@@ -1791,6 +1867,8 @@
             size: 100,
             armLength: 150,
             stroke: 2,
+            dashLength: 12,
+            dashGap: 6,
             opacity: 60,
             spinning: false,
             pulsing: false
@@ -1800,7 +1878,10 @@
             const size = ringSettings.size;
             const armLength = ringSettings.armLength;
             const stroke = ringSettings.stroke;
+            const dashLength = ringSettings.dashLength;
+            const dashGap = ringSettings.dashGap;
             const opacity = ringSettings.opacity / 100;
+            const dashArray = `${dashLength} ${dashGap}`;
 
             // Calculate inner ring size (70% of outer)
             const innerSize = size * 0.7;
@@ -1814,12 +1895,14 @@
 
             // Update outer circle
             ringCircle.setAttribute('r', size);
-            ringCircle.setAttribute('stroke-width', stroke);
+            ringCircle.style.strokeWidth = stroke;
+            ringCircle.style.strokeDasharray = dashArray;
             ringCircle.style.stroke = `rgba(255, 255, 255, ${opacity})`;
 
             // Update inner circle
             ringInner.setAttribute('r', innerSize);
-            ringInner.setAttribute('stroke-width', stroke * 0.75);
+            ringInner.style.strokeWidth = stroke * 0.75;
+            ringInner.style.strokeDasharray = dashArray;
             ringInner.style.stroke = `rgba(255, 255, 255, ${opacity * 0.7})`;
 
             // Update left arm
@@ -1827,7 +1910,8 @@
             leftArm.setAttribute('y1', 0);
             leftArm.setAttribute('x2', -(size + armLength));
             leftArm.setAttribute('y2', 0);
-            leftArm.setAttribute('stroke-width', stroke);
+            leftArm.style.strokeWidth = stroke;
+            leftArm.style.strokeDasharray = dashArray;
             leftArm.style.stroke = `rgba(255, 255, 255, ${opacity})`;
 
             // Update right arm
@@ -1835,7 +1919,8 @@
             rightArm.setAttribute('y1', 0);
             rightArm.setAttribute('x2', size + armLength);
             rightArm.setAttribute('y2', 0);
-            rightArm.setAttribute('stroke-width', stroke);
+            rightArm.style.strokeWidth = stroke;
+            rightArm.style.strokeDasharray = dashArray;
             rightArm.style.stroke = `rgba(255, 255, 255, ${opacity})`;
 
             // Update visibility
@@ -1845,6 +1930,8 @@
             ringSizeValue.textContent = `${size}px`;
             armLengthValue.textContent = `${armLength}px`;
             ringStrokeValue.textContent = `${stroke}px`;
+            dashLengthValue.textContent = `${dashLength}px`;
+            dashGapValue.textContent = `${dashGap}px`;
             ringOpacityValue.textContent = `${ringSettings.opacity}%`;
         }
 
@@ -1865,6 +1952,16 @@
 
         ringStrokeSlider.addEventListener('input', () => {
             ringSettings.stroke = parseFloat(ringStrokeSlider.value);
+            updateRing();
+        });
+
+        dashLengthSlider.addEventListener('input', () => {
+            ringSettings.dashLength = parseFloat(dashLengthSlider.value);
+            updateRing();
+        });
+
+        dashGapSlider.addEventListener('input', () => {
+            ringSettings.dashGap = parseFloat(dashGapSlider.value);
             updateRing();
         });
 
@@ -1941,6 +2038,8 @@
                     size: ringSettings.size,
                     armLength: ringSettings.armLength,
                     stroke: ringSettings.stroke,
+                    dashLength: ringSettings.dashLength,
+                    dashGap: ringSettings.dashGap,
                     opacity: ringSettings.opacity,
                     spinning: ringSettings.spinning,
                     pulsing: ringSettings.pulsing
@@ -2021,10 +2120,16 @@
                 if (ringSettings.rotating !== undefined && ringSettings.spinning === undefined) {
                     ringSettings.spinning = ringSettings.rotating;
                 }
+                // Set defaults for dash settings if not present
+                if (ringSettings.dashLength === undefined) ringSettings.dashLength = 12;
+                if (ringSettings.dashGap === undefined) ringSettings.dashGap = 6;
+
                 ringVisibleCheck.checked = ringSettings.visible;
                 ringSizeSlider.value = ringSettings.size;
                 armLengthSlider.value = ringSettings.armLength || 150;
                 ringStrokeSlider.value = ringSettings.stroke;
+                dashLengthSlider.value = ringSettings.dashLength;
+                dashGapSlider.value = ringSettings.dashGap;
                 ringOpacitySlider.value = ringSettings.opacity;
                 ringContainer.classList.toggle('spinning', ringSettings.spinning);
                 ringContainer.classList.toggle('pulsing', ringSettings.pulsing);
@@ -2160,6 +2265,82 @@
                 e.preventDefault();
                 playPauseBtn.click();
             }
+        });
+
+        // ============================================
+        // SCENE ZOOM CONTROL (for full-screen recording)
+        // ============================================
+        const sceneContainer = document.querySelector('.scene-container');
+        const sceneZoomSlider = document.getElementById('sceneZoomSlider');
+        const sceneZoomValue = document.getElementById('sceneZoomValue');
+        const sceneXSlider = document.getElementById('sceneXSlider');
+        const sceneXValue = document.getElementById('sceneXValue');
+        const sceneYSlider = document.getElementById('sceneYSlider');
+        const sceneYValue = document.getElementById('sceneYValue');
+
+        function updateSceneZoom() {
+            const zoom = parseFloat(sceneZoomSlider.value);
+            const xPos = parseFloat(sceneXSlider.value);
+            const yPos = parseFloat(sceneYSlider.value);
+
+            sceneZoomValue.textContent = `${zoom}%`;
+            sceneXValue.textContent = `${xPos}%`;
+            sceneYValue.textContent = `${yPos}%`;
+
+            // Calculate translation based on viewport size
+            const translateX = (xPos / 100) * window.innerWidth;
+            const translateY = (yPos / 100) * window.innerHeight;
+
+            sceneContainer.style.transform = `translate(${translateX}px, ${translateY}px) scale(${zoom / 100})`;
+        }
+
+        sceneZoomSlider.addEventListener('input', updateSceneZoom);
+        sceneXSlider.addEventListener('input', updateSceneZoom);
+        sceneYSlider.addEventListener('input', updateSceneZoom);
+
+        // ============================================
+        // LOAD DEFAULT SETTINGS ON PAGE LOAD
+        // ============================================
+        const defaultSettings = {
+            "camera": { "orbit": 11, "pitch": 83, "distance": 40.5, "fov": 45 },
+            "offset": { "x": 1.7, "y": 8.5, "z": 0.5 },
+            "rotation": { "yaw": 3, "pitch": -11, "roll": 24 },
+            "clip": { "start": 5, "end": 10 },
+            "logo": { "visible": true, "posX": 50, "posY": 50, "size": 264 },
+            "transition": {
+                "totalDuration": 4.5,
+                "whaleInStart": 0,
+                "whaleInEnd": 0.3,
+                "whaleOutStart": 1.369463087248322,
+                "whaleOutEnd": 3.1520134228187926,
+                "logoStart": 2.5936241610738255,
+                "logoEnd": 4.2
+            },
+            "ring": {
+                "visible": true,
+                "size": 400,
+                "armLength": 1200,
+                "stroke": 2,
+                "dashLength": 12,
+                "dashGap": 6,
+                "opacity": 62,
+                "spinning": true,
+                "pulsing": false
+            },
+            "movement": {
+                "enabled": true,
+                "startX": 29,
+                "endX": 62,
+                "easing": "easeInOut"
+            }
+        };
+
+        // Apply default settings when model loads
+        whale.addEventListener('load', () => {
+            setTimeout(() => {
+                applySettings(defaultSettings);
+                console.log('Default settings applied');
+            }, 600);
         });
     </script>
 </body>

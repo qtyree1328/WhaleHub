@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Whale News - Whale Watchers Atlas</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="description" content="Latest news on whale research, conservation, migration, and whale watching destinations worldwide.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: var(--surface-alt);
+            padding-top: 72px;
+        }
+
+        /* Hero Section */
+        .news-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, #1a8ccc 100%);
+            padding: 60px 24px;
+            text-align: center;
+            color: white;
+        }
+
+        .news-hero h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            margin: 0 0 12px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .news-hero p {
+            font-size: 16px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            position: sticky;
+            top: 72px;
+            z-index: 100;
+        }
+
+        .filter-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-muted);
+        }
+
+        .filter-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .last-updated {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* News Grid */
+        .news-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        /* News Card */
+        .news-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .news-card a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .news-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+        }
+
+        .news-image.placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .news-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-category {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            width: fit-content;
+        }
+
+        .news-category.research { background: #e0f2fe; color: #0369a1; }
+        .news-category.conservation { background: #dcfce7; color: #166534; }
+        .news-category.migration { background: #fef3c7; color: #92400e; }
+        .news-category.tourism { background: #fce7f3; color: #9d174d; }
+        .news-category.species { background: #ede9fe; color: #6b21a8; }
+        .news-category.general { background: #f1f5f9; color: #475569; }
+
+        .news-title {
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        .news-excerpt {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0 0 16px 0;
+            flex: 1;
+        }
+
+        .news-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .news-source {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .source-favicon {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 24px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <span class="whale-icon">🐋</span>
+                <span class="brand-text">Whale Watchers Atlas</span>
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Map</a>
+                <a href="/species.html" class="nav-link">Species</a>
+                <a href="/density-map.html" class="nav-link">Density</a>
+                <a href="/news.html" class="nav-link active">News</a>
+                <a href="/about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="news-hero">
+        <h1>🐳 Whale News</h1>
+        <p>Latest stories on whale research, conservation efforts, migration patterns, and whale watching worldwide</p>
+    </section>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-container">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All News</button>
+                <button class="filter-tab" data-filter="research">Research</button>
+                <button class="filter-tab" data-filter="conservation">Conservation</button>
+                <button class="filter-tab" data-filter="migration">Migration</button>
+                <button class="filter-tab" data-filter="tourism">Tourism</button>
+                <button class="filter-tab" data-filter="species">Species</button>
+            </div>
+            <span class="last-updated" id="lastUpdated">Updated: Loading...</span>
+        </div>
+    </div>
+
+    <!-- News Content -->
+    <main class="news-container">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+        <div class="news-grid" id="newsGrid" style="display: none;"></div>
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="icon">🐋</div>
+            <h3>No news articles yet</h3>
+            <p>Check back soon for the latest whale news!</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--primary-dark); color: white; padding: 40px 24px; text-align: center;">
+        <p style="margin: 0; opacity: 0.8;">© 2026 Whale Watchers Atlas · Built with 🐋 by <a href="https://tyreespatial.com" style="color: var(--accent);">Tyree Spatial</a></p>
+    </footer>
+
+    <script>
+        // News data will be loaded from news-data.json
+        let allNews = [];
+        let currentFilter = 'all';
+
+        async function loadNews() {
+            try {
+                const response = await fetch('/news-data.json');
+                if (!response.ok) throw new Error('Failed to load news');
+                const data = await response.json();
+                allNews = data.articles || [];
+                
+                // Update last updated
+                if (data.lastUpdated) {
+                    const date = new Date(data.lastUpdated);
+                    document.getElementById('lastUpdated').textContent = 
+                        `Updated: ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                }
+                
+                renderNews();
+            } catch (error) {
+                console.error('Error loading news:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+            }
+        }
+
+        function renderNews() {
+            const grid = document.getElementById('newsGrid');
+            const loading = document.getElementById('loading');
+            const empty = document.getElementById('emptyState');
+
+            const filtered = currentFilter === 'all' 
+                ? allNews 
+                : allNews.filter(n => n.category === currentFilter);
+
+            loading.style.display = 'none';
+
+            if (filtered.length === 0) {
+                grid.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            grid.style.display = 'grid';
+            grid.innerHTML = filtered.map(article => createNewsCard(article)).join('');
+        }
+
+        function createNewsCard(article) {
+            const imageHtml = article.image 
+                ? `<img src="${article.image}" alt="" class="news-image" onerror="this.outerHTML='<div class=\\'news-image placeholder\\'>🐋</div>'">`
+                : `<div class="news-image placeholder">🐋</div>`;
+
+            const sourceDomain = new URL(article.url).hostname.replace('www.', '');
+            const faviconUrl = `https://www.google.com/s2/favicons?domain=${sourceDomain}&sz=32`;
+
+            const dateStr = article.date 
+                ? new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                : '';
+
+            return `
+                <article class="news-card">
+                    <a href="${article.url}" target="_blank" rel="noopener">
+                        ${imageHtml}
+                        <div class="news-content">
+                            <span class="news-category ${article.category || 'general'}">${article.category || 'News'}</span>
+                            <h3 class="news-title">${article.title}</h3>
+                            <p class="news-excerpt">${article.description || ''}</p>
+                            <div class="news-meta">
+                                <span class="news-source">
+                                    <img src="${faviconUrl}" alt="" class="source-favicon" onerror="this.style.display='none'">
+                                    ${sourceDomain}
+                                </span>
+                                <span>${dateStr}</span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+            `;
+        }
+
+        // Filter handling
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentFilter = tab.dataset.filter;
+                renderNews();
+            });
+        });
+
+        // Initialize
+        loadNews();
+    </script>
+</body>
+</html>

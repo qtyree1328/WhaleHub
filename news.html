@@ -255,26 +255,34 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Navigation Bar -->
     <nav id="navbar">
         <div class="nav-container">
-            <a href="/" class="nav-brand">
-                <span class="whale-icon">🐋</span>
+            <a href="index.html" class="nav-brand">
+                <span class="whale-icon">
+                    <img src="favicon.ico" alt="Whale Icon" class="whale-icon-img">
+                </span>
                 <span class="brand-text">Whale Watchers Atlas</span>
             </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="nav-links">
-                <a href="/" class="nav-link">Map</a>
-                <a href="/species.html" class="nav-link">Species</a>
-                <a href="/density-map.html" class="nav-link">Density</a>
-                <a href="/news.html" class="nav-link active">News</a>
-                <a href="/about.html" class="nav-link">About</a>
+                <a href="density-map.html" class="nav-link">Density Map</a>
+                <a href="species.html" class="nav-link">Species Map</a>
+                <a href="whale-species-gallery.html" class="nav-link">Whale Species</a>
+                <a href="whale-locations-gallery.html" class="nav-link">Locations</a>
+                <a href="news.html" class="nav-link active">News</a>
+                <a href="about.html" class="nav-link">About</a>
             </div>
         </div>
     </nav>
 
     <!-- Hero -->
     <section class="news-hero">
-        <h1>🐳 Whale News</h1>
+        <h1><img src="favicon.ico" alt="" style="height: 32px; vertical-align: middle; margin-right: 8px;">Whale News</h1>
         <p>Latest stories on whale research, conservation efforts, migration patterns, and whale watching worldwide</p>
     </section>
 
@@ -300,7 +308,7 @@
         </div>
         <div class="news-grid" id="newsGrid" style="display: none;"></div>
         <div class="empty-state" id="emptyState" style="display: none;">
-            <div class="icon">🐋</div>
+            <div class="icon"><img src="favicon.ico" alt="" style="width: 64px; height: 64px;"></div>
             <h3>No news articles yet</h3>
             <p>Check back soon for the latest whale news!</p>
         </div>
@@ -308,7 +316,7 @@
 
     <!-- Footer -->
     <footer style="background: var(--primary-dark); color: white; padding: 40px 24px; text-align: center;">
-        <p style="margin: 0; opacity: 0.8;">© 2026 Whale Watchers Atlas · Built with 🐋 by <a href="https://tyreespatial.com" style="color: var(--accent);">Tyree Spatial</a></p>
+        <p style="margin: 0; opacity: 0.8;">© 2026 Whale Watchers Atlas · Built by <a href="https://tyreespatial.com" style="color: var(--accent);">Tyree Spatial</a></p>
     </footer>
 
     <script>
@@ -362,8 +370,8 @@
 
         function createNewsCard(article) {
             const imageHtml = article.image 
-                ? `<img src="${article.image}" alt="" class="news-image" onerror="this.outerHTML='<div class=\\'news-image placeholder\\'>🐋</div>'">`
-                : `<div class="news-image placeholder">🐋</div>`;
+                ? `<img src="${article.image}" alt="" class="news-image" onerror="this.outerHTML='<div class=\\'news-image placeholder\\'><img src=\\'favicon.ico\\' alt=\\'\\'></div>'">`
+                : `<div class="news-image placeholder"><img src="favicon.ico" alt="" style="width: 48px; height: 48px;"></div>`;
 
             const sourceDomain = new URL(article.url).hostname.replace('www.', '');
             const faviconUrl = `https://www.google.com/s2/favicons?domain=${sourceDomain}&sz=32`;
@@ -405,6 +413,21 @@
 
         // Initialize
         loadNews();
+
+        // Nav toggle for mobile
+        (function() {
+            const toggle = document.getElementById('navToggle');
+            const navbar = document.getElementById('navbar');
+            if (!toggle || !navbar) return;
+            
+            toggle.addEventListener('click', () => {
+                navbar.classList.toggle('nav-open');
+            });
+
+            navbar.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => navbar.classList.remove('nav-open'));
+            });
+        })();
     </script>
 </body>
 </html>

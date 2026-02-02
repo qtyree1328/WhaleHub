@@ -1,6 +1,60 @@
 {
-  "lastUpdated": "2026-02-02T04:00:00Z",
+  "lastUpdated": "2026-02-02T04:15:00Z",
   "articles": [
+    {
+      "title": "Whale Freed After Rescue Effort Off the Big Island",
+      "url": "https://www.kitv.com/news/whale-freed-after-rescue-effort-off-the-big-island/article_8eaf7644-5975-471e-a697-51b8c99962ea.html",
+      "description": "Just after first light Monday morning, calm waters off Honokohau Harbor set the scene for what would become a remarkable story of survival along the Kona coast.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-01-30",
+      "source": "KITV"
+    },
+    {
+      "title": "The Complex Logistics of Moving 30 Beluga Whales",
+      "url": "https://www.theguardian.com/world/2026/jan/29/valium-health-checks-and-fabric-slings-the-complex-logistics-of-moving-30-beluga-whales",
+      "description": "When 30 beluga whales and four dolphins are moved from Canada's Marineland amusement park, the operation will be both a careful logistical feat and what former trainers say is a long overdue move.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-01-29",
+      "source": "The Guardian"
+    },
+    {
+      "title": "Entangled Right Whale Known for Cape Cod Canal Closure Dies",
+      "url": "https://www.capecodtimes.com/story/news/environment/2026/01/30/north-atlantic-right-whale-division-noaa-center-coastal-studies-cape-cod-ryan-schosberg-neaq/88435651007/",
+      "description": "Rescue teams up and down the East Coast worked for months to try to rescue this whale. Researchers say deaths can be reduced by adopting ropeless fishing gear.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-01-30",
+      "source": "Cape Cod Times"
+    },
+    {
+      "title": "Boat Strikes Threaten Long Island Whales",
+      "url": "https://www.wshu.org/long-island-news/2026-01-29/boat-strikes-threaten-long-island-whales",
+      "description": "The top two threats facing whales off Long Island's coast are boat strikes and fishing nets, according to research by the Atlantic Marine Conservation Society.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-01-29",
+      "source": "WSHU"
+    },
+    {
+      "title": "Canada's Marineland Whales Could Find New Homes in U.S.",
+      "url": "https://www.nytimes.com/2026/01/26/world/canada/canada-marineland-beluga-whales.html",
+      "description": "Canada's last captive whales have received a reprieve from death after the government conditionally approved a plan to export them to the United States.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-01-26",
+      "source": "New York Times"
+    },
+    {
+      "title": "Oregon Implements New Rules for Crab Fishers to Reduce Whale Deaths",
+      "url": "https://www.opb.org/article/2026/01/28/oregon-dungeness-crab-fishing-season-whales/",
+      "description": "The Oregon Department of Fish and Wildlife is implementing temporary rule changes for Dungeness crab fishers to restrict gear and areas where fishing can occur.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-01-28",
+      "source": "OPB"
+    },
     {
       "title": "Greenland Declares Emergency After Orcas Spotted Near Melting Ice Shelves",
       "url": "https://shopatgood.com/31-172347-greenland-declares-an-emergency-after-researchers-spot-orcas-breaching-dangerously-close-to-rapidly-melting-ice-shelves-4/",
@@ -13,10 +67,10 @@
     {
       "title": "A North Atlantic Right Whale Baby Boom Is On, But the Species Remains at Risk",
       "url": "https://www.wired.com/story/a-north-atlantic-right-whale-baby-boom-is-on-but-the-species-remains-at-risk/",
-      "description": "North Atlantic right whales are experiencing an encouraging uptick in births, but conservationists warn the critically endangered species still faces significant threats.",
+      "description": "Researchers have documented nearly two dozen North Atlantic right whale calves this season. It's an encouraging sign for a species whose population is below 400.",
       "image": null,
-      "category": "conservation",
-      "date": "2026-01-30",
+      "category": "research",
+      "date": "2026-01-27",
       "source": "Wired"
     },
     {

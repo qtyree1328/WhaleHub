@@ -1,6 +1,69 @@
 {
-  "lastUpdated": "2026-02-04T15:00:00Z",
+  "lastUpdated": "2026-02-07T15:00:00Z",
   "articles": [
+    {
+      "title": "'Go Slow–Whales Below' Initiative Launches for Peak Hawaiian Whale Season",
+      "url": "https://mauinow.com/2026/02/06/go-slow-whales-below-initiative-aims-for-boater-and-whale-safety-during-peak-winter-kohola-season/",
+      "description": "The 'Go Slow – Whales Below' initiative urges mariners to exercise caution as humpback whale season reaches its peak in Hawaiian waters, following the discovery of a whale calf with propeller injuries.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-06",
+      "source": "Maui Now"
+    },
+    {
+      "title": "Sound Reveals the Hidden Lives of Deep-Diving Whales",
+      "url": "https://www.earth.com/news/sound-reveals-the-hidden-lives-of-deep-diving-whales/",
+      "description": "Scientists used underwater sound recordings to reconstruct 3D dive and hunting behavior of elusive beaked whales in the Gulf of Mexico.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-06",
+      "source": "Earth.com"
+    },
+    {
+      "title": "French Carrier CMA CGM Supports Right Whale Conservation Research",
+      "url": "https://www.capeandislands.org/local-news/2026-02-05/french-carrier-supports-right-whale-conservation-other-whoi-research",
+      "description": "French shipping company CMA CGM supports WHOI acoustic monitoring that alerts mariners to slow down when right whales are detected in shipping lanes.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-05",
+      "source": "Cape & Islands"
+    },
+    {
+      "title": "Indigenous Leaders Release Treaty Recognizing Whales as Legal Persons",
+      "url": "https://insideclimatenews.org/news/05022026/maori-scientist-daniel-hikuroa-legal-rights-of-whales/",
+      "description": "Indigenous leaders from across Polynesia released landmark treaty text recognizing whales as legal persons and ancestral beings, potentially reshaping global ocean governance.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-05",
+      "source": "Inside Climate News"
+    },
+    {
+      "title": "Whale Sharks Released from Nets as Indian Fishers Turn Rescuers",
+      "url": "https://news.mongabay.com/2026/02/whale-sharks-released-from-nets-along-indias-coast-as-fishers-turn-rescuers/",
+      "description": "Over a thousand whale sharks have been rescued along India's west coast as fishers voluntarily cut their nets to free trapped sharks in this community-driven conservation movement.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-04",
+      "source": "Mongabay"
+    },
+    {
+      "title": "A Hopeful Season: 22 North Atlantic Right Whale Calves Documented",
+      "url": "https://www.ifaw.org/international/journal/hopeful-season-for-north-atlantic-right-whales",
+      "description": "Researchers have documented 22 North Atlantic right whale calves this season — the highest total in 15 years, offering hope for the critically endangered species.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-04",
+      "source": "IFAW"
+    },
+    {
+      "title": "Bipartisan Lawmakers Introduce Whale CHARTS Act for Whale Safety",
+      "url": "https://www.eenews.net/articles/bipartisan-lawmakers-chart-plan-for-whale-safety/",
+      "description": "Rep. Doris Matsui and five colleagues introduce the Whale Conservation Habitat Analysis, Research and Technical Strategies (Whale CHARTS) Act to protect whales from ship strikes.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-03",
+      "source": "E&E News"
+    },
     {
       "title": "Humpbacks 'Mug' Whale Watchers Off Maui in Close Encounter",
       "url": "https://www.hawaiinewsnow.com/2026/02/04/humpbacks-mug-whale-watchers-off-maui/",
@@ -20,6 +83,15 @@
       "source": "The Cool Down"
     },
     {
+      "title": "Right Whale and Calf Sighting Caught on Video Off Boca Grande, Florida",
+      "url": "https://eu.news-press.com/story/news/environment/2026/02/03/right-whale-calf-sighting-gulf-florida-boca-grande-video/88474960007/",
+      "description": "The Florida Fish and Wildlife Conservation Commission aerial survey team captured video of right whale 'Millipede' and her new calf approximately 5 miles east of the St. Johns River entrance.",
+      "image": null,
+      "category": "species",
+      "date": "2026-02-03",
+      "source": "News-Press"
+    },
+    {
       "title": "As the Arctic Grows Noisier, Narwhals Are Becoming Quieter",
       "url": "https://insideclimatenews.org/news/02022026/as-the-arctic-grows-noisier-narwhals-are-becoming-quieter/",
       "description": "Underwater noise pollution is forcing narwhals to reduce their vocalizations, contributing to serious impacts on the Arctic ecosystem according to Ocean Conservancy researchers.",
@@ -36,15 +108,6 @@
       "category": "conservation",
       "date": "2026-02-02",
       "source": "Coastal Review"
-    },
-    {
-      "title": "Right Whale and Calf Sighting Caught on Video Off Boca Grande, Florida",
-      "url": "https://eu.news-press.com/story/news/environment/2026/02/03/right-whale-calf-sighting-gulf-florida-boca-grande-video/88474960007/",
-      "description": "The Florida Fish and Wildlife Conservation Commission aerial survey team captured video of right whale 'Millipede' and her new calf approximately 5 miles east of the St. Johns River entrance.",
-      "image": null,
-      "category": "species",
-      "date": "2026-02-03",
-      "source": "News-Press"
     },
     {
       "title": "Division's Final Journey: The Tragic Story of an Entangled Right Whale",

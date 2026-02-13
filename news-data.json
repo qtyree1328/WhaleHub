@@ -1,6 +1,69 @@
 {
-  "lastUpdated": "2026-02-10T15:00:00Z",
+  "lastUpdated": "2026-02-13T15:00:00Z",
   "articles": [
+    {
+      "title": "Gray Whales Arriving Early in San Francisco Bay — Scientists Don't Know Why",
+      "url": "https://www.sfgate.com/local/article/gray-whale-sf-bay-21345537.php",
+      "description": "Two gray whales have been spotted exploring San Francisco Bay unusually early in February 2026. The Marine Mammal Center's team used distinct markings to identify the individuals.",
+      "image": null,
+      "category": "migration",
+      "date": "2026-02-11",
+      "source": "SFGate"
+    },
+    {
+      "title": "Underwater Mics and Machine Learning Aid Right Whale Conservation",
+      "url": "https://www.sciencedaily.com/releases/2025/02/250221171337.htm",
+      "description": "Researchers have developed a new method using underwater microphones and machine learning to estimate North Atlantic right whale numbers — a safer and more cost-effective monitoring approach.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-11",
+      "source": "ScienceDaily"
+    },
+    {
+      "title": "Scientists Harness AI to Help Protect Whales Along Atlantic Coast",
+      "url": "https://www.sciencedaily.com/releases/2025/02/250211134456.htm",
+      "description": "Rutgers University researchers developed an AI tool to predict endangered whale habitat, guiding ships along the Atlantic coast to avoid deadly collisions and inform conservation strategies.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-11",
+      "source": "ScienceDaily"
+    },
+    {
+      "title": "Surprise Baby Whale Sightings Reveal There's Still Much to Learn About Humpbacks",
+      "url": "https://www.sciencedaily.com/releases/2025/05/250520012829.htm",
+      "description": "New study highlights the critical need for increased awareness to protect newborn humpback whales throughout their winter journey north — which can span more than 2,300 kilometers.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-11",
+      "source": "ScienceDaily"
+    },
+    {
+      "title": "The Race to Save Wikie and Keijo: Mother and Son Orcas Left in Shut-Down Aquarium",
+      "url": "https://www.theguardian.com/environment/2026/feb/12/orcas-france-aquarium-marineland-antibes-killer-whales-wikie-keijo-animal-welfare",
+      "description": "The Whale Sanctuary Project presents its plan for two orcas stranded at France's closed Marineland aquarium, facing resistance from animal welfare groups and the park's owner.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-12",
+      "source": "The Guardian"
+    },
+    {
+      "title": "Climate Crisis Linked to Fall in Southern Right Whale Birth Rates",
+      "url": "https://www.theguardian.com/environment/2026/feb/11/climate-crisis-southern-right-whale-birth-rates",
+      "description": "Researchers warn that declining birth rates in southern right whales across South America and South Africa signal how climate change affects krill-dependent marine life.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-11",
+      "source": "The Guardian"
+    },
+    {
+      "title": "New Research Uncovers Hidden Divide in West Coast Killer Whales",
+      "url": "https://www.sciencedaily.com/releases/2025/11/251120002604.htm",
+      "description": "Study reveals two distinct communities of transient killer whales on the West Coast inhabit very different worlds and lead distinctly different lives, with implications for conservation planning.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-11",
+      "source": "ScienceDaily"
+    },
     {
       "title": "Maldives Launches Tech4Nature Project to Safeguard Whale Sharks",
       "url": "https://www.prnewswire.com/news-releases/maldives-launches-tech4nature-project-to-safeguard-iconic-whale-sharks-302683552.html",
@@ -29,15 +92,6 @@
       "source": "CT Examiner"
     },
     {
-      "title": "Right Whale Calves Return in Unusual Numbers",
-      "url": "https://www.nationalfisherman.com/right-whale-calves-return-in-unusual-numbers",
-      "description": "Researchers surveying the Southeastern U.S. coast this winter have documented 21 North Atlantic right whale calves, offering a rare bright spot for one of the most endangered species.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-05",
-      "source": "National Fisherman"
-    },
-    {
       "title": "'Go Slow–Whales Below' Initiative Launches for Peak Hawaiian Whale Season",
       "url": "https://mauinow.com/2026/02/06/go-slow-whales-below-initiative-aims-for-boater-and-whale-safety-during-peak-winter-kohola-season/",
       "description": "The 'Go Slow – Whales Below' initiative urges mariners to exercise caution as humpback whale season reaches its peak in Hawaiian waters, following the discovery of a whale calf with propeller injuries.",
@@ -54,6 +108,15 @@
       "category": "research",
       "date": "2026-02-06",
       "source": "Earth.com"
+    },
+    {
+      "title": "Right Whale Calves Return in Unusual Numbers",
+      "url": "https://www.nationalfisherman.com/right-whale-calves-return-in-unusual-numbers",
+      "description": "Researchers surveying the Southeastern U.S. coast this winter have documented 21 North Atlantic right whale calves, offering a rare bright spot for one of the most endangered species.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-05",
+      "source": "National Fisherman"
     },
     {
       "title": "French Carrier CMA CGM Supports Right Whale Conservation Research",

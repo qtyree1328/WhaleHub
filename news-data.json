@@ -1,6 +1,42 @@
 {
-  "lastUpdated": "2026-02-13T15:00:00Z",
+  "lastUpdated": "2026-02-16T15:00:00Z",
   "articles": [
+    {
+      "title": "NOAA to Change Whale Protections in Industry-Friendly Move",
+      "url": "https://www.bostonherald.com/2026/02/15/noaa-to-change-whale-protections/",
+      "description": "NOAA announces plans for 'deregulatory-focused' changes to whale protection rules, seeking to reduce economic burdens while maintaining conservation for endangered North Atlantic right whales.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-15",
+      "source": "Boston Herald"
+    },
+    {
+      "title": "US Looks to Roll Back Shipping Rules Designed to Protect Vanishing Right Whale",
+      "url": "https://apnews.com/article/right-whale-boat-strikes-endangered-4f65f61da80a8aecb4f8162da55fd7a5",
+      "description": "The U.S. ocean regulator plans to make industry-friendly changes to longstanding rules designed to protect critically endangered North Atlantic right whales from ship strikes.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-14",
+      "source": "AP News"
+    },
+    {
+      "title": "First 2026 Whale Count Shows Slight Dip in Humpbacks",
+      "url": "https://www.kitv.com/news/first-2026-whale-count-shows-slight-dip-in-humpbacks/article_a9758e67-a1e0-42db-8b3f-3591a0ed73ff.html",
+      "description": "The first whale count of 2026 tallied 1,954 humpback whales statewide in Hawaii, according to organizers with the Hawaiian Islands Humpback Whale National Marine Sanctuary.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-13",
+      "source": "KITV Hawaii"
+    },
+    {
+      "title": "The Race to Save Wikie and Keijo: Mother and Son Orcas Left in Shut-Down Aquarium",
+      "url": "https://www.theguardian.com/environment/2026/feb/12/orcas-france-aquarium-marineland-antibes-killer-whales-wikie-keijo-animal-welfare",
+      "description": "The Whale Sanctuary Project presents its plan for two orcas stranded at France's closed Marineland aquarium, facing resistance from animal welfare groups and the park's owner.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-12",
+      "source": "The Guardian"
+    },
     {
       "title": "Gray Whales Arriving Early in San Francisco Bay — Scientists Don't Know Why",
       "url": "https://www.sfgate.com/local/article/gray-whale-sf-bay-21345537.php",
@@ -29,24 +65,6 @@
       "source": "ScienceDaily"
     },
     {
-      "title": "Surprise Baby Whale Sightings Reveal There's Still Much to Learn About Humpbacks",
-      "url": "https://www.sciencedaily.com/releases/2025/05/250520012829.htm",
-      "description": "New study highlights the critical need for increased awareness to protect newborn humpback whales throughout their winter journey north — which can span more than 2,300 kilometers.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-11",
-      "source": "ScienceDaily"
-    },
-    {
-      "title": "The Race to Save Wikie and Keijo: Mother and Son Orcas Left in Shut-Down Aquarium",
-      "url": "https://www.theguardian.com/environment/2026/feb/12/orcas-france-aquarium-marineland-antibes-killer-whales-wikie-keijo-animal-welfare",
-      "description": "The Whale Sanctuary Project presents its plan for two orcas stranded at France's closed Marineland aquarium, facing resistance from animal welfare groups and the park's owner.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-12",
-      "source": "The Guardian"
-    },
-    {
       "title": "Climate Crisis Linked to Fall in Southern Right Whale Birth Rates",
       "url": "https://www.theguardian.com/environment/2026/feb/11/climate-crisis-southern-right-whale-birth-rates",
       "description": "Researchers warn that declining birth rates in southern right whales across South America and South Africa signal how climate change affects krill-dependent marine life.",
@@ -56,6 +74,15 @@
       "source": "The Guardian"
     },
     {
+      "title": "Surprise Baby Whale Sightings Reveal There's Still Much to Learn About Humpbacks",
+      "url": "https://www.sciencedaily.com/releases/2025/05/250520012829.htm",
+      "description": "New study highlights the critical need for increased awareness to protect newborn humpback whales throughout their winter journey north — which can span more than 2,300 kilometers.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-11",
+      "source": "ScienceDaily"
+    },
+    {
       "title": "New Research Uncovers Hidden Divide in West Coast Killer Whales",
       "url": "https://www.sciencedaily.com/releases/2025/11/251120002604.htm",
       "description": "Study reveals two distinct communities of transient killer whales on the West Coast inhabit very different worlds and lead distinctly different lives, with implications for conservation planning.",
@@ -63,6 +90,15 @@
       "category": "research",
       "date": "2026-02-11",
       "source": "ScienceDaily"
+    },
+    {
+      "title": "Bipartisan Whale CHARTS Act Introduced to Modernize Whale Detection",
+      "url": "https://ecomagazine.com/news/policy/introduced-legislation-to-modernize-whale-habitat-mapping-detection-tools/",
+      "description": "Bipartisan legislation directs NOAA to improve whale habitat maps and develop near-real time whale detection technologies to help prevent deadly ship collisions.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-10",
+      "source": "ECO Magazine"
     },
     {
       "title": "Maldives Launches Tech4Nature Project to Safeguard Whale Sharks",
@@ -153,15 +189,6 @@
       "category": "research",
       "date": "2026-02-04",
       "source": "IFAW"
-    },
-    {
-      "title": "Bipartisan Lawmakers Introduce Whale CHARTS Act for Whale Safety",
-      "url": "https://www.eenews.net/articles/bipartisan-lawmakers-chart-plan-for-whale-safety/",
-      "description": "Rep. Doris Matsui and five colleagues introduce the Whale Conservation Habitat Analysis, Research and Technical Strategies (Whale CHARTS) Act to protect whales from ship strikes.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-03",
-      "source": "E&E News"
     },
     {
       "title": "Humpbacks 'Mug' Whale Watchers Off Maui in Close Encounter",

@@ -1,6 +1,123 @@
 {
-  "lastUpdated": "2026-02-16T15:00:00Z",
+  "lastUpdated": "2026-02-23T15:00:00Z",
   "articles": [
+    {
+      "title": "How a Groundbreaking Indigenous Treaty on Whales' Rights Could Change National Laws",
+      "url": "https://insideclimatenews.org/news/22022026/new-zealand-indigenous-whale-rights-declaration/",
+      "description": "The Hinemoana Halo treaty is reaching out to countries along whales' migratory routes through the Pacific—from the Cook Islands to Tonga, Hawaii and Alaska—to recognize whales as legal persons.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-22",
+      "source": "Inside Climate News"
+    },
+    {
+      "title": "Orcas Are Now Actively Targeting Boats—Here's Why",
+      "url": "https://www.animalsaroundtheglobe.com/orcas-are-now-actively-targeting-boatsheres-why-5-333192/",
+      "description": "Over the past few years, orcas off the Iberian Peninsula have been increasingly interacting with boats—not just swimming alongside them, but actively making contact, sometimes resulting in sinkings.",
+      "image": null,
+      "category": "species",
+      "date": "2026-02-21",
+      "source": "Animals Around The Globe"
+    },
+    {
+      "title": "Deceased Fin Whale Washes Up on Barnegat Light Beach",
+      "url": "https://www.aol.com/articles/deceased-fin-whale-washes-barnegat-173741818.html",
+      "description": "Scientists are investigating the remains of a deceased male fin whale discovered in the surf in Barnegat Light, New Jersey on Feb. 21.",
+      "image": null,
+      "category": "species",
+      "date": "2026-02-21",
+      "source": "AOL News"
+    },
+    {
+      "title": "Newborn Southern Resident Orca Calf Spotted Off Vancouver Island",
+      "url": "https://www.cp24.com/news/canada/2026/02/20/newborn-southern-resident-orca-calf-spotted-off-vancouver-island/",
+      "description": "Biologists with the Center for Whale Research have documented a new Southern Resident killer whale calf traveling with L pod in the Strait of Juan de Fuca.",
+      "image": null,
+      "category": "species",
+      "date": "2026-02-20",
+      "source": "CP24"
+    },
+    {
+      "title": "Satellite Imagery Shows Promise for Monitoring Beluga Whales in Winter",
+      "url": "https://www.mdpi.com/2077-1312/14/4/397",
+      "description": "New research explores the feasibility of using satellite imagery to monitor beluga whales during winter months when traditional survey methods are impossible.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-20",
+      "source": "Journal of Marine Science"
+    },
+    {
+      "title": "Whale Migration Season to Chile Highlights Threat from Ships and Nets",
+      "url": "https://www.reuters.com/business/environment/whale-migration-season-chile-underscores-threat-ships-nets-2026-02-19/",
+      "description": "Increased activity by fin whales along Chile's northern coast during feeding season is highlighting a growing threat of collisions with ships and fishing net entanglements.",
+      "image": null,
+      "category": "migration",
+      "date": "2026-02-19",
+      "source": "Reuters"
+    },
+    {
+      "title": "Go Slow, Whales Below: Molokai Urges Caution During Peak Season",
+      "url": "https://themolokaidispatch.com/go-slow-whales-below/",
+      "description": "Each winter, more than 10,000 humpback whales migrate from Alaska to Hawaii's warmer tropical waters. Molokai urges mariners to exercise caution during peak season.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-02-19",
+      "source": "The Molokai Dispatch"
+    },
+    {
+      "title": "Twelve-Year Tracking Suggests Killer Whales Do Not Always Drive Shark Disappearances",
+      "url": "https://phys.org/news/2026-02-twelve-year-tracking-killer-whales.html",
+      "description": "Long-term tracking study challenges the assumption that orca presence always causes sharks to flee, revealing more complex predator dynamics.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-18",
+      "source": "Phys.org"
+    },
+    {
+      "title": "Scientists Discover New Whale Highway After Tagging Pygmy Blue Whale by Drone",
+      "url": "https://news.mongabay.com/2026/02/scientists-discover-a-new-whale-highway-after-tagging-a-pygmy-blue-whale-by-drone/",
+      "description": "Indonesian scientists have attached a satellite tag onto an endangered pygmy blue whale for the first time by drone, revealing a new feeding site and previously unknown migration path.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-18",
+      "source": "Mongabay"
+    },
+    {
+      "title": "Whale Tales 2026 Opens at the Ritz-Carlton Maui",
+      "url": "https://www.mauinews.com/news/local-news/2026/02/whale-tales-2026-opens-today-at-the-ritz-carlton-maui-kapalua/",
+      "description": "Whale Tales 2026 runs February 19-23 in Kapalua and online, featuring the latest in whale research and conservation with both in-person and virtual attendance options.",
+      "image": null,
+      "category": "tourism",
+      "date": "2026-02-18",
+      "source": "Maui News"
+    },
+    {
+      "title": "Antarctic Type B Killer Whales Seen for First Time Near Australia's Bremer Bay",
+      "url": "https://www.abc.net.au/news/2026-02-16/visiting-orcas-steal-the-feed-of-local-killer-whales-in-wa/106345466",
+      "description": "A tour group has reported what could be the first sighting of a pod of Antarctic type B killer whales in Western Australia's Bremer Canyon—a rare occurrence in Australian waters.",
+      "image": null,
+      "category": "species",
+      "date": "2026-02-16",
+      "source": "ABC Australia"
+    },
+    {
+      "title": "Humpback Whales Make Early Return from Migration to Santa Barbara",
+      "url": "https://www.thecooldown.com/outdoors/humpback-whales-santa-barbara-early-return/",
+      "description": "Humpback whales appeared to make an early return from migration in February, with a captain in Santa Barbara capturing the moment on video and sparking excitement in the marine wildlife community.",
+      "image": null,
+      "category": "migration",
+      "date": "2026-02-16",
+      "source": "The Cool Down"
+    },
+    {
+      "title": "Climate Change Shifting Diets of Fin, Humpback, and Minke Whales",
+      "url": "https://www.thecooldown.com/outdoors/whale-diet-study-climate-change-impacts/",
+      "description": "A 28-year study published in Frontiers found that warming of the northern Atlantic Ocean is shifting the diets of fin, humpback, and minke whales.",
+      "image": null,
+      "category": "research",
+      "date": "2026-02-16",
+      "source": "The Cool Down"
+    },
     {
       "title": "NOAA to Change Whale Protections in Industry-Friendly Move",
       "url": "https://www.bostonherald.com/2026/02/15/noaa-to-change-whale-protections/",
@@ -315,87 +432,6 @@
       "category": "conservation",
       "date": "2026-01-30",
       "source": "KITV"
-    },
-    {
-      "title": "Rare Whale Placenta Found Floating in Hawaiian Waters",
-      "url": "https://www.discoverwildlife.com/animal-facts/marine-animals/whale-placenta-hawaii",
-      "description": "A 136kg whale placenta was discovered floating in Hawaiian waters — an incredibly rare find since they only remain on the surface briefly, making scientific collection almost impossible.",
-      "image": null,
-      "category": "research",
-      "date": "2026-01-29",
-      "source": "Discover Wildlife"
-    },
-    {
-      "title": "Entangled Right Whale Known for Cape Cod Canal Closure Dies",
-      "url": "https://www.capecodtimes.com/story/news/environment/2026/01/30/north-atlantic-right-whale-division-noaa-center-coastal-studies-cape-cod-ryan-schosberg-neaq/88435651007/",
-      "description": "Rescue teams up and down the East Coast worked for months to try to rescue this whale. Researchers say deaths can be reduced by adopting ropeless fishing gear.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-01-30",
-      "source": "Cape Cod Times"
-    },
-    {
-      "title": "The Complex Logistics of Moving 30 Beluga Whales",
-      "url": "https://www.theguardian.com/world/2026/jan/29/valium-health-checks-and-fabric-slings-the-complex-logistics-of-moving-30-beluga-whales",
-      "description": "When 30 beluga whales and four dolphins are moved from Canada's Marineland amusement park, the operation will be both a careful logistical feat and what former trainers say is a long overdue move.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-01-29",
-      "source": "The Guardian"
-    },
-    {
-      "title": "Boat Strikes Threaten Long Island Whales",
-      "url": "https://www.wshu.org/long-island-news/2026-01-29/boat-strikes-threaten-long-island-whales",
-      "description": "The top two threats facing whales off Long Island's coast are boat strikes and fishing nets, according to research by the Atlantic Marine Conservation Society.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-01-29",
-      "source": "WSHU"
-    },
-    {
-      "title": "Aquariums Save Beluga Whales from Threat of Euthanasia",
-      "url": "https://www.newsnationnow.com/animals/aquariums-save-beluga-whales-threat-euthanasia/",
-      "description": "Several aquariums have stepped in to rescue beluga whales that were facing potential euthanasia, providing them new homes and care.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-01-29",
-      "source": "NewsNation"
-    },
-    {
-      "title": "Oregon Implements New Rules for Crab Fishers to Reduce Whale Deaths",
-      "url": "https://www.opb.org/article/2026/01/28/oregon-dungeness-crab-fishing-season-whales/",
-      "description": "The Oregon Department of Fish and Wildlife is implementing temporary rule changes for Dungeness crab fishers to restrict gear and areas where fishing can occur.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-01-28",
-      "source": "OPB"
-    },
-    {
-      "title": "44-Year-Old Whale 'Slalom' Breaks Record with Seventh Calf",
-      "url": "https://www.moneycontrol.com/science/44-year-old-whale-slalom-breaks-15-year-old-record-with-its-seventh-calf-article-13794156.html",
-      "description": "A 44-year-old whale nicknamed 'Slalom' has given birth to her seventh calf, breaking a 15-year record for the species.",
-      "image": null,
-      "category": "research",
-      "date": "2026-01-28",
-      "source": "Money Control"
-    },
-    {
-      "title": "A North Atlantic Right Whale Baby Boom Is On, But the Species Remains at Risk",
-      "url": "https://www.wired.com/story/a-north-atlantic-right-whale-baby-boom-is-on-but-the-species-remains-at-risk/",
-      "description": "Researchers have documented nearly two dozen North Atlantic right whale calves this season. It's an encouraging sign for a species whose population is below 400.",
-      "image": null,
-      "category": "research",
-      "date": "2026-01-27",
-      "source": "Wired"
-    },
-    {
-      "title": "Canada's Marineland Whales Could Find New Homes in U.S.",
-      "url": "https://www.nytimes.com/2026/01/26/world/canada/canada-marineland-beluga-whales.html",
-      "description": "Canada's last captive whales have received a reprieve from death after the government conditionally approved a plan to export them to the United States.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-01-26",
-      "source": "New York Times"
     }
   ]
 }

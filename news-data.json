@@ -1,6 +1,132 @@
 {
-  "lastUpdated": "2026-03-02T14:00:00Z",
+  "lastUpdated": "2026-03-09T14:00:00Z",
   "articles": [
+    {
+      "title": "Scientists Spot Multiple Endangered Blue Whales in Southern New England Waters",
+      "url": "https://www.wbur.org/news/2026/03/06/blue-whales-new-england-spotted-canada-endangered",
+      "description": "Observers with New England Aquarium documented blue whales in their southern New England survey area for the first time—a rare sighting outside Canadian feeding grounds.",
+      "image": null,
+      "category": "research",
+      "date": "2026-03-06",
+      "source": "WBUR"
+    },
+    {
+      "title": "Trump Administration's Plan to Relax Right Whale Protections Raises Concerns",
+      "url": "https://thecurrentga.org/2026/03/06/trump-administrations-plan-to-relax-right-whale-protections-raises-concerns/",
+      "description": "The Trump administration announced plans to weaken regulations protecting endangered North Atlantic right whales, relying more heavily on technology to reduce vessel strikes.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-06",
+      "source": "The Current GA"
+    },
+    {
+      "title": "Festival of Whales Celebrates 55th Year at Dana Point Harbor",
+      "url": "https://danapointharbor.com/festival-of-whales-this-weekend-at-dana-point-harbor/",
+      "description": "Dana Point Harbor's annual Festival of Whales marks its 55th year with a three-day celebration of gray whale migration featuring parades, carnival activities, and whale watching.",
+      "image": null,
+      "category": "tourism",
+      "date": "2026-03-06",
+      "source": "Dana Point Harbor"
+    },
+    {
+      "title": "Are These Killer Whales Cannibals? Scientists Investigate Orca-on-Orca Predation",
+      "url": "https://nautil.us/are-killer-whales-also-cannibals-1278581",
+      "description": "Researchers found severed orca dorsal fins with jagged bite marks on a Russian beach, revealing evidence of killer whale-on-killer whale predation in the North Pacific.",
+      "image": null,
+      "category": "research",
+      "date": "2026-03-06",
+      "source": "Nautilus"
+    },
+    {
+      "title": "Whale Shark Swims 'Astounding' 1,200km from Madagascar to Seychelles",
+      "url": "https://www.discoverwildlife.com/animal-facts/marine-animals/whale-shark-madagascar-seychelles",
+      "description": "First documented instance of a whale shark making the journey from Madagascar to Seychelles, amid declining sightings in Madagascar and increasing sightings in the Seychelles.",
+      "image": null,
+      "category": "research",
+      "date": "2026-03-05",
+      "source": "Discover Wildlife"
+    },
+    {
+      "title": "Humpback Whale Recovery Is Changing Who Fathers the Calves",
+      "url": "https://www.sciencedaily.com/releases/2026/03/260305182700.htm",
+      "description": "As humpback whale populations recover from past whaling, older males are gaining a major advantage in reproduction—early in recovery, breeding groups were dominated by younger whales.",
+      "image": null,
+      "category": "research",
+      "date": "2026-03-05",
+      "source": "ScienceDaily"
+    },
+    {
+      "title": "Gray Whales Star at Festival of Whales, But Researchers Worry About Population",
+      "url": "https://www.ocregister.com/2026/03/05/gray-whales-are-stars-of-this-weekends-festival-of-whales-but-researchers-worry-about-the-population/",
+      "description": "The 52nd Festival of the Whales in Dana Point celebrates annual gray whale migration while researchers express concerns about population health.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-05",
+      "source": "OC Register"
+    },
+    {
+      "title": "Chewed-Up Orca Fins Point to Cannibalism, May Explain Pod Social Structure",
+      "url": "https://www.livescience.com/animals/orcas/chewed-up-orca-fins-on-russian-beach-point-to-cannibalism-and-scientists-say-it-may-explain-why-some-pods-are-so-tight-knit",
+      "description": "Researchers found orca dorsal fins with bite marks on a Russian beach in 2022 and 2024, suggesting cannibalism may explain why some orca pods stay in tight family groups.",
+      "image": null,
+      "category": "research",
+      "date": "2026-03-04",
+      "source": "Live Science"
+    },
+    {
+      "title": "NOAA Announces Planned Rollback of North Atlantic Right Whale Protections",
+      "url": "https://www.wgbh.org/news/local/2026-03-04/noaa-announces-planned-rollback-of-north-atlantic-right-whale-protections",
+      "description": "NOAA plans to roll back protections for North Atlantic right whales as part of ongoing deregulation efforts, citing economic impacts on coastal communities.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-04",
+      "source": "GBH"
+    },
+    {
+      "title": "NOAA Starts Rewriting Rules That Protect North Atlantic Right Whales",
+      "url": "https://www.eenews.net/articles/noaa-starts-rewriting-rules-that-protect-north-atlantic-right-whales/",
+      "description": "Oceanic speed limits protecting endangered North Atlantic right whales will likely be rewritten as NOAA seeks ideas to reduce boat-whale collisions while considering economic vitality.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-04",
+      "source": "E&E News"
+    },
+    {
+      "title": "Gulf Coast Whale Festival Spotlights Endangered Rice's Whale",
+      "url": "https://www.wuwf.org/local-news/2026-03-04/gulf-coast-whale-festival-returns-to-pensacola-with-spotlight-on-endangered-rices-whale",
+      "description": "The 2026 Gulf Coast Whale Festival in Pensacola features talks on the critically endangered Rice's whale, with fewer than 100 remaining in the Gulf of Mexico.",
+      "image": null,
+      "category": "tourism",
+      "date": "2026-03-04",
+      "source": "WUWF"
+    },
+    {
+      "title": "Feds Plan to Roll Back Speed Regulations That Protect Endangered Right Whales",
+      "url": "https://www.pressherald.com/2026/03/03/feds-plan-to-rollback-speed-regulations-that-protect-endangered-right-whales/",
+      "description": "Federal regulators plan to replace seasonal speed restrictions with technology-based strike-avoidance measures, though right whales have more calves than in recent seasons.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-03",
+      "source": "Press Herald"
+    },
+    {
+      "title": "North Atlantic Right Whale Detected Off Cape Ann, Slow Zone Enacted",
+      "url": "https://www.bostonglobe.com/2026/03/03/metro/north-atlantic-right-whale-detected-off-cape-ann/",
+      "description": "A Cape Ann buoy identified a right whale by its unique call, triggering a slow zone for large ships and sharing data with scientists for conservation measures.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-03",
+      "source": "Boston Globe"
+    },
+    {
+      "title": "Killer Whale Moms Struggle to Regain Body Fat with More Offspring",
+      "url": "https://www.cbc.ca/news/science/northern-resident-killer-whale-orca-mothers-9.7111707",
+      "description": "Canadian research on northern resident killer whales shows orca mothers struggle to regain body fat when they have more living offspring, even when food is plentiful.",
+      "image": null,
+      "category": "research",
+      "date": "2026-03-03",
+      "source": "CBC News"
+    },
     {
       "title": "Whale Entanglements in Fishing Gear Surge Off West Coast During Heat Waves",
       "url": "https://timesofsandiego.com/environment/2026/03/01/whale-entanglements-in-fishing-gear-surge-off-west-coast-during-heat-waves/",
@@ -49,7 +175,7 @@
     {
       "title": "Boats Are Reshaping the Lives of the Ocean's Largest Animals",
       "url": "https://www.earth.com/news/boats-are-reshaping-the-lives-of-the-oceans-largest-animals/",
-      "description": "A global study finds that everyday boat traffic can disrupt ocean animals like whales, sharks, and sea turtles — even without collisions.",
+      "description": "A global study finds that everyday boat traffic can disrupt ocean animals like whales, sharks, and sea turtles—even without collisions.",
       "image": null,
       "category": "research",
       "date": "2026-02-27",
@@ -58,7 +184,7 @@
     {
       "title": "All the Right Moves Needed to Save These Endangered Whales",
       "url": "https://ecori.org/all-the-right-moves-needed-to-save-these-endangered-whales/",
-      "description": "The first North Atlantic right whale death of 2026 was recorded — a 4-year-old male named Division died from fishing gear entanglement off North Carolina.",
+      "description": "The first North Atlantic right whale death of 2026 was recorded—a 4-year-old male named Division died from fishing gear entanglement off North Carolina.",
       "image": null,
       "category": "conservation",
       "date": "2026-02-25",
@@ -94,7 +220,7 @@
     {
       "title": "How a Groundbreaking Indigenous Treaty on Whales' Rights Could Change National Laws",
       "url": "https://insideclimatenews.org/news/22022026/new-zealand-indigenous-whale-rights-declaration/",
-      "description": "The Hinemoana Halo treaty is reaching out to countries along whales' migratory routes through the Pacific—from the Cook Islands to Tonga, Hawaii and Alaska—to recognize whales as legal persons.",
+      "description": "The Hinemoana Halo treaty reaches out to countries along whales' migratory routes—from Cook Islands to Tonga, Hawaii and Alaska—to recognize whales as legal persons.",
       "image": null,
       "category": "conservation",
       "date": "2026-02-22",
@@ -121,7 +247,7 @@
     {
       "title": "Newborn Southern Resident Orca Calf Spotted Off Vancouver Island",
       "url": "https://www.cp24.com/news/canada/2026/02/20/newborn-southern-resident-orca-calf-spotted-off-vancouver-island/",
-      "description": "Biologists with the Center for Whale Research have documented a new Southern Resident killer whale calf traveling with L pod in the Strait of Juan de Fuca.",
+      "description": "Biologists with the Center for Whale Research documented a new Southern Resident killer whale calf traveling with L pod in the Strait of Juan de Fuca.",
       "image": null,
       "category": "species",
       "date": "2026-02-20",
@@ -166,7 +292,7 @@
     {
       "title": "Scientists Discover New Whale Highway After Tagging Pygmy Blue Whale by Drone",
       "url": "https://news.mongabay.com/2026/02/scientists-discover-a-new-whale-highway-after-tagging-a-pygmy-blue-whale-by-drone/",
-      "description": "Indonesian scientists have attached a satellite tag onto an endangered pygmy blue whale for the first time by drone, revealing a new feeding site and previously unknown migration path.",
+      "description": "Indonesian scientists attached a satellite tag onto an endangered pygmy blue whale for the first time by drone, revealing a new feeding site and previously unknown migration path.",
       "image": null,
       "category": "research",
       "date": "2026-02-18",
@@ -184,7 +310,7 @@
     {
       "title": "Antarctic Type B Killer Whales Seen for First Time Near Australia's Bremer Bay",
       "url": "https://www.abc.net.au/news/2026-02-16/visiting-orcas-steal-the-feed-of-local-killer-whales-in-wa/106345466",
-      "description": "A tour group has reported what could be the first sighting of a pod of Antarctic type B killer whales in Western Australia's Bremer Canyon—a rare occurrence in Australian waters.",
+      "description": "A tour group reported what could be the first sighting of a pod of Antarctic type B killer whales in Western Australia's Bremer Canyon—a rare occurrence in Australian waters.",
       "image": null,
       "category": "species",
       "date": "2026-02-16",
@@ -245,7 +371,7 @@
       "source": "The Guardian"
     },
     {
-      "title": "Gray Whales Arriving Early in San Francisco Bay — Scientists Don't Know Why",
+      "title": "Gray Whales Arriving Early in San Francisco Bay—Scientists Don't Know Why",
       "url": "https://www.sfgate.com/local/article/gray-whale-sf-bay-21345537.php",
       "description": "Two gray whales have been spotted exploring San Francisco Bay unusually early in February 2026. The Marine Mammal Center's team used distinct markings to identify the individuals.",
       "image": null,
@@ -256,7 +382,7 @@
     {
       "title": "Underwater Mics and Machine Learning Aid Right Whale Conservation",
       "url": "https://www.sciencedaily.com/releases/2025/02/250221171337.htm",
-      "description": "Researchers have developed a new method using underwater microphones and machine learning to estimate North Atlantic right whale numbers — a safer and more cost-effective monitoring approach.",
+      "description": "Researchers developed a new method using underwater microphones and machine learning to estimate North Atlantic right whale numbers—a safer and more cost-effective monitoring approach.",
       "image": null,
       "category": "research",
       "date": "2026-02-11",
@@ -279,24 +405,6 @@
       "category": "research",
       "date": "2026-02-11",
       "source": "The Guardian"
-    },
-    {
-      "title": "Surprise Baby Whale Sightings Reveal There's Still Much to Learn About Humpbacks",
-      "url": "https://www.sciencedaily.com/releases/2025/05/250520012829.htm",
-      "description": "New study highlights the critical need for increased awareness to protect newborn humpback whales throughout their winter journey north — which can span more than 2,300 kilometers.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-11",
-      "source": "ScienceDaily"
-    },
-    {
-      "title": "New Research Uncovers Hidden Divide in West Coast Killer Whales",
-      "url": "https://www.sciencedaily.com/releases/2025/11/251120002604.htm",
-      "description": "Study reveals two distinct communities of transient killer whales on the West Coast inhabit very different worlds and lead distinctly different lives, with implications for conservation planning.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-11",
-      "source": "ScienceDaily"
     },
     {
       "title": "Bipartisan Whale CHARTS Act Introduced to Modernize Whale Detection",
@@ -333,114 +441,6 @@
       "category": "conservation",
       "date": "2026-02-07",
       "source": "CT Examiner"
-    },
-    {
-      "title": "'Go Slow–Whales Below' Initiative Launches for Peak Hawaiian Whale Season",
-      "url": "https://mauinow.com/2026/02/06/go-slow-whales-below-initiative-aims-for-boater-and-whale-safety-during-peak-winter-kohola-season/",
-      "description": "The 'Go Slow – Whales Below' initiative urges mariners to exercise caution as humpback whale season reaches its peak in Hawaiian waters, following the discovery of a whale calf with propeller injuries.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-06",
-      "source": "Maui Now"
-    },
-    {
-      "title": "Sound Reveals the Hidden Lives of Deep-Diving Whales",
-      "url": "https://www.earth.com/news/sound-reveals-the-hidden-lives-of-deep-diving-whales/",
-      "description": "Scientists used underwater sound recordings to reconstruct 3D dive and hunting behavior of elusive beaked whales in the Gulf of Mexico.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-06",
-      "source": "Earth.com"
-    },
-    {
-      "title": "Right Whale Calves Return in Unusual Numbers",
-      "url": "https://www.nationalfisherman.com/right-whale-calves-return-in-unusual-numbers",
-      "description": "Researchers surveying the Southeastern U.S. coast this winter have documented 21 North Atlantic right whale calves, offering a rare bright spot for one of the most endangered species.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-05",
-      "source": "National Fisherman"
-    },
-    {
-      "title": "French Carrier CMA CGM Supports Right Whale Conservation Research",
-      "url": "https://www.capeandislands.org/local-news/2026-02-05/french-carrier-supports-right-whale-conservation-other-whoi-research",
-      "description": "French shipping company CMA CGM supports WHOI acoustic monitoring that alerts mariners to slow down when right whales are detected in shipping lanes.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-05",
-      "source": "Cape & Islands"
-    },
-    {
-      "title": "Indigenous Leaders Release Treaty Recognizing Whales as Legal Persons",
-      "url": "https://insideclimatenews.org/news/05022026/maori-scientist-daniel-hikuroa-legal-rights-of-whales/",
-      "description": "Indigenous leaders from across Polynesia released landmark treaty text recognizing whales as legal persons and ancestral beings, potentially reshaping global ocean governance.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-05",
-      "source": "Inside Climate News"
-    },
-    {
-      "title": "Whale Sharks Released from Nets as Indian Fishers Turn Rescuers",
-      "url": "https://news.mongabay.com/2026/02/whale-sharks-released-from-nets-along-indias-coast-as-fishers-turn-rescuers/",
-      "description": "Over a thousand whale sharks have been rescued along India's west coast as fishers voluntarily cut their nets to free trapped sharks in this community-driven conservation movement.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-04",
-      "source": "Mongabay"
-    },
-    {
-      "title": "A Hopeful Season: 22 North Atlantic Right Whale Calves Documented",
-      "url": "https://www.ifaw.org/international/journal/hopeful-season-for-north-atlantic-right-whales",
-      "description": "Researchers have documented 22 North Atlantic right whale calves this season — the highest total in 15 years, offering hope for the critically endangered species.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-04",
-      "source": "IFAW"
-    },
-    {
-      "title": "Humpbacks 'Mug' Whale Watchers Off Maui in Close Encounter",
-      "url": "https://www.hawaiinewsnow.com/2026/02/04/humpbacks-mug-whale-watchers-off-maui/",
-      "description": "A lucky group of whale watchers off Maui got an incredible close encounter when a pair of curious humpback whales approached their boat on its way to Molokini Crater.",
-      "image": null,
-      "category": "tourism",
-      "date": "2026-02-03",
-      "source": "Hawaii News Now"
-    },
-    {
-      "title": "Humpback Whales Confirm Stunning Comeback: 'We See Them Almost Every Day'",
-      "url": "https://www.thecooldown.com/outdoors/humpback-whales-comeback-ocean-restoration/",
-      "description": "Humpback whales appear to be making a remarkable comeback thanks to their dietary flexibility, according to a new study published in Marine Mammal Science.",
-      "image": null,
-      "category": "species",
-      "date": "2026-02-03",
-      "source": "The Cool Down"
-    },
-    {
-      "title": "Right Whale and Calf Sighting Caught on Video Off Boca Grande, Florida",
-      "url": "https://eu.news-press.com/story/news/environment/2026/02/03/right-whale-calf-sighting-gulf-florida-boca-grande-video/88474960007/",
-      "description": "The Florida Fish and Wildlife Conservation Commission aerial survey team captured video of right whale 'Millipede' and her new calf approximately 5 miles east of the St. Johns River entrance.",
-      "image": null,
-      "category": "species",
-      "date": "2026-02-03",
-      "source": "News-Press"
-    },
-    {
-      "title": "As the Arctic Grows Noisier, Narwhals Are Becoming Quieter",
-      "url": "https://insideclimatenews.org/news/02022026/as-the-arctic-grows-noisier-narwhals-are-becoming-quieter/",
-      "description": "Underwater noise pollution is forcing narwhals to reduce their vocalizations, contributing to serious impacts on the Arctic ecosystem according to Ocean Conservancy researchers.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-02",
-      "source": "Inside Climate News"
-    },
-    {
-      "title": "Critically Endangered Right Whale Found Dead Off North Carolina Coast",
-      "url": "https://coastalreview.org/2026/01/critically-endangered-right-whale-found-dead-off-nc-coast/",
-      "description": "The carcass of a critically endangered North Atlantic right whale was spotted about 25 miles offshore of Avon on Jan. 27, following months of failed rescue efforts after entanglement.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-02",
-      "source": "Coastal Review"
     }
   ]
 }

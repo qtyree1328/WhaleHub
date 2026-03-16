@@ -1,6 +1,87 @@
 {
-  "lastUpdated": "2026-03-09T14:00:00Z",
+  "lastUpdated": "2026-03-16T14:00:00Z",
   "articles": [
+    {
+      "title": "Mass Pilot Whale Stranding in Indonesia Raises Questions About Ocean Health",
+      "url": "https://news.mongabay.com/short-article/2026/03/mass-pilot-whale-stranding-in-indonesia-raises-questions-about-ocean-health/",
+      "description": "Villagers in central Indonesia rescued 34 short-finned pilot whales following a mass stranding on March 9, but were unable to save 21 others despite overnight efforts.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-14",
+      "source": "Mongabay"
+    },
+    {
+      "title": "Endangered North Atlantic Right Whale Spotting Prompts Boating Restrictions",
+      "url": "https://www.yahoo.com/news/articles/endangered-north-atlantic-whale-spotting-035027535.html",
+      "description": "Three potential mothers of the endangered North Atlantic right whale were spotted off the coast of the Carolinas, triggering vessel speed restrictions along the East Coast.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-12",
+      "source": "Yahoo News"
+    },
+    {
+      "title": "Belugas Facing Euthanasia at Shuttered Canada Theme Park May Find US Homes",
+      "url": "https://news.mongabay.com/2026/03/belugas-facing-euthanasia-at-shuttered-canada-theme-park-may-find-new-homes-in-us/",
+      "description": "After Marineland's closure, remaining beluga whales may be relocated to US facilities rather than face euthanasia or sale to China.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-12",
+      "source": "Mongabay"
+    },
+    {
+      "title": "NOAA Fisheries Considers Changing Right Whale Protections",
+      "url": "https://coastalreview.org/2026/03/noaa-fisheries-considers-changing-right-whale-protections/",
+      "description": "As more than 20 North Atlantic right whale mother and calf pairs prepare to migrate up the US Atlantic Coast, the Trump administration is considering rolling back protections.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-11",
+      "source": "Coastal Review"
+    },
+    {
+      "title": "NOAA Considering Changes to Ship Speed Rules to Protect Endangered Whales",
+      "url": "https://www.whro.org/environment/2026-03-11/noaa-considering-changes-to-ship-speed-rules-meant-to-protect-endangered-whales",
+      "description": "NOAA seeks information about ways to reduce regulatory burdens while ensuring responsible conservation practices for North Atlantic right whales.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-11",
+      "source": "WHRO"
+    },
+    {
+      "title": "Whales Are Recovering From Whaling—Can They Keep Up With Climate Change?",
+      "url": "https://climateages.substack.com/p/whales-are-recovering-from-whaling",
+      "description": "In some regions, whales are returning to the oceans. Researchers track their movements with satellite tags and acoustic monitoring as populations rebuild.",
+      "image": null,
+      "category": "research",
+      "date": "2026-03-11",
+      "source": "Climate Ages"
+    },
+    {
+      "title": "Rare Blue Whale with Albinism Spotted in Mexico in 'Unprecedented Milestone'",
+      "url": "https://people.com/rare-blue-whale-with-albinism-spotted-in-unprecedented-milestone-11923288",
+      "description": "A rare blue whale with albinism was spotted off the coast of Mexico. The National Commission for Natural Protected Areas confirmed this unprecedented discovery.",
+      "image": null,
+      "category": "species",
+      "date": "2026-03-10",
+      "source": "People"
+    },
+    {
+      "title": "Pilot Whale Strands Along Southwest Florida Coast",
+      "url": "https://eu.naplesnews.com/story/news/environment/2026/03/09/how-did-a-whale-make-landfall-in-the-naples-area-of-the-gulf/89070788007/",
+      "description": "A pilot whale stranded in the Naples area was euthanized, the Florida Fish and Wildlife Conservation Commission confirmed.",
+      "image": null,
+      "category": "species",
+      "date": "2026-03-10",
+      "source": "Naples News"
+    },
+    {
+      "title": "Volunteers Needed as More Whales and Dolphins Strand Alive in UK",
+      "url": "https://www.bbc.com/news/articles/cqlg4vl61kro",
+      "description": "More volunteers are being recruited to help rescue a growing number of whales, dolphins and porpoises washing up on UK shores.",
+      "image": null,
+      "category": "conservation",
+      "date": "2026-03-09",
+      "source": "BBC"
+    },
     {
       "title": "Scientists Spot Multiple Endangered Blue Whales in Southern New England Waters",
       "url": "https://www.wbur.org/news/2026/03/06/blue-whales-new-england-spotted-canada-endangered",
@@ -351,96 +432,6 @@
       "category": "conservation",
       "date": "2026-02-14",
       "source": "AP News"
-    },
-    {
-      "title": "First 2026 Whale Count Shows Slight Dip in Humpbacks",
-      "url": "https://www.kitv.com/news/first-2026-whale-count-shows-slight-dip-in-humpbacks/article_a9758e67-a1e0-42db-8b3f-3591a0ed73ff.html",
-      "description": "The first whale count of 2026 tallied 1,954 humpback whales statewide in Hawaii, according to organizers with the Hawaiian Islands Humpback Whale National Marine Sanctuary.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-13",
-      "source": "KITV Hawaii"
-    },
-    {
-      "title": "The Race to Save Wikie and Keijo: Mother and Son Orcas Left in Shut-Down Aquarium",
-      "url": "https://www.theguardian.com/environment/2026/feb/12/orcas-france-aquarium-marineland-antibes-killer-whales-wikie-keijo-animal-welfare",
-      "description": "The Whale Sanctuary Project presents its plan for two orcas stranded at France's closed Marineland aquarium, facing resistance from animal welfare groups and the park's owner.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-12",
-      "source": "The Guardian"
-    },
-    {
-      "title": "Gray Whales Arriving Early in San Francisco Bay—Scientists Don't Know Why",
-      "url": "https://www.sfgate.com/local/article/gray-whale-sf-bay-21345537.php",
-      "description": "Two gray whales have been spotted exploring San Francisco Bay unusually early in February 2026. The Marine Mammal Center's team used distinct markings to identify the individuals.",
-      "image": null,
-      "category": "migration",
-      "date": "2026-02-11",
-      "source": "SFGate"
-    },
-    {
-      "title": "Underwater Mics and Machine Learning Aid Right Whale Conservation",
-      "url": "https://www.sciencedaily.com/releases/2025/02/250221171337.htm",
-      "description": "Researchers developed a new method using underwater microphones and machine learning to estimate North Atlantic right whale numbers—a safer and more cost-effective monitoring approach.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-11",
-      "source": "ScienceDaily"
-    },
-    {
-      "title": "Scientists Harness AI to Help Protect Whales Along Atlantic Coast",
-      "url": "https://www.sciencedaily.com/releases/2025/02/250211134456.htm",
-      "description": "Rutgers University researchers developed an AI tool to predict endangered whale habitat, guiding ships along the Atlantic coast to avoid deadly collisions and inform conservation strategies.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-11",
-      "source": "ScienceDaily"
-    },
-    {
-      "title": "Climate Crisis Linked to Fall in Southern Right Whale Birth Rates",
-      "url": "https://www.theguardian.com/environment/2026/feb/11/climate-crisis-southern-right-whale-birth-rates",
-      "description": "Researchers warn that declining birth rates in southern right whales across South America and South Africa signal how climate change affects krill-dependent marine life.",
-      "image": null,
-      "category": "research",
-      "date": "2026-02-11",
-      "source": "The Guardian"
-    },
-    {
-      "title": "Bipartisan Whale CHARTS Act Introduced to Modernize Whale Detection",
-      "url": "https://ecomagazine.com/news/policy/introduced-legislation-to-modernize-whale-habitat-mapping-detection-tools/",
-      "description": "Bipartisan legislation directs NOAA to improve whale habitat maps and develop near-real time whale detection technologies to help prevent deadly ship collisions.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-10",
-      "source": "ECO Magazine"
-    },
-    {
-      "title": "Maldives Launches Tech4Nature Project to Safeguard Whale Sharks",
-      "url": "https://www.prnewswire.com/news-releases/maldives-launches-tech4nature-project-to-safeguard-iconic-whale-sharks-302683552.html",
-      "description": "IUCN, Maldives government, and Huawei launch initiative to modernize management of South Ari Marine Protected Area using real-time monitoring technology to protect whale sharks.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-10",
-      "source": "PR Newswire"
-    },
-    {
-      "title": "Endangered Whales at Risk After Trump Ends Cape Cod Sanctuary Fishing Ban",
-      "url": "https://www.masslive.com/politics/2026/02/endangered-whales-at-risk-after-trump-ends-cape-cod-sanctuarys-fishing-ban-ne-aquarium-warns.html",
-      "description": "The New England Aquarium warns that lifting the commercial fishing ban for a marine national monument off Cape Cod threatens endangered whales and the ecosystem.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-08",
-      "source": "MassLive"
-    },
-    {
-      "title": "Rice's Whales: Connecticut's Responsibility and the Cost of Letting Extinction Happen",
-      "url": "https://ctexaminer.com/2026/02/07/rices-whales-connecticuts-responsibility-and-the-cost-of-letting-extinction-happen/",
-      "description": "With fewer than 100 Rice's whales remaining in the Gulf of Mexico—likely closer to 50—this species faces extinction as a policy choice unfolding in real time.",
-      "image": null,
-      "category": "conservation",
-      "date": "2026-02-07",
-      "source": "CT Examiner"
     }
   ]
 }
